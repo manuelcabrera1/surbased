@@ -7,6 +7,7 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
+import 'package:surbased/src/user/application/user_profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,13 +35,28 @@ class _HomePageState extends State<HomePage> {
     final role = authProvider.userRole;
 
     // Páginas para participantes
-    final participantPages = [const SurveyList(), const RegisterPage()];
+    final participantPages = [
+      const SurveyList(),
+      const RegisterPage(),
+      const UserProfile(),
+      const UserProfile()
+    ];
 
     // Páginas para investigadores
-    final researcherPages = [const SurveyList(), const SurveyCreatePage()];
+    final researcherPages = [
+      const SurveyList(),
+      const SurveyCreatePage(),
+      const UserProfile(),
+      const UserProfile()
+    ];
 
     // Páginas para administradores
-    final adminPages = [const LoginPage(), const RegisterPage()];
+    final adminPages = [
+      const LoginPage(),
+      const RegisterPage(),
+      const UserProfile(),
+      const UserProfile()
+    ];
 
     // Seleccionar las páginas según el rol
     final pages = switch (role) {
@@ -53,9 +69,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: pages as List<Widget>,
+        children: pages,
       ),
-      floatingActionButton: role == 'researcher' && _currentIndex == 1
+      floatingActionButton: role == 'researcher' && _currentIndex == 0
           ? FloatingActionButton(
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.surveyCreate),

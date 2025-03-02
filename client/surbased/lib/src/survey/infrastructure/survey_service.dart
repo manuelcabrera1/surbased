@@ -8,8 +8,9 @@ class SurveyService {
   Future<Map<String, dynamic>> getSurveys(
       String token, String? category) async {
     try {
+      final existingCategory = category != null ? '?category=$category' : '';
       final response = await http
-          .get(Uri.parse('$_baseUrl/surveys?category=$category'), headers: {
+          .get(Uri.parse('$_baseUrl/surveys$existingCategory'), headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });

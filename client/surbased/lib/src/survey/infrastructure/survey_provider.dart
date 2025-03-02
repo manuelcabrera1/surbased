@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/infrastructure/survey_service.dart';
 
@@ -19,6 +17,7 @@ class SurveyProvider extends ChangeNotifier {
     try {
       _error = null;
       _isLoading = true;
+      notifyListeners();
       late Map<String, dynamic> getSurveysResponse;
 
       if (userRole == 'researcher') {

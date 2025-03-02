@@ -17,6 +17,7 @@ class AuthProvider with ChangeNotifier {
   String? get token => _token;
   String? get error => _error;
   bool get isLoading => _isLoading;
+  User? get user => _user;
   String? get userId => _user?.id;
   String? get userRole => _user?.role;
 
@@ -72,6 +73,7 @@ class AuthProvider with ChangeNotifier {
     _error = null;
     _isLoading = true;
     String defaultRole = 'participant';
+    notifyListeners();
 
     try {
       final registerResponse = await _authService.register(name, lastname,

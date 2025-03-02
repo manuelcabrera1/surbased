@@ -4,12 +4,18 @@ import 'package:surbased/src/survey/domain/survey_model.dart';
 class SurveyCard extends StatelessWidget {
   final Survey survey;
   final VoidCallback onTap;
+  final String userRole;
 
   const SurveyCard({
     super.key,
     required this.survey,
     required this.onTap,
+    required this.userRole,
   });
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,11 @@ class SurveyCard extends StatelessWidget {
 
     return Card(
       child: InkWell(
-        onTap: survey.startDate!.isBefore(DateTime.now()) ? onTap : null,
+        onTap: userRole == 'participant'
+            ? survey.startDate!.isBefore(DateTime.now())
+                ? onTap
+                : null
+            : onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -55,11 +65,14 @@ class SurveyCard extends StatelessWidget {
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  survey.endDate != null &&
-                          survey.startDate!.isBefore(DateTime.now())
-                      ? Icon(Icons.lock_outline,
-                          size: 25, color: theme.colorScheme.onSurface)
-                      : Icon(Icons.lock_open_outlined,
+                  userRole == 'participant'
+                      ? survey.endDate != null &&
+                              survey.startDate!.isBefore(DateTime.now())
+                          ? Icon(Icons.lock_outline,
+                              size: 25, color: theme.colorScheme.onSurface)
+                          : Icon(Icons.lock_open_outlined,
+                              size: 25, color: theme.colorScheme.onSurface)
+                      : Icon(Icons.arrow_forward_ios_rounded,
                           size: 25, color: theme.colorScheme.onSurface),
                 ],
               ),
@@ -68,9 +81,5 @@ class SurveyCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 }
