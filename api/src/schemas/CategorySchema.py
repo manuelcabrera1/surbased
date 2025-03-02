@@ -1,0 +1,22 @@
+from typing import List
+import uuid
+from pydantic import BaseModel, Field
+
+class CategoryBase(BaseModel):
+    name: str
+    organization_id: uuid.UUID
+
+    class Config:
+        from_attributes = True
+
+class CategoryCreate(CategoryBase):...
+    
+
+class CategoryUpdate(CategoryBase):...
+
+class CategoryResponse(CategoryBase):
+    id: uuid.UUID
+
+class CategoryResponseWithLength(BaseModel):
+    categories: List[CategoryResponse]
+    length: int

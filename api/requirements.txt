@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+pydantic[email]
+python-multipart
+python-jose
+python-dotenv
+bcrypt
+sqlalchemy[asyncio]
+typing
+asyncpg
