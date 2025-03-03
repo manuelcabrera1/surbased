@@ -21,9 +21,29 @@ class AppTheme {
   static ThemeData theme() {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryBlue,
+      colorScheme: ColorScheme(
         brightness: Brightness.light,
+        primary: primaryBlue,
+        onPrimary: pureWhite,
+        primaryContainer: lightBlue,
+        onPrimaryContainer: primaryBlue,
+        secondary: secondaryBlue,
+        onSecondary: pureWhite,
+        secondaryContainer: lightBlue.withOpacity(0.5),
+        onSecondaryContainer: secondaryBlue,
+        tertiary: blackText.withOpacity(0.9),
+        onTertiary: pureWhite,
+        tertiaryContainer: lightBlue.withOpacity(0.3),
+        onTertiaryContainer: accentBlue,
+        error: Colors.red,
+        onError: pureWhite,
+        errorContainer: Colors.red.withOpacity(0.1),
+        onErrorContainer: Colors.red,
+        surface: pureWhite,
+        onSurface: darkText,
+        onSurfaceVariant: greyText,
+        outline: primaryBlue.withOpacity(0.2),
+        shadow: Colors.black.withOpacity(0.1),
       ),
 
       scaffoldBackgroundColor: offWhite,

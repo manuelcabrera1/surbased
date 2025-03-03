@@ -7,7 +7,7 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
-import 'package:surbased/src/user/application/user_profile.dart';
+import 'package:surbased/src/user/application/widgets/user_profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,63 +29,80 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> _onDestinationSelected(int index) async {
+    if (mounted) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final role = authProvider.userRole;
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final role = authProvider.userRole;
 
-    // Páginas para participantes
-    final participantPages = [
-      const SurveyList(),
-      const RegisterPage(),
-      const UserProfile(),
-      const UserProfile()
-    ];
+        // Si el usuario no está autenticado o el rol es null, mostramos un indicador de carga
+        if (!authProvider.isAuthenticated || role == null) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
-    // Páginas para investigadores
-    final researcherPages = [
-      const SurveyList(),
-      const SurveyCreatePage(),
-      const UserProfile(),
-      const UserProfile()
-    ];
+        // Páginas para participantes
+        final participantPages = [
+          const SurveyList(),
+          const RegisterPage(),
+          const UserProfile(),
+          const UserProfile()
+        ];
 
-    // Páginas para administradores
-    final adminPages = [
-      const LoginPage(),
-      const RegisterPage(),
-      const UserProfile(),
-      const UserProfile()
-    ];
+        // Páginas para investigadores
+        final researcherPages = [
+          const SurveyList(),
+          const SurveyCreatePage(),
+          const UserProfile(),
+          const UserProfile()
+        ];
 
-    // Seleccionar las páginas según el rol
-    final pages = switch (role) {
-      'participant' => participantPages,
-      'researcher' => researcherPages,
-      'admin' => adminPages,
-      _ => participantPages, // Por defecto, mostrar páginas de participante
-    };
+        // Páginas para administradores
+        final adminPages = [
+          const LoginPage(),
+          const RegisterPage(),
+          const UserProfile(),
+          const UserProfile()
+        ];
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
-      ),
-      floatingActionButton: role == 'researcher' && _currentIndex == 0
-          ? FloatingActionButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, AppRoutes.surveyCreate),
-              child: const Icon(Icons.add),
-            )
-          : null,
-      bottomNavigationBar: CustomNavigationBar(
-        currentIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+        // Seleccionar las páginas según el rol
+        final pages = switch (role) {
+          'participant' => participantPages,
+          'researcher' => researcherPages,
+          'admin' => adminPages,
+          _ => participantPages, // Por defecto, mostrar páginas de participante
+        };
+
+        return Scaffold(
+          body: IndexedStack(
+            index: _currentIndex,
+            children: pages,
+          ),
+          floatingActionButton: role == 'researcher' && _currentIndex == 0
+              ? FloatingActionButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, AppRoutes.surveyCreate),
+                  child: const Icon(Icons.add),
+                )
+              : null,
+          bottomNavigationBar: CustomNavigationBar(
+            currentIndex: _currentIndex,
+            onDestinationSelected: _onDestinationSelected,
+          ),
+        );
+      },
     );
   }
 }

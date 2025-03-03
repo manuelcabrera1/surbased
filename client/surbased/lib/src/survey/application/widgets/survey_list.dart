@@ -13,13 +13,37 @@ class SurveyList extends StatefulWidget {
 }
 
 class _SurveyListState extends State<SurveyList> {
+  bool _isInitialized = false;
+
   @override
-  void initState() {
-    super.initState();
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
-    surveyProvider.getSurveys(authProvider.userId!, authProvider.userRole!,
-        authProvider.token!, null);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Solo cargar las encuestas una vez
+    if (!_isInitialized) {
+      _isInitialized = true;
+
+      // Usar addPostFrameCallback para asegurarnos de que el build ha terminado
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
+          if (authProvider.isAuthenticated &&
+              authProvider.userId != null &&
+              authProvider.userRole != null &&
+              authProvider.token != null) {
+            final surveyProvider =
+                Provider.of<SurveyProvider>(context, listen: false);
+            surveyProvider.getSurveys(
+              authProvider.userId!,
+              authProvider.userRole!,
+              authProvider.token!,
+              null,
+            );
+          }
+        }
+      });
+    }
   }
 
   @override

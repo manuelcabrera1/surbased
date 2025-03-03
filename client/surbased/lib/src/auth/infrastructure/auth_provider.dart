@@ -101,14 +101,23 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      await _authService.logout();
-      _isAuthenticated = false;
-      _token = null;
+      await _clearAuthState();
       notifyListeners();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
       throw Exception(_error);
     }
+  }
+
+  Future<void> _clearAuthState() async {
+    _isAuthenticated = false;
+    _token = null;
+    _user = null;
+    _error = null;
+    _isLoading = false;
+
+    final prefs = await _prefs;
+    await prefs.clear();
   }
 }
