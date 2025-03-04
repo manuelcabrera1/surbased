@@ -118,8 +118,10 @@ async def get_user_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_d
             
     
 
-@user_router.put("/users/{id}", status_code=201, response_model=UserResponse, dependencies=[Depends(check_current_user)])
-async def update_user(id: uuid.UUID, user: UserUpdateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+@user_router.put("/users/{id}", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
+async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], user: UserUpdateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
@@ -136,12 +138,28 @@ async def update_user(id: uuid.UUID, user: UserUpdateRequest, db: Annotated[Asyn
             if result3.scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
             
-        
-        await db.execute(update(User).where(User.id == id).values(user.model_dump()))
-        await db.commit()
+        if current_user.role == "admin":
+            await db.execute(update(User).where(User.id == id).values(user.model_dump()))
+            await db.commit()
+        else:
+            await db.execute(update(User).where(User.id == id).values(email= user.email, name= user.name, lastname= user.lastname, birthdate= user.birthdate))
+            await db.commit()
 
 
         return existing_user
+
+@user_router.put("/users/change-password", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
+async def update_password(current_user: Annotated[User, Depends(get_current_user)], password: str, db: Annotated[AsyncSession, Depends(get_db)]):
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        await db.execute(update(User).where(User.id == current_user.id).values(password=hashed_password))
+        await db.commit()
+
+        return current_user
 
 
 
