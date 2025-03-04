@@ -120,4 +120,9 @@ class AuthProvider with ChangeNotifier {
     final prefs = await _prefs;
     await prefs.clear();
   }
+
+  void refreshUser(User user) {
+    _user = user;
+    notifyListeners();
+  }
 }

@@ -46,6 +46,11 @@ class _SurveyListState extends State<SurveyList> {
     }
   }
 
+  void disponse() {
+    super.dispose();
+    _isInitialized = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -65,38 +70,40 @@ class _SurveyListState extends State<SurveyList> {
               style: theme.textTheme.bodyMedium,
             ),
           )
-        : Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 60),
-                Padding(
-                  padding: const EdgeInsets.only(left: 25),
-                  child: Text(
-                    'Surveys',
-                    style: theme.textTheme.displayMedium,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    itemCount: surveyProvider.surveys.length,
-                    itemBuilder: (context, index) => SurveyCard(
-                      userRole: userRole,
-                      survey: surveyProvider.surveys[index],
-                      onTap: () => userRole == 'researcher'
-                          ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
-                              arguments: surveyProvider.surveys[index])
-                          : Navigator.pushNamed(
-                              context, AppRoutes.surveyComplete,
-                              arguments: surveyProvider.surveys[index]),
+        : SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child: Text(
+                      'Surveys',
+                      style: theme.textTheme.displayMedium,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 30),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      itemCount: surveyProvider.surveys.length,
+                      itemBuilder: (context, index) => SurveyCard(
+                        userRole: userRole,
+                        survey: surveyProvider.surveys[index],
+                        onTap: () => userRole == 'researcher'
+                            ? Navigator.pushNamed(
+                                context, AppRoutes.surveyDetail,
+                                arguments: surveyProvider.surveys[index])
+                            : Navigator.pushNamed(
+                                context, AppRoutes.surveyComplete,
+                                arguments: surveyProvider.surveys[index]),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
   }

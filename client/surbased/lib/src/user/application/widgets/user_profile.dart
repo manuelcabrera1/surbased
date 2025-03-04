@@ -68,10 +68,10 @@ class _UserProfileState extends State<UserProfile> {
     final organizationProvider = Provider.of<OrganizationProvider>(context);
 
     final accountSettings = {
-      'Personal Information': () {
+      'Edit Profile': () {
         Navigator.pushNamed(context, AppRoutes.userEditInfo);
       },
-      'Password Settings': () {
+      'Change Password': () {
         Navigator.pushNamed(context, AppRoutes.userEditPassword);
       },
       'Notifications': () {
@@ -91,82 +91,84 @@ class _UserProfileState extends State<UserProfile> {
     };
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 25),
-                  child: Text('Profile', style: theme.textTheme.displayMedium),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child:
+                        Text('Profile', style: theme.textTheme.displayMedium),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 35),
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.account_circle,
-                      size: 130,
-                    ),
-                    const SizedBox(height: 8),
-                    user != null && user.name != null
-                        ? Text(
-                            user.name!,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
-                              letterSpacing: 0.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        : const SizedBox.shrink(),
-                    const SizedBox(height: 5),
-                    if (organizationProvider.isLoading)
-                      const CircularProgressIndicator(strokeWidth: 2)
-                    else if (organizationProvider.organization != null)
-                      Text(
-                        organizationProvider.organization?.name ?? '',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 18,
-                        ),
-                        textAlign: TextAlign.center,
+                const SizedBox(height: 35),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.account_circle,
+                        size: 130,
                       ),
-                    //const SizedBox(height: 4),
-                    user != null
-                        ? Text(
-                            user.email,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontSize: 16,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              UserSettingsSection(
-                  title: 'Account Settings', items: accountSettings),
-              const SizedBox(height: 20),
-              UserSettingsSection(
-                  title: 'Appearance', items: appearanceSettings),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: TextButton(
-                      onPressed: _logout,
-                      child: Text('Logout',
+                      const SizedBox(height: 8),
+                      user != null && user.name != null
+                          ? Text(
+                              user.name!,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                                letterSpacing: 0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                          : const SizedBox.shrink(),
+                      const SizedBox(height: 5),
+                      if (organizationProvider.isLoading)
+                        const CircularProgressIndicator(strokeWidth: 2)
+                      else if (organizationProvider.organization != null)
+                        Text(
+                          organizationProvider.organization?.name ?? '',
                           style: theme.textTheme.titleMedium?.copyWith(
-                              color: theme.colorScheme.error,
-                              fontWeight: FontWeight.bold))),
+                            fontSize: 18,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      //const SizedBox(height: 4),
+                      user != null
+                          ? Text(
+                              user.email,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontSize: 16,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
                 ),
-              )
-            ],
+                const SizedBox(height: 30),
+                UserSettingsSection(
+                    title: 'Account Settings', items: accountSettings),
+                const SizedBox(height: 20),
+                UserSettingsSection(
+                    title: 'Appearance', items: appearanceSettings),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: TextButton(
+                        onPressed: _logout,
+                        child: Text('Logout',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.error,
+                                fontWeight: FontWeight.bold))),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
