@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
-import 'package:surbased/src/user/application/user_profile.dart';
+import 'package:surbased/src/user/application/widgets/user_profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,10 +29,28 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> _onDestinationSelected(int index) async {
+    if (mounted) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final role = authProvider.userRole;
+
+    // Si el usuario no está autenticado o el rol es null, mostramos un indicador de carga
+    if (!authProvider.isAuthenticated || role == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     // Páginas para participantes
     final participantPages = [
@@ -80,11 +98,7 @@ class _HomePageState extends State<HomePage> {
           : null,
       bottomNavigationBar: CustomNavigationBar(
         currentIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onDestinationSelected: _onDestinationSelected,
       ),
     );
   }

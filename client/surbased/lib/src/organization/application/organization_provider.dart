@@ -12,6 +12,13 @@ class OrganizationProvider with ChangeNotifier {
   String? get error => _error;
   Organization? get organization => _organization;
 
+  void clearState() {
+    _organization = null;
+    _error = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> getOrganizationById(String id, String token) async {
     _error = null;
     _isLoading = true;

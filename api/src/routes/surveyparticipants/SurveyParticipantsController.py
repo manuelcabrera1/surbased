@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, select, update
@@ -61,12 +62,14 @@ async def get_all_participant_surveys(id: uuid.UUID, current_user: Annotated[Use
                 result = await db.execute(select(Survey).join(survey_participant).join(User).where(and_(User.id == id, 
                                                                                                     Survey.id == survey_participant.c.survey_id, 
                                                                                                     Survey.category_id == category,
+                                                                                                    Survey.end_date >= datetime.now(),
                                                                                                     User.id == survey_participant.c.participant_id,
                                                                                                     User.organization_id == current_user.organization_id, User.role == "participant")))
             else:
                 result = await db.execute(select(Survey).join(survey_participant).join(User).where(and_(User.id == id,
                                                                                                     Survey.id == survey_participant.c.survey_id, 
                                                                                                     User.id == survey_participant.c.participant_id,
+                                                                                                    Survey.end_date >= datetime.now(),
                                                                                                     User.organization_id == current_user.organization_id, User.role == "participant")))
         
         surveys = result.scalars().all()

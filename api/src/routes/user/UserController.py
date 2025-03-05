@@ -77,7 +77,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 
 
 @user_router.get("/users/me", status_code=200, response_model=UserResponse)
-async def get_current_user(current_user: Annotated[User, Depends(get_current_user)] = None):
+async def get_user(current_user: Annotated[User, Depends(get_current_user)] = None):
     
     if not current_user:
         raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -115,11 +115,25 @@ async def get_user_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_d
             raise HTTPException(status_code=404, detail="User not found") 
         
         return existing_user
-            
+
+
+@user_router.put("/users/change-password", status_code=200, dependencies=[Depends(check_current_user)])
+async def update_password(current_user: Annotated[User, Depends(get_current_user)], pw: UserUpdatePasswordRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
 
-@user_router.put("/users/{id}", status_code=201, response_model=UserResponse, dependencies=[Depends(check_current_user)])
-async def update_user(id: uuid.UUID, user: UserUpdateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        hashed_password = bcrypt.hashpw(pw.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        await db.execute(update(User).where(User.id == current_user.id).values(password=hashed_password))
+        await db.commit()
+
+        return None
+
+@user_router.put("/users/{id}", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
+async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], user: UserUpdateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
@@ -136,16 +150,19 @@ async def update_user(id: uuid.UUID, user: UserUpdateRequest, db: Annotated[Asyn
             if result3.scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
             
-        
-        await db.execute(update(User).where(User.id == id).values(user.model_dump()))
-        await db.commit()
+        if current_user.role == "admin":
+            await db.execute(update(User).where(User.id == id).values(user.model_dump()))
+            await db.commit()
+        else:
+            await db.execute(update(User).where(User.id == id).values(email= user.email, name= user.name, lastname= user.lastname, birthdate= user.birthdate))
+            await db.commit()
 
 
         return existing_user
 
 
 
-@user_router.delete("/users/{id}", status_code=204, dependencies=[Depends(check_current_user)])
+@user_router.delete("/users/{id}", status_code=200, dependencies=[Depends(check_current_user)])
 async def delete_user(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)]):
 
         #check if user exists

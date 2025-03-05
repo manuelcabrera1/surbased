@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'auth_service.dart';
+import '../../infrastructure/auth_service.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -101,14 +101,83 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      await _authService.logout();
-      _isAuthenticated = false;
-      _token = null;
+      await _clearAuthState();
       notifyListeners();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
       throw Exception(_error);
+    }
+  }
+
+  Future<void> _clearAuthState() async {
+    _isAuthenticated = false;
+    _token = null;
+    _user = null;
+    _error = null;
+    _isLoading = false;
+
+    final prefs = await _prefs;
+    await prefs.clear();
+  }
+
+  void refreshUser(User user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  Future<bool> updateUser(String id, String name, String lastname, String email,
+      String birthdate, String token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final isUpdated = await _authService.updateUser(
+          id, name, lastname, email, birthdate, token);
+      if (isUpdated['success']) {
+        _user = User.fromJson(isUpdated['data']);
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = isUpdated['data'];
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateUserPassword(
+      String id, String password, String token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final isUpdated =
+          await _authService.updateUserPassword(id, password, token);
+      if (isUpdated['success']) {
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = isUpdated['data'];
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 }

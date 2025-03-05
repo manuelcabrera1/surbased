@@ -73,5 +73,8 @@ class UserByRoleRequest(BaseModel):
 class UserResponseWithLength(BaseModel):
     users: List[UserResponse]
     length: int
+    
 
+class UserUpdatePasswordRequest(BaseModel):
+    password: str
 

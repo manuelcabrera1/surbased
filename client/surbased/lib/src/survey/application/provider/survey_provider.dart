@@ -12,6 +12,13 @@ class SurveyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  void clearState() {
+    _isLoading = false;
+    _error = null;
+    _surveys = [];
+    notifyListeners();
+  }
+
   Future<void> getSurveys(
       String userId, String userRole, String token, String? category) async {
     try {
