@@ -20,5 +20,5 @@ class Organization(Base):
 
 
 
-    users: Mapped[List["User"]] = relationship(back_populates="organization")
-    categories: Mapped[List["Category"]] = relationship(back_populates="organization")
+    users: Mapped[List["User"]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")
+    categories: Mapped[List["Category"]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")

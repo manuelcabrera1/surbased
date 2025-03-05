@@ -26,7 +26,7 @@ class Option(Base):
 
 
 
-    question: Mapped["Question"] = relationship(back_populates="options")
-    answers: Mapped[List["Answer"]] = relationship(back_populates="option")
+    question: Mapped["Question"] = relationship(back_populates="options", cascade="all, delete", lazy="selectin")
+    answers: Mapped[List["Answer"]] = relationship(back_populates="option", cascade="all, delete", lazy="selectin")
 
 

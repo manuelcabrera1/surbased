@@ -20,7 +20,7 @@ class Answer(Base):
 
 
 
-    option: Mapped["Option"] = relationship(back_populates="answers")
-    participant: Mapped["User"] = relationship(back_populates="answers")
+    option: Mapped["Option"] = relationship(back_populates="answers", cascade="all, delete", lazy="selectin")
+    participant: Mapped["User"] = relationship(back_populates="answers", cascade="all, delete", lazy="selectin")
 
 

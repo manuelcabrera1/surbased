@@ -1,4 +1,4 @@
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 import uuid
 from database import Base
 from sqlalchemy import String, UUID
@@ -24,4 +24,4 @@ class Metric(Base):
     formula: Mapped[str] = mapped_column(String(200), nullable=True)
 
 
-    surveys: Mapped[List["Survey"]] = relationship(secondary=survey_metric, back_populates="metrics")
+    surveys: Mapped[Optional[List["Survey"]]] = relationship(secondary=survey_metric, back_populates="metrics", cascade="all, delete", lazy="selectin")

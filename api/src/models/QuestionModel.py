@@ -30,8 +30,8 @@ class Question(Base):
 
 
 
-    survey: Mapped["Survey"] = relationship(back_populates="questions")
-    options: Mapped[List["Option"]] = relationship(back_populates="question")
+    survey: Mapped["Survey"] = relationship(back_populates="questions", cascade="all, delete", lazy="selectin")
+    options: Mapped[List["Option"]] = relationship(back_populates="question", cascade="all, delete", lazy="selectin")
 
 
     __table_args__ = (

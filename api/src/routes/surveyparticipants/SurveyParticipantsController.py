@@ -40,7 +40,7 @@ async def get_all_survey_participants(id: uuid.UUID, current_user: Annotated[Use
                                                                                                     User.organization_id == current_user.organization_id, 
                                                                                                     User.role == "participant")))
 
-    participants = result.scalars().all()
+    participants = result.unique().scalars().all()
 
     return { "users": participants, "length": len(participants) }
     
@@ -72,7 +72,7 @@ async def get_all_participant_surveys(id: uuid.UUID, current_user: Annotated[Use
                                                                                                     Survey.end_date >= datetime.now(),
                                                                                                     User.organization_id == current_user.organization_id, User.role == "participant")))
         
-        surveys = result.scalars().all()
+        surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys)}
     

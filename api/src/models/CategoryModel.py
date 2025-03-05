@@ -19,7 +19,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     organization_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("organizations.id"), nullable=False)
 
-    surveys: Mapped[Optional[List["Survey"]]] = relationship(back_populates="category")
-    organization: Mapped["Organization"] = relationship(back_populates="categories")
+    surveys: Mapped[Optional[List["Survey"]]] = relationship(back_populates="category", cascade="all, delete", lazy="selectin")
+    organization: Mapped["Organization"] = relationship(back_populates="categories", cascade="all, delete", lazy="selectin")
 
     
