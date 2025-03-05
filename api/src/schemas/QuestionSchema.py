@@ -1,6 +1,8 @@
 from typing import List
 import uuid
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
+
+from .OptionSchema import OptionCreateRequest, OptionResponse
 
 class QuestionBase(BaseModel):
     number: int
@@ -13,13 +15,15 @@ class QuestionBase(BaseModel):
             raise ValueError("The number must be greater than 0")
         return self
     
-class QuestionCreateRequest(QuestionBase):...
+class QuestionCreateRequest(QuestionBase):
+    options: List[OptionCreateRequest]
 
 class QuestionUpdateRequest(QuestionBase):...
 
 class QuestionResponse(QuestionBase):
     id: uuid.UUID
     survey_id: uuid.UUID
+    options: List[OptionResponse] = Field(default_factory=list)
 
 class QuestionResponseWithLength(BaseModel):
     questions: List[QuestionResponse]

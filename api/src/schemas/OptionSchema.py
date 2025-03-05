@@ -5,11 +5,11 @@ from uuid import UUID
 class OptionBase(BaseModel):
     description: str
     is_correct: bool
-    question_id: UUID
 
-class OptionCreateRequest(OptionBase): ...
+class OptionCreateRequest(OptionBase):...
 
-class OptionUpdateRequest(OptionBase): ...
+class OptionUpdateRequest(OptionBase):...
+
 class OptionResponse(OptionBase):
     id: UUID
 

@@ -1,5 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, update, and_
+from models.QuestionModel import Question
+from models.OptionModel import Option
+from schemas.OptionSchema import OptionResponse
+from schemas.QuestionSchema import QuestionResponse
 from models.CategoryModel import Category
 from models.UserModel import User
 from models.SurveyModel import Survey
@@ -16,47 +20,6 @@ survey_router = APIRouter(tags=["Survey"])
 
 
 
-@survey_router.post("/surveys",status_code=201, response_model=SurveyResponse)
-@required_roles(["researcher", "admin"])
-async def create_survey(survey: SurveyCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
-
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-        
-        #check if category exists
-
-        result = await db.execute(select(Category).where(Category.id == survey.category_id))
-        category = result.scalars().first()
-
-        if not category:
-            raise HTTPException(status_code=400, detail="Category not found")
-        
-        #check if researcher exists
-
-        result = await db.execute(select(User).where(and_(User.id == survey.researcher_id, User.role == "researcher")))
-        researcher = result.scalars().first()
-
-        if not researcher:
-            raise HTTPException(status_code=400, detail="Researcher not found")
-        
-        #check if survey name is already registered in the category
-
-        result = await db.execute(select(Survey).join(Category).where(and_(Survey.name == survey.name, Category.id == survey.category_id)))
-        existing_survey = result.scalars().first()
-
-        if existing_survey:
-            raise HTTPException(status_code=400, detail="Survey name already registered in this category")
-        
-        #check if researcher is trying to create a survey for another organization
-        if current_user.role == "researcher" and researcher.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=403, detail="Forbidden")
-
-        new_survey = Survey(name=survey.name, description=survey.description, start_date=survey.start_date, end_date=survey.end_date, researcher_id=survey.researcher_id, category_id=survey.category_id)
-        db.add(new_survey)
-        await db.commit()
-        await db.refresh(new_survey)
-
-        return new_survey
 
 
 @survey_router.get("/surveys", status_code=200, response_model=SurveyResponseWithLength)
@@ -93,7 +56,7 @@ async def get_all_surveys(current_user: Annotated[User, Depends(get_current_user
                 result = await db.execute(select(Survey).join(Category).where(Category.organization_id == current_user.organization_id))
 
 
-        surveys = result.scalars().all()
+        surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys) }
 
@@ -112,7 +75,7 @@ async def get_survey_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(g
         if current_user.role == "researcher" or current_user.role == "participant":
             result = await db.execute(select(Survey).join(User).where(and_(Survey.id == id, User.organization_id == current_user.organization_id)))
 
-        survey = result.scalars().first()   
+        survey = result.unique().scalars().first()   
 
         if not survey:
             raise HTTPException(status_code=404, detail="Survey not found")
@@ -171,7 +134,153 @@ async def delete_survey(id:uuid.UUID, current_user: Annotated[User, Depends(get_
         await db.commit()
 
         return None
+
+@survey_router.post("/surveys/", status_code=201, response_model=SurveyResponse)
+@required_roles(["admin", "researcher"])
+async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
+    #check if category exists
+    result = await db.execute(select(Category).where(Category.id == survey.category_id))
+    category = result.unique().scalars().first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    #check if survey exists in this category (by name)
+    result = await db.execute(select(Survey).where(Survey.name == survey.name, Survey.category_id == survey.category_id))
+    existing_survey = result.unique().scalars().first()
+    if existing_survey:
+        raise HTTPException(status_code=400, detail="Survey name already registered in this category")
+    
+    #researcher id: check if researcher org and category org match
+    result = await db.execute(select(User).where(User.id == survey.researcher_id, User.organization_id == category.organization_id))
+    researcher = result.unique().scalars().first()
+    if not researcher:
+        raise HTTPException(status_code=404, detail="Researcher not found")
+    
+    #check if start_date is not before today and end_date is after start_date
+    if survey.start_date and survey.start_date < date.today():
+        raise HTTPException(status_code=400, detail="Start date cannot be in the past")
+    if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
+        raise HTTPException(status_code=400, detail="Start date cannot be after end date")
+    
+    #questions
+    # descriptions and number should be unique
+    #options:
+    # description should be unique
+    # if the question referenced is not multiple_answer, then there should be at most one correct answer
+    # if the question referenced is multiple_answer, then there should be at least one correct answer
+
+    questions_descriptions = set()
+    questions_numbers = set()
+    
+    
+    for question in survey.questions:
+        if question.description in questions_descriptions:
+            raise HTTPException(status_code=400, detail=f"Duplicated question description: {question.description}")
+        
+        if question.number < 1 or question.number > (len(survey.questions) + 1):
+            raise HTTPException(status_code=400, detail="Question number must be between 1 and the total number of questions")
+        
+        if question.number in questions_numbers:
+            raise HTTPException(status_code=400, detail=f"Duplicated question number: {question.number}")
+
+        questions_descriptions.add(question.description)
+        questions_numbers.add(question.number)
+        
+        options_descriptions = set()
+        correct_options_count = 0   
+        for option in question.options:
+            if option.description in options_descriptions:
+                raise HTTPException(status_code=400, detail=f"Duplicated option description: {option.description}")
+            options_descriptions.add(option.description)
+            if option.is_correct:
+                correct_options_count += 1
+
+        if question.multiple_answer:
+            if correct_options_count == 0:
+                raise HTTPException(status_code=400, detail="Multiple answer question must have at least one correct answer")
+        else:
+            if correct_options_count > 1:
+                raise HTTPException(status_code=400, detail="Single answer question must have at most one correct answer")
+    
+
+    try:
+        # Crear el cuestionario
+        new_survey = Survey(
+            name=survey.name, 
+            description=survey.description, 
+            start_date=survey.start_date, 
+            end_date=survey.end_date, 
+            researcher_id=survey.researcher_id, 
+            category_id=survey.category_id
+        )
+        db.add(new_survey)
+        await db.flush()
+        
+        # Crear las preguntas y opciones
+        created_questions = []
+        
+        for q_data in survey.questions:
+            new_question = Question(
+                number=q_data.number,
+                description=q_data.description,
+                multiple_answer=q_data.multiple_answer,
+                survey_id=new_survey.id
+            )
+            db.add(new_question)
+            await db.flush()
+            
+            created_options = []
+            for o_data in q_data.options:
+                new_option = Option(
+                    description=o_data.description,
+                    is_correct=o_data.is_correct,
+                    question_id=new_question.id
+                )
+                db.add(new_option)
+                created_options.append(new_option)  
+
+            created_questions.append(new_question)
+        
+        await db.commit()
+        await db.refresh(new_survey)
+        
+        # Construir la respuesta
+        response = SurveyResponse(
+            id=new_survey.id,
+            name=new_survey.name,
+            description=new_survey.description,
+            start_date=new_survey.start_date,
+            end_date=new_survey.end_date,
+            researcher_id=new_survey.researcher_id,
+            category_id=new_survey.category_id,
+            questions=[
+                QuestionResponse(
+                    id=q.id,
+                    number=q.number,
+                    description=q.description,
+                    multiple_answer=q.multiple_answer,
+                    survey_id=q.survey_id,
+                    options=[
+                        OptionResponse(
+                            id=o.id,
+                            description=o.description,
+                            is_correct=o.is_correct,
+                            question_id=o.question_id
+                        ) for o in q.options
+                    ]
+                ) for q in created_questions
+            ]
+        )
+        
+        return response
+        
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating survey: {str(e)}")
 
 
 
