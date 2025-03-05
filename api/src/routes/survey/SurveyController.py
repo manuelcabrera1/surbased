@@ -143,8 +143,9 @@ async def update_survey(id:uuid.UUID, survey: SurveyCreate, current_user: Annota
 
         await db.execute(update(Survey).where(Survey.id == id).values(survey.model_dump()))
         await db.commit()
+    
 
-        return survey
+        return existing_survey
     
 
 
