@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/organization/infrastructure/organization_provider.dart';
+import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/user/application/widgets/user_settings_section.dart';
 
 class UserProfile extends StatefulWidget {

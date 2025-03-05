@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
-import 'package:surbased/src/user/infrastructure/user_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

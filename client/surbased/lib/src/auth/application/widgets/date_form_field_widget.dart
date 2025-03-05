@@ -38,14 +38,15 @@ class DateFormField extends FormField<DateTime> {
                   prefixIcon: const Icon(Icons.calendar_month),
                   errorText: state.errorText,
                 ),
-                child: state.value == null || !enabled
+                child: state.value == null
                     ? Text('Select Date',
                         style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant))
-                    : Text(
-                        DateFormat('dd/MM/yyyy').format(state.value!),
-                        style: theme.textTheme.bodyLarge!,
-                      ),
+                    : Text(DateFormat('dd/MM/yyyy').format(state.value!),
+                        style: theme.textTheme.bodyLarge!.copyWith(
+                            color: !enabled
+                                ? theme.colorScheme.onSurfaceVariant
+                                : theme.colorScheme.tertiary)),
               ),
             );
           },

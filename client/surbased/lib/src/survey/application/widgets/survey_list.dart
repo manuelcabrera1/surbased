@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
-import 'package:surbased/src/survey/infrastructure/survey_provider.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 
 class SurveyList extends StatefulWidget {
   const SurveyList({super.key});
@@ -63,48 +63,46 @@ class _SurveyListState extends State<SurveyList> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return surveyProvider.surveys.isEmpty
-        ? Center(
-            child: Text(
-              'No surveys found',
-              style: theme.textTheme.bodyMedium,
-            ),
-          )
-        : SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25),
-                    child: Text(
-                      'Surveys',
-                      style: theme.textTheme.displayMedium,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      itemCount: surveyProvider.surveys.length,
-                      itemBuilder: (context, index) => SurveyCard(
-                        userRole: userRole,
-                        survey: surveyProvider.surveys[index],
-                        onTap: () => userRole == 'researcher'
-                            ? Navigator.pushNamed(
-                                context, AppRoutes.surveyDetail,
-                                arguments: surveyProvider.surveys[index])
-                            : Navigator.pushNamed(
-                                context, AppRoutes.surveyComplete,
-                                arguments: surveyProvider.surveys[index]),
-                      ),
-                    ),
-                  ),
-                ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: Text(
+                'Surveys',
+                style: theme.textTheme.displayMedium,
               ),
             ),
-          );
+            const SizedBox(height: 30),
+            if (surveyProvider.surveys.isEmpty)
+              const Expanded(
+                child: Center(
+                  child: Text('No surveys found'),
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemCount: surveyProvider.surveys.length,
+                  itemBuilder: (context, index) => SurveyCard(
+                    userRole: userRole,
+                    survey: surveyProvider.surveys[index],
+                    onTap: () => userRole == 'researcher'
+                        ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
+                            arguments: surveyProvider.surveys[index])
+                        : Navigator.pushNamed(context, AppRoutes.surveyComplete,
+                            arguments: surveyProvider.surveys[index]),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

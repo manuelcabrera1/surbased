@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
-import 'package:surbased/src/user/infrastructure/user_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 
 class UserEditInfoPage extends StatefulWidget {
   const UserEditInfoPage({super.key});
@@ -51,17 +50,15 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-        final updatedUser = await userProvider.updateUser(
+        final updatedUser = await authProvider.updateUser(
             authProvider.user!.id,
             _nameController.text,
             _lastNameController.text,
             _emailController.text,
             DateFormat('yyyy-MM-dd').format(_birthdate!),
             authProvider.token!);
-        if (updatedUser != null) {
-          authProvider.refreshUser(updatedUser);
+        if (updatedUser) {
           setState(() => _isEditing = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +68,9 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(userProvider.error!)),
+              SnackBar(
+                  content:
+                      Text(authProvider.error ?? 'Error updating profile')),
             );
           }
         }

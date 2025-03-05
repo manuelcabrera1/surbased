@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:surbased/src/auth/infrastructure/auth_provider.dart';
-import 'package:surbased/src/user/infrastructure/user_provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 
 class UserEditPasswordPage extends StatefulWidget {
   const UserEditPasswordPage({super.key});
@@ -27,9 +26,8 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-        final updatedUser = await userProvider.updateUserPassword(
+        final updatedUser = await authProvider.updateUserPassword(
             authProvider.user!.id,
             _passwordController.text,
             authProvider.token!);
@@ -44,7 +42,9 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(userProvider.error!)),
+              SnackBar(
+                  content:
+                      Text(authProvider.error ?? 'Error updating password')),
             );
           }
         }
