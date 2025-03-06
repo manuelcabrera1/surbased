@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:surbased/src/survey/domain/question_model.dart';
+
 Survey surveyFromJson(String str) => Survey.fromJson(json.decode(str));
 
 String surveyToJson(Survey data) => json.encode(data.toJson());
@@ -12,6 +14,7 @@ class Survey {
   final String? description;
   final DateTime? startDate;
   final DateTime? endDate;
+  final List<Question> questions;
 
   Survey({
     required this.name,
@@ -21,6 +24,7 @@ class Survey {
     this.description,
     this.startDate,
     this.endDate,
+    required this.questions,
   });
 
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
@@ -30,8 +34,9 @@ class Survey {
         id: json["id"],
         description: json["description"],
         startDate: DateTime.parse(json["start_date"]),
-        endDate:
-            json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
+        endDate: DateTime.parse(json["end_date"]),
+        questions: List<Question>.from(
+            json["questions"].map((x) => Question.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -41,9 +46,9 @@ class Survey {
         "id": id,
         "description": description,
         "start_date":
-            "${startDate?.year.toString().padLeft(4, '0')}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}", //una fecha en este formato seria
-        "end_date": endDate == null
-            ? null
-            : "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}",
+            "${startDate?.year.toString().padLeft(4, '0')}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}",
+        "end_date":
+            "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}",
+        "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
       };
 }

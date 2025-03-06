@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/infrastructure/survey_service.dart';
 
@@ -19,8 +20,14 @@ class SurveyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createSurvey(String name, String category, String description,
-      String startDate, String endDate, String token) async {
+  Future<void> createSurvey(
+      String name,
+      String category,
+      String description,
+      String startDate,
+      String endDate,
+      List<Question>? questions,
+      String token) async {
     try {
       _error = null;
       _isLoading = true;
