@@ -12,6 +12,7 @@ class OptionUpdateRequest(OptionBase):...
 
 class OptionResponse(OptionBase):
     id: UUID
+    question_id: UUID
 
 class OptionResponseWithLength(BaseModel):
     options: List[OptionResponse]

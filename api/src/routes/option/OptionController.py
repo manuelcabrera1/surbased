@@ -38,20 +38,20 @@ async def create_option(survey_id:uuid.UUID, question_id:uuid.UUID, option: Opti
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id)))
             
-        survey = result.scalars().first()
+        survey = result.unique().scalars().first()
         if not survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if question exists and belongs to survey
         result = await db.execute(select(Question).where(and_(Question.id == question_id, Question.survey_id == survey_id)))
-        question = result.scalars().first()
+        question = result.unique().scalars().first()
 
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
         
         #check if option already exists
         result = await db.execute(select(Option).where(Option.question_id == question_id))
-        options = result.scalars().all()
+        options = result.unique().scalars().all()
         existing_option_description = any(o.description == option.description for o in options)
         if existing_option_description:
             raise HTTPException(status_code=400, detail="Option already exists")
@@ -83,20 +83,20 @@ async def get_options(survey_id:uuid.UUID, question_id:uuid.UUID, current_user: 
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id)))
             
-        survey = result.scalars().first()
+        survey = result.unique().scalars().first()
         if not survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
 
         #check if question exists and belongs to survey
         result = await db.execute(select(Question).where(and_(Question.id == question_id, Question.survey_id == survey_id)))
-        question = result.scalars().first()
+        question = result.unique().scalars().first()
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
         
         #get options
         result = await db.execute(select(Option).where(Option.question_id == question_id))
-        options = result.scalars().all()
+        options = result.unique().scalars().all()
         #return options
         return {"options": options, "length": len(options)}
         
@@ -117,13 +117,13 @@ async def update_option(survey_id:uuid.UUID, question_id:uuid.UUID, option_id:uu
             
         #check if question exists and belongs to survey
         result = await db.execute(select(Question).where(and_(Question.id == question_id, Question.survey_id == survey_id)))
-        question = result.scalars().first()
+        question = result.unique().scalars().first()
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
         
         #check if option exists and belongs to question
         result = await db.execute(select(Option).where(Option.question_id == question_id))
-        options = result.scalars().all()
+        options = result.unique().scalars().all()
         existing_option = next((o for o in options if o.id == option_id), None)
         if not existing_option:
             raise HTTPException(status_code=404, detail="Option not found")
@@ -158,21 +158,21 @@ async def delete_option(survey_id:uuid.UUID, question_id:uuid.UUID, option_id:uu
             result = await db.execute(select(Survey).join(Category).where(and_(Survey.id == survey_id, 
                                                                                Survey.category_id == Category.id,
                                                                                 Category.organization_id == current_user.organization_id)))
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if question exists and belongs to survey
         result = await db.execute(select(Question).where(and_(Question.id == question_id, Question.survey_id == survey_id)))
-        question = result.scalars().first()
+        question = result.unique().scalars().first()
 
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
 
         #check if option exists and belongs to question
         result = await db.execute(select(Option).where(and_(Option.id == option_id, Option.question_id == question.id)))
-        existing_option = result.scalars().first()
+        existing_option = result.unique().scalars().first()
         
         if not existing_option:
             raise HTTPException(status_code=404, detail="Option not found")

@@ -99,7 +99,7 @@ async def update_survey(id:uuid.UUID, survey: SurveyCreate, current_user: Annota
         if current_user.role == "researcher":
             result = await db.execute(select(Survey).join(User).where(and_(Survey.id == id, User.organization_id == current_user.organization_id)))
 
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
@@ -125,7 +125,7 @@ async def delete_survey(id:uuid.UUID, current_user: Annotated[User, Depends(get_
         if current_user.role == "researcher":
             result = await db.execute(select(Survey).join(User).where(and_(Survey.id == id, User.organization_id == current_user.organization_id)))
 
-        survey = result.scalars().first()  
+        survey = result.unique().scalars().first()  
 
         if not survey:
             raise HTTPException(status_code=404, detail="Survey not found")

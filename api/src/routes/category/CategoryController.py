@@ -26,7 +26,7 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
         
         if current_user.role == "researcher":
             result = await db.execute(select(Category).where(and_(Category.name == category.name, Category.organization_id == category.organization_id)))
-        existing_category = result.scalars().first()
+        existing_category = result.unique().scalars().first()
 
         if existing_category:
             raise HTTPException(status_code=400, detail="Existing category")
@@ -55,7 +55,7 @@ async def get_all_categories(current_user: Annotated[User, Depends(get_current_u
         if current_user.role == "researcher":
            result = await db.execute(select(Category).where(Category.organization_id == current_user.organization_id))
 
-        categories = result.scalars().all()
+        categories = result.unique().scalars().all()
         return { "categories": categories, "length": len(categories) }
     
 
@@ -73,7 +73,7 @@ async def get_category_by_id(id:uuid.UUID, current_user: Annotated[User, Depends
         if current_user.role == "researcher":
             result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
 
-        existing_category = result.scalars().first()
+        existing_category = result.unique().scalars().first()
 
         if not existing_category:
             raise HTTPException(status_code=404, detail="Category not found") 
@@ -94,7 +94,7 @@ async def update_category_info(id: uuid.UUID, category: CategoryUpdate, current_
         if current_user.role == "research":
             result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
 
-        existing_category = result.scalars().first()
+        existing_category = result.unique().scalars().first()
 
         if not existing_category:
             raise HTTPException(status_code=400, detail="Category not found")
@@ -104,7 +104,7 @@ async def update_category_info(id: uuid.UUID, category: CategoryUpdate, current_
         if existing_category.name != category.name:
             result2 = await db.execute(select(Category).where(Category.name == category.name))
             
-            if result2.scalars().first() is not None:
+            if result2.unique().scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Category name already registered")
             
 
@@ -121,7 +121,7 @@ async def delete_category(id: uuid.UUID, current_user: Annotated[User, Depends(g
 
         #check if category exists
         result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
-        existing_category = result.scalars().first()
+        existing_category = result.unique().scalars().first()
 
         if not existing_category:
             raise HTTPException(status_code=400, detail="Category not found")
