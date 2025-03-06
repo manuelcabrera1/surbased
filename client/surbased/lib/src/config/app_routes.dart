@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
 import 'package:surbased/src/shared/application/home_page.dart';
+import 'package:surbased/src/survey/application/pages/survey_add_questions_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_detail_page.dart';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String surveyDetail = '/survey/detail';
   static const String surveyComplete = '/survey/complete';
   static const String surveyCreate = '/survey/create';
+  static const String surveyAddQuestions = '/survey/create/questions';
   static const String userEditInfo = '/user/edit/info';
   static const String userEditPassword = '/user/edit/password';
   static const String userNotifications = '/user/notifications';
@@ -39,6 +41,7 @@ class AppRoutes {
     userSecurity: (_) => const UserSecurityPage(),
     userTheme: (_) => const UserThemePage(),
     userAccessibility: (_) => const UserAccessibilityPage(),
+    surveyAddQuestions: (_) => const SurveyAddQuestionsPage(),
     //researcherHome: (_) => const ResearcherHomePage(),
     //adminHome: (_) => const AdminHomePage(),
   };
