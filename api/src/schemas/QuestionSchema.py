@@ -8,7 +8,9 @@ class QuestionBase(BaseModel):
     number: int
     description: str
     multiple_answer: bool
-    
+    required: bool = True
+    has_correct_answer: bool 
+
     @model_validator(mode="after")
     def validate_number(self):
         if self.number < 1:

@@ -199,12 +199,11 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             if option.is_correct:
                 correct_options_count += 1
 
-        if question.multiple_answer:
-            if correct_options_count == 0:
-                raise HTTPException(status_code=400, detail="Multiple answer question must have at least one correct answer")
-        else:
-            if correct_options_count > 1:
-                raise HTTPException(status_code=400, detail="Single answer question must have at most one correct answer")
+        if question.has_correct_answer:
+            if question.multiple_answer and correct_options_count == 0:
+                    raise HTTPException(status_code=400, detail="Multiple answer question must have at least one correct answer")
+            if not question.multiple_answer and correct_options_count > 1:
+                    raise HTTPException(status_code=400, detail="Single answer question must have at most one correct answer")
     
 
     try:
@@ -228,7 +227,9 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                 number=q_data.number,
                 description=q_data.description,
                 multiple_answer=q_data.multiple_answer,
-                survey_id=new_survey.id
+                survey_id=new_survey.id,
+                required=q_data.required,
+                has_correct_answer=q_data.has_correct_answer
             )
             db.add(new_question)
             await db.flush()
@@ -264,6 +265,8 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                     description=q.description,
                     multiple_answer=q.multiple_answer,
                     survey_id=q.survey_id,
+                    required=q.required,
+                    has_correct_answer=q.has_correct_answer,
                     options=[
                         OptionResponse(
                             id=o.id,

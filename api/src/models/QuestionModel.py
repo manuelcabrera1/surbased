@@ -20,12 +20,8 @@ class Question(Base):
     number: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(250), nullable=False)
     multiple_answer: Mapped[bool] = mapped_column(Boolean, nullable=False)
-
-
-
-
-
-
+    required: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    has_correct_answer: Mapped[bool] = mapped_column(Boolean, nullable=False)
     survey_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("surveys.id"), nullable=False)
 
 
