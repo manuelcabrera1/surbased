@@ -20,14 +20,14 @@ async def create_user(user: UserCreateRequest, db: Annotated[AsyncSession, Depen
     try: 
         #check if user already exists
         result = await db.execute(select(User).where(User.email == user.email))
-        existing_user = result.scalars().first()
+        existing_user = result.unique().scalars().first()
 
         if existing_user and existing_user.email == user.email:
             raise HTTPException(status_code=400, detail="This email is already in use")  
         
         #check if org already exists
         result = await db.execute(select(Organization).where(Organization.name == user.organization))
-        existing_org = result.scalars().first()
+        existing_org = result.unique().scalars().first()
 
         if not existing_org:
             raise HTTPException(status_code=404, detail= "Organization not found")
@@ -57,7 +57,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
         
     #check if user exists
     result = await db.execute(select(User).where(User.email == form_data.username))
-    existing_user = result.scalars().first()
+    existing_user = result.unique().scalars().first()
 
     if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -99,7 +99,7 @@ async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_us
         if current_user.role == "researcher":
             result = await db.execute(select(User).where(User.organization_id == current_user.organization_id))
 
-        users = result.scalars().all()
+        users = result.unique().scalars().all()
         return { "users": users, "length": len(users) }
     
 
@@ -109,7 +109,7 @@ async def get_user_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_d
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
-        existing_user = result.scalars().first()
+        existing_user = result.unique().scalars().first()
 
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found") 
@@ -137,7 +137,7 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
-        existing_user = result.scalars().first()
+        existing_user = result.unique().scalars().first()
 
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -147,7 +147,7 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
         if existing_user.email != user.email:
             result3 = await db.execute(select(User).where(User.email == user.email))
 
-            if result3.scalars().first() is not None:
+            if result3.unique().scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
             
         if current_user.role == "admin":
@@ -167,7 +167,7 @@ async def delete_user(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
-        existing_user = result.scalars().first()
+        existing_user = result.unique().scalars().first()
 
         if not existing_user:
             raise HTTPException(status_code=400, detail="User not found")
@@ -191,7 +191,7 @@ async def filter_users(db: Annotated[AsyncSession, Depends(get_db)], role:Option
             query = query.where(User.organization_id == org_id)
         
         result = await db.execute(query)
-        users = result.scalars().all()
+        users = result.unique().scalars().all()
 
         return { "users": users, "length": len(users) }
     

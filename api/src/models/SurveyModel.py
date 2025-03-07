@@ -32,11 +32,11 @@ class Survey(Base):
 
  
 
-    participants: Mapped[Optional[List["User"]]] = relationship(secondary=survey_participant, back_populates="surveys_participant")
-    researcher: Mapped["User"] = relationship(back_populates="surveys_researcher")
-    category: Mapped["Category"] = relationship(back_populates="surveys")
-    metrics: Mapped["Metric"] = relationship(secondary=survey_metric, back_populates="surveys")
-    questions: Mapped["Question"] = relationship(back_populates="survey")
+    participants: Mapped[Optional[List["User"]]] = relationship(secondary=survey_participant, back_populates="surveys_participant", cascade="all, delete", lazy="selectin")
+    researcher: Mapped["User"] = relationship(back_populates="surveys_researcher", cascade="all, delete", lazy="selectin")
+    category: Mapped["Category"] = relationship(back_populates="surveys", cascade="all, delete", lazy="selectin")
+    metrics: Mapped[Optional[List["Metric"]]] = relationship(secondary=survey_metric, back_populates="surveys", cascade="all, delete", lazy="selectin")
+    questions: Mapped[Optional[List["Question"]]] = relationship(back_populates="survey", cascade="all, delete", lazy="selectin")
     
 
     __table_args__ = (

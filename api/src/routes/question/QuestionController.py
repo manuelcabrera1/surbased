@@ -30,20 +30,20 @@ async def create_question(id: uuid.UUID, question: QuestionCreateRequest, curren
         #check if survey exists
         if current_user.role == "admin":
             result = await db.execute(select(Survey).where(Survey.id == id))
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if current_user.role == "researcher":
             result = await db.execute(select(Survey).join(Category).where(Survey.id == id, 
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id))
 
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if question already exists in survey
         result2 = await db.execute(select(Question).where(Question.survey_id == id))
-        questions = result2.scalars().all()
+        questions = result2.unique().scalars().all()
 
         existing_question = next((q for q in questions if q.description == question.description or q.number == question.number), None)
 
@@ -84,7 +84,7 @@ async def get_survey_questions(id: uuid.UUID, current_user: Annotated[User, Depe
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id)))
         
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
@@ -93,7 +93,7 @@ async def get_survey_questions(id: uuid.UUID, current_user: Annotated[User, Depe
         #get questions
         result = await db.execute(select(Question).where(Question.survey_id == id))
         
-        questions = result.scalars().all()
+        questions = result.unique().scalars().all()
         return {"questions": questions, "length": len(questions)}
     
 
@@ -112,7 +112,7 @@ async def get_survey_question_by_id(survey_id: uuid.UUID, id: uuid.UUID, current
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id)))
         
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
@@ -120,7 +120,7 @@ async def get_survey_question_by_id(survey_id: uuid.UUID, id: uuid.UUID, current
         
         #get question
         result = await db.execute(select(Question).where(and_(Question.survey_id == survey_id, Question.id == id)))
-        question = result.scalars().first()
+        question = result.unique().scalars().first()
 
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
@@ -149,13 +149,13 @@ async def update_question(survey_id: uuid.UUID, question_id: uuid.UUID, question
                     Category.organization_id == current_user.organization_id
                 ))
             )
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
 
         
         result2 = await db.execute(select(Question).where(Question.survey_id == survey_id))
-        questions = result2.scalars().all()
+        questions = result2.unique().scalars().all()
         
         existing_question = next((q for q in questions if q.id == question_id), None)
 
@@ -165,7 +165,6 @@ async def update_question(survey_id: uuid.UUID, question_id: uuid.UUID, question
         
         #check if question number is bigger than the survey questions
         if question.number > len(questions):
-            print(question.number, len(questions))
             raise HTTPException(status_code=400, detail="Question number is bigger than the survey questions")
         
         #check if question number is already in use
@@ -209,14 +208,14 @@ async def delete_question(survey_id: uuid.UUID, question_id: uuid.UUID, current_
                                                                         Survey.category_id == Category.id, 
                                                                         Category.organization_id == current_user.organization_id)))
         
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if question exists in survey
         result2 = await db.execute(select(Question).where(Question.survey_id == survey_id))
-        questions = result2.scalars().all()
+        questions = result2.unique().scalars().all()
 
         existing_question = next((q for q in questions if q.id == question_id), None)
 

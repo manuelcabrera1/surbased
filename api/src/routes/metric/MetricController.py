@@ -31,7 +31,7 @@ async def create_metric(metric: MetricCreateRequest, current_user: Annotated[Use
         
         #check if metric already exists
         result = await db.execute(select(Metric).where(Metric.name == metric.name))
-        existing_metric = result.scalars().first()
+        existing_metric = result.unique().scalars().first()
 
         if existing_metric:
             raise HTTPException(status_code=400, detail="This metric already exists")
@@ -52,7 +52,7 @@ async def get_metric_by_id(id: uuid.UUID, current_user: Annotated[User, Depends(
         
         #check if metric already exists
         result = await db.execute(select(Metric).where(Metric.id == id))
-        existing_metric = result.scalars().first()
+        existing_metric = result.unique().scalars().first()
 
         if not existing_metric:
             raise HTTPException(status_code=404, detail="Metric not found")
@@ -70,7 +70,7 @@ async def update_metric(id: uuid.UUID, metric: MetricUpdateRequest, current_user
         
         #check if metric already exists
         result = await db.execute(select(Metric).where(Metric.id == id))
-        existing_metric = result.scalars().first()
+        existing_metric = result.unique().scalars().first()
 
         if not existing_metric:
             raise HTTPException(status_code=404, detail="Metric not found")
@@ -97,7 +97,7 @@ async def delete_metric(id: uuid.UUID, current_user: Annotated[User, Depends(get
         
         #check if metric already exists
         result = await db.execute(select(Metric).where(Metric.id == id))
-        existing_metric = result.scalars().first()
+        existing_metric = result.unique().scalars().first()
 
         if not existing_metric:
             raise HTTPException(status_code=404, detail="Metric not found")

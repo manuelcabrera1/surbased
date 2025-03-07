@@ -17,7 +17,7 @@ org_router = APIRouter(tags=["Organization"])
 async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)]):
 
         result = await db.execute(select(Organization).where(Organization.name == org.name))
-        existing_org = result.scalars().first()
+        existing_org = result.unique().scalars().first()
 
         if existing_org:
             raise HTTPException(status_code=400, detail="This organization already exists")
@@ -35,7 +35,7 @@ async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSessio
 async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)]):
 
         result = await db.execute(select(Organization))
-        orgs = result.scalars().all()
+        orgs = result.unique().scalars().all()
         return { "orgs": orgs, "length": len(orgs) }
     
 
@@ -45,7 +45,7 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
 
         
         result = await db.execute(select(Organization).where(Organization.id == id))
-        existing_org = result.scalars().first()
+        existing_org = result.unique().scalars().first()
 
         if not existing_org:
             raise HTTPException(status_code=404, detail="Organization not found") 
@@ -69,7 +69,7 @@ async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annota
 
         if existing_org.name != org.name:
             result2 = await db.execute(select(Organization).where(Organization.name == org.name))
-            existing_org_name = result2.scalars().first()
+            existing_org_name = result2.unique().scalars().first()
             
             if existing_org_name:
                 raise HTTPException(status_code=400, detail="Organization name already registered")
@@ -87,7 +87,7 @@ async def delete_organization(id: uuid.UUID, db: Annotated[AsyncSession, Depends
 
         #check if org exists
         result = await db.execute(select(Organization).where(Organization.id == id))
-        existing_org = result.scalars().first()
+        existing_org = result.unique().scalars().first()
 
         if not existing_org:
             raise HTTPException(status_code=400, detail="Organization not found")

@@ -58,16 +58,16 @@ class SurveyCard extends StatelessWidget {
                 children: [
                   Text(
                     survey.endDate != null &&
-                            survey.startDate!.isBefore(DateTime.now())
-                        ? 'Fecha de fin: ${_formatDate(survey.endDate!)}'
-                        : 'Fecha de inicio: ${_formatDate(survey.startDate!)}',
+                            survey.startDate!.isBefore(
+                                DateTime.now().add(const Duration(days: 1)))
+                        ? 'End date: ${_formatDate(survey.endDate!)}'
+                        : 'Start date: ${_formatDate(survey.startDate!)}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
                   userRole == 'participant'
-                      ? survey.endDate != null &&
-                              survey.startDate!.isBefore(DateTime.now())
+                      ? survey.startDate!.isAfter(DateTime.now())
                           ? Icon(Icons.lock_outline,
                               size: 25, color: theme.colorScheme.onSurface)
                           : Icon(Icons.lock_open_outlined,

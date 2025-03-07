@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/infrastructure/survey_service.dart';
 
@@ -19,17 +20,45 @@ class SurveyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getSurveys(
-      String userId, String userRole, String token, String? category) async {
+  Future<void> createSurvey(
+      String name,
+      String category,
+      String description,
+      String startDate,
+      String endDate,
+      List<Question>? questions,
+      String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> getSurveys(String userId, String userRole, String token,
+      String? org, String? category) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
       late Map<String, dynamic> getSurveysResponse;
 
-      if (userRole == 'researcher') {
+      if (userRole == 'admin') {
         getSurveysResponse = await _surveyService.getSurveys(
           token,
+          org,
+          category,
+        );
+      }
+
+      if (userRole == 'admin' || userRole == 'researcher') {
+        getSurveysResponse = await _surveyService.getSurveys(
+          token,
+          null,
           category,
         );
       }

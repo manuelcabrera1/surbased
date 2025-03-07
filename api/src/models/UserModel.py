@@ -35,10 +35,10 @@ class User(Base):
     
     
 
-    organization: Mapped["Organization"] = relationship(back_populates="users")
-    surveys_participant: Mapped[Optional[List["Survey"]]]=relationship(secondary=survey_participant, back_populates="participants")
-    surveys_researcher: Mapped[Optional[List["Survey"]]] = relationship(back_populates="researcher")
-    answers: Mapped[Optional[List["Answer"]]] = relationship(back_populates="participant")
+    organization: Mapped["Organization"] = relationship(back_populates="users", cascade="all, delete", lazy="selectin")
+    surveys_participant: Mapped[Optional[List["Survey"]]]=relationship(secondary=survey_participant, back_populates="participants", cascade="all, delete", lazy="selectin")
+    surveys_researcher: Mapped[Optional[List["Survey"]]] = relationship(back_populates="researcher", cascade="all, delete", lazy="selectin")
+    answers: Mapped[Optional[List["Answer"]]] = relationship(back_populates="participant", cascade="all, delete", lazy="selectin")
 
     __table_args__ = (
         CheckConstraint("role IN ('researcher', 'participant', 'admin')", name="role_check"),

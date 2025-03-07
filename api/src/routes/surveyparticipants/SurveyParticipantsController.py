@@ -40,7 +40,7 @@ async def get_all_survey_participants(id: uuid.UUID, current_user: Annotated[Use
                                                                                                     User.organization_id == current_user.organization_id, 
                                                                                                     User.role == "participant")))
 
-    participants = result.scalars().all()
+    participants = result.unique().scalars().all()
 
     return { "users": participants, "length": len(participants) }
     
@@ -72,7 +72,7 @@ async def get_all_participant_surveys(id: uuid.UUID, current_user: Annotated[Use
                                                                                                     Survey.end_date >= datetime.now(),
                                                                                                     User.organization_id == current_user.organization_id, User.role == "participant")))
         
-        surveys = result.scalars().all()
+        surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys)}
     
@@ -86,14 +86,14 @@ async def assign_participant_to_survey(id: uuid.UUID, user: AssignParticipantToS
         
         #check if survey exists
         result = await db.execute(select(Survey).where(Survey.id == id))
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if participant exists
         result = await db.execute(select(User).where(and_(User.email == user.email, User.role == "participant")))
-        existing_participant = result.scalars().first()
+        existing_participant = result.unique().scalars().first()
 
         if not existing_participant:
             raise HTTPException(status_code=404, detail="Participant not found")
@@ -107,7 +107,7 @@ async def assign_participant_to_survey(id: uuid.UUID, user: AssignParticipantToS
                 Survey.id == existing_survey.id
             ))
         )
-        existing_assignment = assignment_query.scalars().first()
+        existing_assignment = assignment_query.unique().scalars().first()
         
         if existing_assignment:
             raise HTTPException(status_code=400, detail="Participant already assigned to this survey")
@@ -116,7 +116,7 @@ async def assign_participant_to_survey(id: uuid.UUID, user: AssignParticipantToS
         #check if survey and participant are from the same organization
         result = await db.execute(select(Category).where(and_(Category.id == existing_survey.category_id,
                                                                               Category.organization_id == existing_participant.organization_id)))
-        belongs_to_same_org = result.scalars().first()
+        belongs_to_same_org = result.unique().scalars().first()
         
         if not belongs_to_same_org:
             raise HTTPException(status_code=403, detail="Forbidden")
@@ -138,7 +138,7 @@ async def assign_participant_to_survey(id: uuid.UUID, user: AssignParticipantToS
                                                                                                 Survey.id == survey_participant.c.survey_id, 
                                                                                                 User.id == survey_participant.c.participant_id,
                                                                                                 User.role == "participant")))
-        participants = result.scalars().all()
+        participants = result.unique().scalars().all()
 
         return { "users": participants, "length": len(participants) }
     
@@ -153,14 +153,14 @@ async def remove_participant_from_survey(id: uuid.UUID, user: RemoveParticipantF
         
         #check if survey exists
         result = await db.execute(select(Survey).where(Survey.id == id))
-        existing_survey = result.scalars().first()
+        existing_survey = result.unique().scalars().first()
 
         if not existing_survey:
             raise HTTPException(status_code=404, detail="Survey not found")
         
         #check if participant exists
         result = await db.execute(select(User).where(and_(User.email == user.email, User.role == "participant")))
-        existing_participant = result.scalars().first()
+        existing_participant = result.unique().scalars().first()
 
         if not existing_participant:
             raise HTTPException(status_code=404, detail="Participant not found")
@@ -174,7 +174,7 @@ async def remove_participant_from_survey(id: uuid.UUID, user: RemoveParticipantF
                 Survey.id == existing_survey.id
             ))
         )
-        existing_assignment = assignment_query.scalars().first()
+        existing_assignment = assignment_query.unique().scalars().first()
         
         if not existing_assignment:
             raise HTTPException(status_code=400, detail="Participant not assigned to this survey")
@@ -195,7 +195,7 @@ async def remove_participant_from_survey(id: uuid.UUID, user: RemoveParticipantF
                                                                                                 Survey.id == survey_participant.c.survey_id, 
                                                                                                 User.id == survey_participant.c.participant_id,
                                                                                                 User.role == "participant")))
-        participants = result.scalars().all()
+        participants = result.unique().scalars().all()
 
         return { "users": participants, "length": len(participants) }
     

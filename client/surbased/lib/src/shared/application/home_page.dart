@@ -70,8 +70,8 @@ class _HomePageState extends State<HomePage> {
 
     // Páginas para administradores
     final adminPages = [
-      const LoginPage(),
-      const RegisterPage(),
+      const SurveyList(),
+      const SurveyCreatePage(),
       const UserProfile(),
       const UserProfile()
     ];
