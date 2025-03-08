@@ -30,8 +30,10 @@ class CategoryProvider extends ChangeNotifier {
           await _categoryService.getCategories(organizationId, token);
 
       if (categoriesResponse['success']) {
-        _categories = categoriesResponse['data']['categories']
-            .map((c) => Category.fromJson(c));
+        _categories =
+            (categoriesResponse['data']['categories'] as List<dynamic>)
+                .map((c) => Category.fromJson(c))
+                .toList();
         _isLoading = false;
         _error = null;
         notifyListeners();

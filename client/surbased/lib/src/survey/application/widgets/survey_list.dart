@@ -42,6 +42,9 @@ class _SurveyListState extends State<SurveyList> {
               null,
               null,
             );
+            final categoryProvider =
+                Provider.of<CategoryProvider>(context, listen: false);
+            categoryProvider.getCategories(null, authProvider.token!);
           }
         }
       });
@@ -62,7 +65,7 @@ class _SurveyListState extends State<SurveyList> {
 
     final userRole = authProvider.userRole!;
 
-    if (surveyProvider.isLoading) {
+    if (surveyProvider.isLoading || categoryProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 

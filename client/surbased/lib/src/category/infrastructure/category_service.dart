@@ -7,9 +7,11 @@ class CategoryService {
 
   Future<Map<String, dynamic>> getCategories(
       String? organizationId, String token) async {
+    final existingOrganization =
+        organizationId != null ? '?organization=$organizationId' : '';
     try {
       final response =
-          await http.get(Uri.parse('$_baseUrl/categories/'), headers: {
+          await http.get(Uri.parse('$_baseUrl$existingOrganization'), headers: {
         'Authorization': 'Bearer $token',
       });
 
