@@ -8,34 +8,94 @@ class SurveyProvider extends ChangeNotifier {
   List<Survey> _surveys = [];
   bool _isLoading = false;
   String? _error;
+  Survey? _currentSurvey;
 
   List<Survey> get surveys => _surveys;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  Survey? get currentSurvey => _currentSurvey;
 
   void clearState() {
     _isLoading = false;
     _error = null;
     _surveys = [];
+    _currentSurvey = null;
     notifyListeners();
   }
 
-  Future<void> createSurvey(
-      String name,
-      String category,
-      String description,
-      String startDate,
-      String endDate,
-      List<Question>? questions,
-      String token) async {
+  void clearCurrentSurvey() {
+    _currentSurvey = null;
+    notifyListeners();
+  }
+
+  bool addSurveyInfo(String name, String? description, DateTime startDate,
+      DateTime? endDate, String categoryId, String researcherId) {
+    _currentSurvey = Survey(
+      name: name,
+      description: description ?? '',
+      categoryId: categoryId,
+      startDate: startDate,
+      endDate: endDate,
+      questions: [],
+      researcherId: researcherId,
+    );
+    notifyListeners();
+    return true;
+  }
+
+  bool addQuestion(Question question) {
+    _currentSurvey!.questions.add(question);
+    notifyListeners();
+    return true;
+  }
+
+  bool updateQuestion(int index, Question question) {
+    _currentSurvey!.questions[index] = question;
+    notifyListeners();
+    return true;
+  }
+
+  bool insertQuestion(int index, Question question) {
+    _currentSurvey!.questions.insert(index, question);
+    notifyListeners();
+    return true;
+  }
+
+  bool removeQuestion(int index) {
+    _currentSurvey!.questions.removeAt(index);
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> createSurvey(String token) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
+
+      final response = await _surveyService.createSurvey(
+        _currentSurvey!.toJson(),
+        token,
+      );
+
+      if (response['success']) {
+        _surveys.add(_currentSurvey!);
+        _isLoading = false;
+        _error = null;
+        _currentSurvey = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = response['data'];
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _isLoading = false;
       _error = e.toString();
       notifyListeners();
+      return false;
     }
   }
 

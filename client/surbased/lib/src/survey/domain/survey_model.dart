@@ -10,9 +10,9 @@ class Survey {
   final String name;
   final String categoryId;
   final String researcherId;
-  final String id;
+  final String? id;
   final String? description;
-  final DateTime? startDate;
+  final DateTime startDate;
   final DateTime? endDate;
   final List<Question> questions;
 
@@ -20,9 +20,9 @@ class Survey {
     required this.name,
     required this.categoryId,
     required this.researcherId,
-    required this.id,
+    this.id,
     this.description,
-    this.startDate,
+    required this.startDate,
     this.endDate,
     required this.questions,
   });
@@ -32,9 +32,10 @@ class Survey {
         categoryId: json["category_id"],
         researcherId: json["researcher_id"],
         id: json["id"],
-        description: json["description"],
+        description: json["description"] ?? '',
         startDate: DateTime.parse(json["start_date"]),
-        endDate: DateTime.parse(json["end_date"]),
+        endDate:
+            json["end_date"] != null ? DateTime.parse(json["end_date"]) : null,
         questions: List<Question>.from(
             json["questions"].map((x) => Question.fromJson(x))),
       );
@@ -43,12 +44,12 @@ class Survey {
         "name": name,
         "category_id": categoryId,
         "researcher_id": researcherId,
-        "id": id,
         "description": description,
         "start_date":
-            "${startDate?.year.toString().padLeft(4, '0')}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}",
-        "end_date":
-            "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}",
+            "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
+        "end_date": endDate != null
+            ? "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}"
+            : null,
         "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
       };
 }

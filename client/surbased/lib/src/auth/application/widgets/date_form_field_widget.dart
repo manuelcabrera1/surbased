@@ -10,6 +10,7 @@ class DateFormField extends FormField<DateTime> {
     void Function(DateTime?)? onChanged,
     bool enabled = true,
     bool required = true,
+    bool canSelectAFutureDate = false,
   }) : super(
           initialValue: initialDate,
           validator: validator ??
@@ -24,7 +25,10 @@ class DateFormField extends FormField<DateTime> {
                         context: state.context,
                         initialDate: state.value ?? DateTime.now(),
                         firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
+                        lastDate: canSelectAFutureDate
+                            ? DateTime.now()
+                                .add(const Duration(days: 365 * 100))
+                            : DateTime.now(),
                       );
 
                       if (selectedDate != null) {
@@ -35,6 +39,7 @@ class DateFormField extends FormField<DateTime> {
                   : null,
               child: InputDecorator(
                 decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
                   enabled: enabled,
                   labelText: labelText,
                   prefixIcon: const Icon(Icons.calendar_month),

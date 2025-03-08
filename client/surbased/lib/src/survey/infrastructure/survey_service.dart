@@ -6,12 +6,7 @@ class SurveyService {
   final String _baseUrl = 'http://10.0.2.2:8000';
 
   Future<Map<String, dynamic>> createSurvey(
-      String name,
-      String category,
-      String description,
-      String startDate,
-      String endDate,
-      String token) async {
+      Map<String, dynamic> survey, String token) async {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/surveys'),
@@ -19,13 +14,7 @@ class SurveyService {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          'name': name,
-          'category': category,
-          'description': description,
-          'start_date': startDate,
-          'end_date': endDate,
-        }),
+        body: json.encode(survey),
       );
 
       if (response.statusCode == 201) {

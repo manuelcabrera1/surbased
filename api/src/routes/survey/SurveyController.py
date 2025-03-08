@@ -135,7 +135,7 @@ async def delete_survey(id:uuid.UUID, current_user: Annotated[User, Depends(get_
 
         return None
 
-@survey_router.post("/surveys/", status_code=201, response_model=SurveyResponse)
+@survey_router.post("/surveys", status_code=201, response_model=SurveyResponse)
 @required_roles(["admin", "researcher"])
 async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
@@ -174,21 +174,13 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     # if the question referenced is multiple_answer, then there should be at least one correct answer
 
     questions_descriptions = set()
-    questions_numbers = set()
     
     
     for question in survey.questions:
         if question.description in questions_descriptions:
             raise HTTPException(status_code=400, detail=f"Duplicated question description: {question.description}")
-        
-        if question.number < 1 or question.number > (len(survey.questions) + 1):
-            raise HTTPException(status_code=400, detail="Question number must be between 1 and the total number of questions")
-        
-        if question.number in questions_numbers:
-            raise HTTPException(status_code=400, detail=f"Duplicated question number: {question.number}")
 
         questions_descriptions.add(question.description)
-        questions_numbers.add(question.number)
         
         options_descriptions = set()
         correct_options_count = 0   
@@ -217,37 +209,45 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             category_id=survey.category_id
         )
         db.add(new_survey)
-        await db.flush()
         
         # Crear las preguntas y opciones
         created_questions = []
+        question_number = 1;
         
         for q_data in survey.questions:
             new_question = Question(
-                number=q_data.number,
+                number=question_number,
                 description=q_data.description,
                 multiple_answer=q_data.multiple_answer,
-                survey_id=new_survey.id,
+                survey=new_survey,
                 required=q_data.required,
                 has_correct_answer=q_data.has_correct_answer
             )
             db.add(new_question)
-            await db.flush()
-            
-            created_options = []
+            created_questions.append(new_question)
+            question_number += 1;
+        await db.commit()
+
+        await db.refresh(new_survey)
+        for q in created_questions:
+            await db.refresh(q)
+
+        created_options = []
+        for q_data, q in zip(survey.questions, created_questions):
             for o_data in q_data.options:
                 new_option = Option(
-                    description=o_data.description,
-                    is_correct=o_data.is_correct,
-                    question_id=new_question.id
-                )
-                db.add(new_option)
-                created_options.append(new_option)  
+                description=o_data.description,
+                is_correct=o_data.is_correct,
+                question=q  # Asociar directamente con la pregunta
+            )
+            db.add(new_option)
+            created_options.append(new_option)
 
-            created_questions.append(new_question)
-        
+    # Commit final para opciones
         await db.commit()
-        await db.refresh(new_survey)
+        for o in created_options:
+            await db.refresh(o)
+        
         
         # Construir la respuesta
         response = SurveyResponse(

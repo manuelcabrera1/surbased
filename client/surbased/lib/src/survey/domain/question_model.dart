@@ -1,19 +1,23 @@
 import 'package:surbased/src/survey/domain/option_model.dart';
 
 class Question {
-  final int number;
+  final int? number;
   final String description;
   final bool multipleAnswer;
-  final String id;
-  final String surveyId;
+  final bool required;
+  final bool hasCorrectAnswer;
+  final String? id;
+  final String? surveyId;
   final List<Option> options;
 
   Question({
-    required this.number,
+    this.number,
     required this.description,
     required this.multipleAnswer,
-    required this.id,
-    required this.surveyId,
+    required this.required,
+    required this.hasCorrectAnswer,
+    this.id,
+    this.surveyId,
     required this.options,
   });
 
@@ -21,6 +25,8 @@ class Question {
         number: json["number"],
         description: json["description"],
         multipleAnswer: json["multiple_answer"],
+        required: json["required"],
+        hasCorrectAnswer: json["has_correct_answer"],
         id: json["id"],
         surveyId: json["survey_id"],
         options:
@@ -28,11 +34,10 @@ class Question {
       );
 
   Map<String, dynamic> toJson() => {
-        "number": number,
         "description": description,
         "multiple_answer": multipleAnswer,
-        "id": id,
-        "survey_id": surveyId,
+        "required": required,
+        "has_correct_answer": hasCorrectAnswer,
         "options": List<dynamic>.from(options.map((x) => x.toJson())),
       };
 }

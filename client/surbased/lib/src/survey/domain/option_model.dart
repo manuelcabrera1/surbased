@@ -1,14 +1,14 @@
 class Option {
   final String description;
   final bool isCorrect;
-  final String id;
-  final String questionId;
+  final String? id;
+  final String? questionId;
 
   Option({
     required this.description,
     required this.isCorrect,
-    required this.id,
-    required this.questionId,
+    this.id,
+    this.questionId,
   });
 
   factory Option.fromJson(Map<String, dynamic> json) => Option(
@@ -21,7 +21,5 @@ class Option {
   Map<String, dynamic> toJson() => {
         "description": description,
         "is_correct": isCorrect,
-        "id": id,
-        "question_id": questionId,
       };
 }

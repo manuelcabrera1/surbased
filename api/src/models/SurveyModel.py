@@ -3,7 +3,7 @@ import uuid
 from database import Base
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Date, UniqueConstraint, func, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
-
+from datetime import date
 from sqlalchemy.orm import  Mapped, mapped_column, relationship
 from .SurveyParticipantModel import survey_participant
 from .SurveyMetricModel import survey_metric
@@ -25,8 +25,8 @@ class Survey(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, index=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(250), nullable=False)
-    start_date: Mapped[Date] = mapped_column(Date, nullable=False) 
-    end_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False) 
+    end_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     researcher_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), nullable=False)
     category_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("categories.id"), nullable=False)
 

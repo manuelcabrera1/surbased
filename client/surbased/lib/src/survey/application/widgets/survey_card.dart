@@ -47,7 +47,7 @@ class SurveyCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 10),
               category.name.isNotEmpty || category.name != ''
                   ? Text(
                       'Category: ${category.name}',
@@ -57,7 +57,7 @@ class SurveyCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     )
                   : const SizedBox.shrink(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

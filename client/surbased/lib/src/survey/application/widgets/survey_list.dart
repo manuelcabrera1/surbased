@@ -63,6 +63,10 @@ class _SurveyListState extends State<SurveyList> {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
 
+    if (authProvider.userRole == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final userRole = authProvider.userRole!;
 
     if (surveyProvider.isLoading || categoryProvider.isLoading) {

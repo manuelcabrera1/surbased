@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+
+import '../../../category/application/provider/category_provider.dart';
 
 class SurveyCreatePage extends StatefulWidget {
   const SurveyCreatePage({super.key});
@@ -11,10 +16,12 @@ class SurveyCreatePage extends StatefulWidget {
 
 class SurveyCreatePageState extends State<SurveyCreatePage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController =
+      TextEditingController(text: '');
   DateTime? _startDate;
   DateTime? _endDate;
+  String? _categoryId;
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
@@ -23,15 +30,53 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
     return null;
   }
 
+  String? _endDateValidator(DateTime? value) {
+    if (value != null && _startDate != null && value.isBefore(_startDate!)) {
+      return 'End date must be after start date';
+    }
+    return null;
+  }
+
+  void _handleContinue() {
+    if (_formKey.currentState!.validate()) {
+      final surveyProvider =
+          Provider.of<SurveyProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      bool success = surveyProvider.addSurveyInfo(
+        _nameController.text,
+        _descriptionController.text,
+        _startDate ?? DateTime.now(),
+        _endDate,
+        _categoryId!,
+        authProvider.user!.id,
+      );
+      if (success) {
+        Navigator.pushNamed(context, AppRoutes.surveyAddQuestions);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(surveyProvider.error!)),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final categories = categoryProvider.categories;
+    final surveyProvider = Provider.of<SurveyProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Survey'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => {
+            Navigator.pop(context),
+            surveyProvider.clearCurrentSurvey(),
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -45,11 +90,28 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                 const SizedBox(height: 10),
                 TextFormField(
                   keyboardType: TextInputType.text,
-                  controller: _titleController,
+                  controller: _nameController,
                   decoration: const InputDecoration(
-                    labelText: 'Survey Title',
+                    labelText: 'Survey Name',
                     border: OutlineInputBorder(),
                   ),
+                  validator: _fieldValidator,
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: categories
+                      .map((category) => DropdownMenuItem(
+                            value: category.id,
+                            child: Text(category.name),
+                          ))
+                      .toList(),
+                  onChanged: (categoryId) => setState(() {
+                    _categoryId = categoryId;
+                  }),
                   validator: _fieldValidator,
                 ),
                 const SizedBox(height: 20),
@@ -68,6 +130,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                   initialDate: _startDate,
                   onChanged: (date) => setState(() => _startDate = date),
                   required: false,
+                  canSelectAFutureDate: true,
                 ),
                 const SizedBox(height: 20),
                 DateFormField(
@@ -75,16 +138,18 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                   initialDate: _endDate,
                   onChanged: (date) => setState(() => _endDate = date),
                   required: false,
+                  canSelectAFutureDate: true,
+                  validator: _endDateValidator,
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _formKey.currentState?.validate() ?? false
-                      ? Navigator.pushNamed(
-                          context,
-                          AppRoutes.surveyAddQuestions,
+                  onPressed: surveyProvider.isLoading ? null : _handleContinue,
+                  child: surveyProvider.isLoading
+                      ? const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
                         )
-                      : null,
-                  child: const Text('Continue'),
+                      : const Text('Continue'),
                 ),
               ],
             ),

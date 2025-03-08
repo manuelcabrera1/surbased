@@ -37,7 +37,7 @@ class AppTheme {
         onTertiaryContainer: accentBlue,
         error: Colors.red,
         onError: pureWhite,
-        errorContainer: Colors.red.withOpacity(0.1),
+        errorContainer: Colors.red.withOpacity(0.6),
         onErrorContainer: Colors.red,
         surface: pureWhite,
         onSurface: darkText,
