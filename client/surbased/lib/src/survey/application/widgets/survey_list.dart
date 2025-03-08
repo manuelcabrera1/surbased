@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
@@ -57,6 +58,7 @@ class _SurveyListState extends State<SurveyList> {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
 
     final userRole = authProvider.userRole!;
 
@@ -93,6 +95,8 @@ class _SurveyListState extends State<SurveyList> {
                   itemBuilder: (context, index) => SurveyCard(
                     userRole: userRole,
                     survey: surveyProvider.surveys[index],
+                    category: categoryProvider.getCategoryById(
+                        surveyProvider.surveys[index].categoryId),
                     onTap: () => userRole == 'researcher'
                         ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
                             arguments: surveyProvider.surveys[index])

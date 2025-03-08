@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 
 class SurveyCard extends StatelessWidget {
   final Survey survey;
   final VoidCallback onTap;
   final String userRole;
+  final Category category;
 
   const SurveyCard({
     super.key,
     required this.survey,
     required this.onTap,
     required this.userRole,
+    required this.category,
   });
 
   String _formatDate(DateTime date) {
@@ -45,13 +48,15 @@ class SurveyCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              Text(
-                survey.description ?? '',
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: theme.colorScheme.onSurface),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              category.name.isNotEmpty || category.name != ''
+                  ? Text(
+                      'Category: ${category.name}',
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: theme.colorScheme.onSurface),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : const SizedBox.shrink(),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
@@ -55,10 +56,13 @@ class _UserProfileState extends State<UserProfile> {
           Provider.of<OrganizationProvider>(context, listen: false);
       final surveyProvider =
           Provider.of<SurveyProvider>(context, listen: false);
+      final categoryProvider =
+          Provider.of<CategoryProvider>(context, listen: false);
 
       //clean all providers
       organizationProvider.clearState();
       surveyProvider.clearState();
+      categoryProvider.clearState();
       await authProvider.logout();
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
