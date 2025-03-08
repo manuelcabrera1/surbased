@@ -39,7 +39,7 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
         return new_category
 
 
-@category_router.get("/categories/", status_code=200, response_model=CategoryResponseWithLength)
+@category_router.get("/categories", status_code=200, response_model=CategoryResponseWithLength)
 @required_roles(["researcher", "admin"])
 async def get_all_categories(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], org: Optional[uuid.UUID] = None):
 
