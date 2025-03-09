@@ -14,6 +14,7 @@ from typing import Annotated, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.Auth import create_access_token, check_current_user, oauth_scheme, get_current_user, required_roles
+from sqlalchemy.orm import selectinload
 
 
 survey_router = APIRouter(tags=["Survey"])
@@ -209,45 +210,47 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             category_id=survey.category_id
         )
         db.add(new_survey)
+        await db.flush()  # Flush para obtener el ID del survey
         
-        # Crear las preguntas y opciones
+        # Crear las preguntas
         created_questions = []
-        question_number = 1;
+        question_number = 1
         
         for q_data in survey.questions:
             new_question = Question(
                 number=question_number,
                 description=q_data.description,
                 multiple_answer=q_data.multiple_answer,
-                survey=new_survey,
+                survey_id=new_survey.id,  # Usar el ID directamente
                 required=q_data.required,
                 has_correct_answer=q_data.has_correct_answer
             )
             db.add(new_question)
-            created_questions.append(new_question)
-            question_number += 1;
-        await db.commit()
-
-        await db.refresh(new_survey)
-        for q in created_questions:
-            await db.refresh(q)
-
-        created_options = []
-        for q_data, q in zip(survey.questions, created_questions):
-            for o_data in q_data.options:
-                new_option = Option(
-                description=o_data.description,
-                is_correct=o_data.is_correct,
-                question=q  # Asociar directamente con la pregunta
-            )
-            db.add(new_option)
-            created_options.append(new_option)
-
-    # Commit final para opciones
-        await db.commit()
-        for o in created_options:
-            await db.refresh(o)
+            created_questions.append((new_question, q_data.options))
+            question_number += 1
         
+        await db.flush()  # Flush para obtener los IDs de las preguntas
+        
+        # Crear las opciones
+        for question, options_data in created_questions:
+            for option_data in options_data:
+                new_option = Option(
+                    description=option_data.description,
+                    is_correct=option_data.is_correct,
+                    question_id=question.id  # Usar el ID directamente
+                )
+                db.add(new_option)
+        
+        await db.commit()  # Commit final
+        
+        # Cargar las preguntas con sus opciones usando una consulta explícita
+        result = await db.execute(
+            select(Question)
+            .options(selectinload(Question.options))
+            .where(Question.survey_id == new_survey.id)
+            .order_by(Question.number)
+        )
+        loaded_questions = result.unique().scalars().all()
         
         # Construir la respuesta
         response = SurveyResponse(
@@ -275,7 +278,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                             question_id=o.question_id
                         ) for o in q.options
                     ]
-                ) for q in created_questions
+                ) for q in loaded_questions
             ]
         )
         
