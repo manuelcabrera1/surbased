@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/survey/application/pages/survey_without_questions_card.dart';
+import 'package:surbased/src/survey/application/widgets/survey_without_questions_card.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_add_edit_question_dialog.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
