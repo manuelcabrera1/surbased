@@ -3,7 +3,7 @@ import uuid
 from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import date
 
-from .QuestionSchema import QuestionCreateRequest, QuestionResponse
+from .QuestionSchema import *
 
 
 class SurveyBase(BaseModel):
@@ -30,8 +30,8 @@ class SurveyResponse(SurveyBase):
     id: uuid.UUID
     description: str
     start_date: date
-    end_date: Optional[date] = None
-    questions: List[QuestionResponse] = Field(default_factory=list)
+    end_date: Optional[date] = Field(default=None)
+    questions: List[QuestionResponse]
 class SurveyResponseWithLength(BaseModel):
     surveys: List[SurveyResponse]
     length: int

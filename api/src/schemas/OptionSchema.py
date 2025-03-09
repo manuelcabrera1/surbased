@@ -18,6 +18,10 @@ class OptionResponseWithLength(BaseModel):
     options: List[OptionResponse]
     length: int
 
+class OptionWithId(BaseModel):
+    id: UUID
+
+
 
         
         

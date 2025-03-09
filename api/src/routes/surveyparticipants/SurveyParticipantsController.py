@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, select, update
+from sqlalchemy import and_, or_, select, update
 from models.CategoryModel import Category
 from models.SurveyModel import Survey
 from models.SurveyParticipantModel import survey_participant
@@ -62,15 +62,17 @@ async def get_all_participant_surveys(id: uuid.UUID, current_user: Annotated[Use
                 result = await db.execute(select(Survey).join(survey_participant).join(User).where(and_(User.id == id, 
                                                                                                     Survey.id == survey_participant.c.survey_id, 
                                                                                                     Survey.category_id == category,
-                                                                                                    Survey.end_date >= datetime.now(),
+                                                                                                    or_(Survey.end_date >= datetime.now(), Survey.end_date == None),
                                                                                                     User.id == survey_participant.c.participant_id,
-                                                                                                    User.organization_id == current_user.organization_id, User.role == "participant")))
+                                                                                                    User.organization_id == current_user.organization_id, 
+                                                                                                    User.role == "participant")))
             else:
                 result = await db.execute(select(Survey).join(survey_participant).join(User).where(and_(User.id == id,
                                                                                                     Survey.id == survey_participant.c.survey_id, 
                                                                                                     User.id == survey_participant.c.participant_id,
-                                                                                                    Survey.end_date >= datetime.now(),
-                                                                                                    User.organization_id == current_user.organization_id, User.role == "participant")))
+                                                                                                    User.organization_id == current_user.organization_id,
+                                                                                                    or_(Survey.end_date >= datetime.now(), Survey.end_date == None),
+                                                                                                    User.role == "participant")))
         
         surveys = result.unique().scalars().all()
 

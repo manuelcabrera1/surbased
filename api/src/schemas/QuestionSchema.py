@@ -2,7 +2,7 @@ from typing import List
 import uuid
 from pydantic import BaseModel, Field, model_validator
 
-from .OptionSchema import OptionCreateRequest, OptionResponse
+from .OptionSchema import *
 
 class QuestionBase(BaseModel):
     description: str
@@ -24,4 +24,8 @@ class QuestionResponse(QuestionBase):
 class QuestionResponseWithLength(BaseModel):
     questions: List[QuestionResponse]
     length: int
+
+class QuestionWithId(BaseModel):
+    id: uuid.UUID
+    options: List[OptionWithId]
 

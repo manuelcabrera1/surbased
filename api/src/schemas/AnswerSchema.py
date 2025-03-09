@@ -3,17 +3,17 @@ from typing import List
 from pydantic import BaseModel
 from uuid import UUID
 
-class AnswerBase(BaseModel):
-    participant_id: UUID
-    option_id: UUID
+from schemas.QuestionSchema import *
 
-class AnswerCreate(AnswerBase): ...
+class AnswerBase(BaseModel):...
+
+class AnswerCreate(AnswerBase):
+    questions: List[QuestionWithId]
 
 class AnswerUpdate(AnswerBase): ...
 
 class AnswerResponse(AnswerBase):
     id: UUID
-    updated_at: datetime.datetime
 
 class AnswerResponseWithLength(AnswerBase):
     answers: List[AnswerResponse]

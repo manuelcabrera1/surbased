@@ -41,7 +41,7 @@ class Survey(Base):
 
     __table_args__ = (
         UniqueConstraint("name", "category_id", name="name_category_unique"),
-        CheckConstraint("start_date <=CURRENT_DATE", name="start_date_check"),
+        CheckConstraint("start_date >=CURRENT_DATE", name="start_date_check"),
         CheckConstraint("end_date >= start_date", name="end_date_check"),
     )
 
