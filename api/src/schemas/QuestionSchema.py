@@ -17,6 +17,7 @@ class QuestionCreateRequest(QuestionBase):
 class QuestionUpdateRequest(QuestionBase):...
 
 class QuestionResponse(QuestionBase):
+    number: int
     id: uuid.UUID
     survey_id: uuid.UUID
     options: List[OptionResponse] = Field(default_factory=list)

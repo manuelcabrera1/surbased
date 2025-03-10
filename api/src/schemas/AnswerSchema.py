@@ -13,7 +13,8 @@ class AnswerCreate(AnswerBase):
 class AnswerUpdate(AnswerBase): ...
 
 class AnswerResponse(AnswerBase):
-    id: UUID
+    survey_id: UUID
+    questions: List[QuestionWithId]
 
 class AnswerResponseWithLength(AnswerBase):
     answers: List[AnswerResponse]
