@@ -40,7 +40,6 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
 
 
 @category_router.get("/categories", status_code=200, response_model=CategoryResponseWithLength)
-@required_roles(["researcher", "admin"])
 async def get_all_categories(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], org: Optional[uuid.UUID] = None):
 
         if not current_user:
@@ -52,7 +51,7 @@ async def get_all_categories(current_user: Annotated[User, Depends(get_current_u
             else:
                 result = await db.execute(select(Category))
 
-        if current_user.role == "researcher":
+        if current_user.role == "researcher" or current_user.role == "participant":
            result = await db.execute(select(Category).where(Category.organization_id == current_user.organization_id))
 
         categories = result.unique().scalars().all()
