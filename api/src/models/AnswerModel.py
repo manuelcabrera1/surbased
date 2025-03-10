@@ -16,7 +16,7 @@ class Answer(Base):
 
     participant_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), primary_key=True)
     option_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("options.id"), primary_key=True)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
+    question_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("questions.id"), primary_key=True)
 
 
 
