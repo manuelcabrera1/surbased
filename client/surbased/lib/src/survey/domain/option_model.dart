@@ -1,12 +1,12 @@
 class Option {
-  final String description;
-  final bool isCorrect;
+  final String? description;
+  final bool? isCorrect;
   final String? id;
   final String? questionId;
 
   Option({
-    required this.description,
-    required this.isCorrect,
+    this.description,
+    this.isCorrect,
     this.id,
     this.questionId,
   });
@@ -18,8 +18,12 @@ class Option {
         questionId: json["question_id"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "description": description,
-        "is_correct": isCorrect,
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> json = {};
+    if (description != null) json["description"] = description;
+    if (isCorrect != null) json["is_correct"] = isCorrect;
+    if (id != null) json["id"] = id;
+    if (questionId != null) json["question_id"] = questionId;
+    return json;
+  }
 }

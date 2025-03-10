@@ -27,12 +27,15 @@ class _SurveyAddEditQuestionDialogState
   @override
   void initState() {
     super.initState();
-    if (mounted && widget.isEdit && widget.question != null) {
-      _questionTextController.text = widget.question!.description;
+    if (mounted &&
+        widget.isEdit &&
+        widget.question != null &&
+        widget.question!.options != null) {
+      _questionTextController.text = widget.question!.description!;
       _options.addAll(
-          widget.question!.options!.map((option) => option.description));
-      _isMultipleAnswer = widget.question!.multipleAnswer;
-      _isRequired = widget.question!.required;
+          widget.question!.options!.map((option) => option.description!));
+      _isMultipleAnswer = widget.question!.multipleAnswer!;
+      _isRequired = widget.question!.required!;
     }
   }
 

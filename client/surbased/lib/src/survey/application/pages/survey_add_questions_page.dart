@@ -207,11 +207,15 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '${index + 1}. ${question.description}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  Expanded(
+                    child: Text(
+                      '${index + 1}. ${question.description}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   PopupMenuButton(
@@ -258,7 +262,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                 ],
               ),
               const SizedBox(height: 4),
-              if (question.options.isNotEmpty) ...[
+              if (question.options != null && question.options!.isNotEmpty) ...[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -267,20 +271,20 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
-                    ...question.options.map((option) => Padding(
+                    ...question.options!.map((option) => Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
                           child: Row(
                             children: [
                               Icon(
-                                !question.multipleAnswer
-                                    ? Icons.radio_button_unchecked
-                                    : Icons.check_box_outline_blank,
+                                question.multipleAnswer!
+                                    ? Icons.check_box_outline_blank
+                                    : Icons.radio_button_unchecked,
                                 size: 16,
                                 color: Colors.grey,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(option.description),
+                                child: Text(option.description!),
                               ),
                             ],
                           ),
@@ -292,7 +296,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  question.required
+                  question.required!
                       ? Chip(
                           label: const Text(
                             'Required',

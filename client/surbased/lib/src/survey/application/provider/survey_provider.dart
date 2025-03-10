@@ -15,6 +15,11 @@ class SurveyProvider extends ChangeNotifier {
   String? get error => _error;
   Survey? get currentSurvey => _currentSurvey;
 
+  set currentSurvey(Survey? value) {
+    _currentSurvey = value;
+    notifyListeners();
+  }
+
   void clearState() {
     _isLoading = false;
     _error = null;

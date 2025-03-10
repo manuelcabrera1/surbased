@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
+import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:surbased/src/survey/domain/survey_model.dart';
 
 class SurveyList extends StatefulWidget {
   const SurveyList({super.key});
@@ -56,6 +59,27 @@ class _SurveyListState extends State<SurveyList> {
     _isInitialized = false;
   }
 
+  void _handleOnTap(Survey survey) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+
+    if (mounted && authProvider.userRole != null) {
+      final userRole = authProvider.userRole;
+      answerProvider.setCurrentSurveyBeingAnswered(survey);
+      userRole == 'researcher'
+          ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
+              arguments: survey)
+          : Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SurveyCompletePage(
+                  survey: survey,
+                ),
+              ),
+            );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -104,11 +128,7 @@ class _SurveyListState extends State<SurveyList> {
                     survey: surveyProvider.surveys[index],
                     category: categoryProvider.getCategoryById(
                         surveyProvider.surveys[index].categoryId),
-                    onTap: () => userRole == 'researcher'
-                        ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
-                            arguments: surveyProvider.surveys[index])
-                        : Navigator.pushNamed(context, AppRoutes.surveyComplete,
-                            arguments: surveyProvider.surveys[index]),
+                    onTap: () => _handleOnTap(surveyProvider.surveys[index]),
                   ),
                 ),
               ),

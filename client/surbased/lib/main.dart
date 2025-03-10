@@ -4,6 +4,7 @@ import 'package:surbased/src/app.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/shared/application/provider/theme_provider.dart';
+import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
 
@@ -15,5 +16,6 @@ void main() async {
     ChangeNotifierProvider(create: (_) => OrganizationProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider()),
     ChangeNotifierProvider(create: (_) => CategoryProvider()),
+    ChangeNotifierProvider(create: (_) => AnswerProvider()),
   ], child: const App()));
 }
