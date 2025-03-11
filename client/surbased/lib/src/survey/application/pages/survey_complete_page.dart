@@ -39,7 +39,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
   void _submitSurvey() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
-    if (allRequiredQuestionsAreAnswered() && authProvider.token != null) {
+    if (authProvider.token != null) {
       bool success = await answerProvider.registerSurveyAnswers(
           widget.survey!.id!, authProvider.token!);
       if (success) {
@@ -58,6 +58,28 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
           );
         }
       }
+    }
+  }
+
+  void _showSubmitSurveyConfirmationDialog() {
+    if (allRequiredQuestionsAreAnswered()) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Submit Survey'),
+          content: const Text('Are you sure you want to submit this survey?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => _submitSurvey(),
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      );
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -69,6 +91,38 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
     }
   }
 
+  void _showGoBackConfirmationDialog() {
+    final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+
+    if (answerProvider.currentSurveyBeingAnswered!.questions
+        .any((q) => q.options!.isNotEmpty)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Return'),
+          content: const Text(
+              'Are you sure you want to return to the survey list?\nYour progress will be lost.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                answerProvider.clearAllCurrentInfo();
+                Navigator.pushNamed(context, AppRoutes.home);
+              },
+              child: const Text('Return'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      answerProvider.clearAllCurrentInfo();
+      Navigator.pushNamed(context, AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final answerProvider = Provider.of<AnswerProvider>(context);
@@ -76,14 +130,10 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       appBar: AppBar(
         title: const Text("Complete survey"),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: answerProvider.isLoading
-              ? null
-              : () {
-                  answerProvider.clearQuestionsToBeAnswered();
-                  Navigator.of(context).pop();
-                },
-        ),
+            icon: const Icon(Icons.arrow_back),
+            onPressed: answerProvider.isLoading
+                ? null
+                : _showGoBackConfirmationDialog),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -102,7 +152,9 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: answerProvider.isLoading ? null : _submitSurvey,
+                onPressed: answerProvider.isLoading
+                    ? null
+                    : _showSubmitSurveyConfirmationDialog,
                 child: answerProvider.isLoading
                     ? const CircularProgressIndicator(strokeWidth: 2)
                     : const Text('Submit'),
