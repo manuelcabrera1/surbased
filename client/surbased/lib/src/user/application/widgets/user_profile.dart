@@ -15,38 +15,9 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  bool _isInitialized = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!_isInitialized) {
-      _isInitialized = true;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          final authProvider =
-              Provider.of<AuthProvider>(context, listen: false);
-          if (authProvider.user != null &&
-              authProvider.user!.organizationId != null &&
-              authProvider.token != null) {
-            final organizationProvider =
-                Provider.of<OrganizationProvider>(context, listen: false);
-            organizationProvider.getOrganizationById(
-              authProvider.user!.organizationId!,
-              authProvider.token!,
-            );
-          }
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
-    _isInitialized = false;
   }
 
   Future<void> _logout() async {

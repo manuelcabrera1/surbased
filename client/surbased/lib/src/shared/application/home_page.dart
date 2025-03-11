@@ -3,9 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 
@@ -55,7 +59,7 @@ class _HomePageState extends State<HomePage> {
     // Páginas para participantes
     final participantPages = [
       const SurveyList(),
-      const RegisterPage(),
+      const SurveyEventsCalendar(),
       const UserProfile(),
       const UserProfile()
     ];
@@ -63,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     // Páginas para investigadores
     final researcherPages = [
       const SurveyList(),
-      const SurveyCreatePage(),
+      const SurveyEventsCalendar(),
       const UserProfile(),
       const UserProfile()
     ];

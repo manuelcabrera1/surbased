@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -43,7 +46,35 @@ class _LoginPageState extends State<LoginPage> {
           _passwordController.text,
         );
 
-        if (isLogged) {
+        if (isLogged && mounted) {
+          final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
+          final surveyProvider =
+              Provider.of<SurveyProvider>(context, listen: false);
+          final organizationProvider =
+              Provider.of<OrganizationProvider>(context, listen: false);
+          final categoryProvider =
+              Provider.of<CategoryProvider>(context, listen: false);
+
+          if (authProvider.isAuthenticated) {
+            surveyProvider.getSurveys(
+              authProvider.userId!,
+              authProvider.userRole!,
+              authProvider.token!,
+              null,
+              null,
+            );
+
+            categoryProvider.getCategories(null, authProvider.token!);
+
+            if (authProvider.user!.organizationId != null) {
+              organizationProvider.getOrganizationById(
+                authProvider.user!.organizationId!,
+                authProvider.token!,
+              );
+            }
+          }
+
           _navigateToHome();
         } else {
           if (mounted) {
