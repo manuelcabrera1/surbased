@@ -15,6 +15,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   late Map<DateTime, List<dynamic>> _events;
+  bool _isExpanded =
+      false; // Variable para controlar si la lista está expandida
 
   @override
   void dispose() {
@@ -41,15 +43,19 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       final categoryProvider =
           Provider.of<CategoryProvider>(context, listen: false);
 
-      print(
-          'Cargando eventos. Número de encuestas: ${surveyProvider.surveys.length}');
-
       _events.clear();
+
+      DateTime now = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      );
 
       if (surveyProvider.surveys.isNotEmpty) {
         for (var survey in surveyProvider.surveys) {
           if (survey.endDate != null) {
-            if (!survey.endDate!.isBefore(DateTime.now())) {
+            if (survey.endDate!.isAfter(now) ||
+                survey.endDate!.isAtSameMomentAs(now)) {
               for (DateTime date = survey.startDate;
                   date.isBefore(survey.endDate!) ||
                       date.isAtSameMomentAs(survey.endDate!);
@@ -71,12 +77,16 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       }
 
       if (mounted) {
-        setState(() {
-          print('Eventos cargados: ${_events.length} días con eventos');
-        });
+        setState(() {});
       }
     } catch (e) {
-      print('Error al cargar eventos: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error while loading your programmed surveys: $e'),
+          ),
+        );
+      }
     }
   }
 
@@ -203,50 +213,100 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                             color: theme.colorScheme.primary,
                           ),
                         ),
+                        const SizedBox(height: 5),
+                        const Divider(
+                          thickness: 0.2,
+                        ),
                         if (_selectedDay != null &&
                             _getEventsForDay(_selectedDay!).isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: _getEventsForDay(_selectedDay!).length,
-                            itemBuilder: (context, index) {
-                              final event =
-                                  _getEventsForDay(_selectedDay!)[index];
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                elevation: 1,
-                                color: theme.colorScheme.primaryContainer
-                                    .withOpacity(0.4),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${event['surveyName']} - ${event['surveyCategory']}',
-                                        style: theme.textTheme.titleMedium
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.colorScheme.primary,
+                          // Obtener la lista de eventos para el día seleccionado
+                          Builder(builder: (context) {
+                            final events = _getEventsForDay(_selectedDay!);
+                            final eventCount = events.length;
+                            final showExpandButton = eventCount > 2;
+                            final displayCount =
+                                _isExpanded || !showExpandButton
+                                    ? eventCount
+                                    : 2;
+
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: EdgeInsets.zero,
+                                  itemCount: displayCount,
+                                  itemBuilder: (context, index) {
+                                    final event = events[index];
+                                    return Card(
+                                      margin: const EdgeInsets.only(bottom: 20),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      elevation: 1,
+                                      color: theme.colorScheme.primaryContainer
+                                          .withOpacity(0.4),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${event['surveyName']} - ${event['surveyCategory']}',
+                                              style: theme.textTheme.titleMedium
+                                                  ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    theme.colorScheme.primary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${event['surveyDescription']}',
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${event['surveyDescription']}',
-                                        style: theme.textTheme.bodyMedium,
-                                      ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
+                                if (showExpandButton)
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isExpanded = !_isExpanded;
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          _isExpanded
+                                              ? 'Show Less'
+                                              : 'Show All (${eventCount - 2} more)',
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                            color: theme.colorScheme.primary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          _isExpanded
+                                              ? Icons.keyboard_arrow_up
+                                              : Icons.keyboard_arrow_down,
+                                          size: 16,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
                           const SizedBox(height: 10),
                         ] else ...[
                           SizedBox(
