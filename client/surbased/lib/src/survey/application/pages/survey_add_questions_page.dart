@@ -212,7 +212,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       '${index + 1}. ${question.description}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                       ),
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
@@ -261,7 +261,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                   )
                 ],
               ),
-              const SizedBox(height: 4),
+              //const SizedBox(height: 4),
               if (question.options != null && question.options!.isNotEmpty) ...[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,12 +279,15 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                                 question.multipleAnswer!
                                     ? Icons.check_box_outline_blank
                                     : Icons.radio_button_unchecked,
-                                size: 16,
+                                size: 20,
                                 color: Colors.grey,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(option.description!),
+                                child: Text(
+                                  option.description!,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                               ),
                             ],
                           ),

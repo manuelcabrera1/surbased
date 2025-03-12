@@ -3,17 +3,21 @@ import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/infrastructure/survey_service.dart';
 
+import '../../../user/domain/user_model.dart';
+
 class SurveyProvider extends ChangeNotifier {
   final SurveyService _surveyService = SurveyService();
   List<Survey> _surveys = [];
   bool _isLoading = false;
   String? _error;
   Survey? _currentSurvey;
+  List<User> _surveyParticipants = [];
 
   List<Survey> get surveys => _surveys;
   bool get isLoading => _isLoading;
   String? get error => _error;
   Survey? get currentSurvey => _currentSurvey;
+  List<User> get surveyParticipants => _surveyParticipants;
 
   set currentSurvey(Survey? value) {
     _currentSurvey = value;
@@ -128,7 +132,7 @@ class SurveyProvider extends ChangeNotifier {
         );
       }
       if (userRole == 'participant') {
-        getSurveysResponse = await _surveyService.getSurveysParticipant(
+        getSurveysResponse = await _surveyService.getParticipantSurveys(
           userId,
           token,
           category,
@@ -144,6 +148,38 @@ class SurveyProvider extends ChangeNotifier {
         notifyListeners();
       } else {
         _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getSurveyParticipants(String surveyId, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final getSurveyParticipantsResponse =
+          await _surveyService.getSurveyParticipants(
+        surveyId,
+        token,
+      );
+
+      if (getSurveyParticipantsResponse['success']) {
+        _surveyParticipants =
+            (getSurveyParticipantsResponse['data']['users'] as List<dynamic>)
+                .map((s) => User.fromJson(s))
+                .toList();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveyParticipantsResponse['data'];
         _isLoading = false;
         notifyListeners();
       }

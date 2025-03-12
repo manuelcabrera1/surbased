@@ -22,24 +22,32 @@ class _SurveyListState extends State<SurveyList> {
     super.dispose();
   }
 
-  void _handleOnTap(Survey survey) {
+  Future<void> _handleOnTap(Survey survey) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
 
     if (mounted && authProvider.userRole != null) {
       final userRole = authProvider.userRole;
-      answerProvider.setCurrentSurveyBeingAnswered(survey);
-      userRole == 'researcher'
-          ? Navigator.pushNamed(context, AppRoutes.surveyDetail,
-              arguments: survey)
-          : Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SurveyCompletePage(
-                  survey: survey,
-                ),
-              ),
-            );
+      if (userRole == 'participant') {
+        final answerProvider =
+            Provider.of<AnswerProvider>(context, listen: false);
+        answerProvider.setCurrentSurveyBeingAnswered(survey);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SurveyCompletePage(
+              survey: survey,
+            ),
+          ),
+        );
+      } else {
+        final surveyProvider =
+            Provider.of<SurveyProvider>(context, listen: false);
+        surveyProvider.currentSurvey = survey;
+
+        if (mounted) {
+          Navigator.pushNamed(context, AppRoutes.surveyDetail);
+        }
+      }
     }
   }
 
@@ -61,29 +69,31 @@ class _SurveyListState extends State<SurveyList> {
     }
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                'Surveys',
-                style: theme.textTheme.displayMedium,
-              ),
-            ),
-            const SizedBox(height: 30),
-            if (surveyProvider.surveys.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Text('No surveys found'),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 25),
+                child: Text(
+                  'Surveys',
+                  style: theme.textTheme.displayMedium,
                 ),
-              )
-            else
-              Expanded(
-                child: ListView.builder(
+              ),
+              const SizedBox(height: 30),
+              if (surveyProvider.surveys.isEmpty)
+                const Expanded(
+                  child: Center(
+                    child: Text('No surveys found'),
+                  ),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   itemCount: surveyProvider.surveys.length,
                   itemBuilder: (context, index) => SurveyCard(
@@ -94,8 +104,8 @@ class _SurveyListState extends State<SurveyList> {
                     onTap: () => _handleOnTap(surveyProvider.surveys[index]),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

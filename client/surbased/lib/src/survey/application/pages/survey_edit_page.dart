@@ -8,25 +8,23 @@ import 'package:surbased/src/survey/application/widgets/survey_form.dart';
 
 import '../../../category/application/provider/category_provider.dart';
 
-class SurveyCreatePage extends StatefulWidget {
-  const SurveyCreatePage({super.key});
+class SurveyEditPage extends StatefulWidget {
+  const SurveyEditPage({super.key});
 
   @override
-  State<SurveyCreatePage> createState() => SurveyCreatePageState();
+  State<SurveyEditPage> createState() => SurveyEditPageState();
 }
 
-class SurveyCreatePageState extends State<SurveyCreatePage> {
+class SurveyEditPageState extends State<SurveyEditPage> {
   @override
   Widget build(BuildContext context) {
-    final surveyProvider = Provider.of<SurveyProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Survey'),
+        title: const Text('Edit Survey'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {
             Navigator.pop(context),
-            surveyProvider.clearCurrentSurvey(),
           },
         ),
       ),

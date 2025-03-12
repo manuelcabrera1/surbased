@@ -6,6 +6,7 @@ import 'package:surbased/src/survey/application/pages/survey_add_questions_page.
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_detail_page.dart';
+import 'package:surbased/src/survey/application/pages/survey_edit_page.dart';
 import 'package:surbased/src/user/application/pages/user_accessibility_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_info_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String surveyDetail = '/survey/detail';
   static const String surveyComplete = '/survey/complete';
   static const String surveyCreate = '/survey/create';
+  static const String surveyEdit = '/survey/edit';
   static const String surveyAddQuestions = '/survey/create/questions';
   static const String userEditInfo = '/user/edit/info';
   static const String userEditPassword = '/user/edit/password';
@@ -35,6 +37,7 @@ class AppRoutes {
     surveyDetail: (_) => const SurveyDetailPage(),
     surveyComplete: (_) => const SurveyCompletePage(),
     surveyCreate: (_) => const SurveyCreatePage(),
+    surveyEdit: (_) => const SurveyEditPage(),
     userEditInfo: (_) => const UserEditInfoPage(),
     userEditPassword: (_) => const UserEditPasswordPage(),
     userNotifications: (_) => const UserNotificationsPage(),

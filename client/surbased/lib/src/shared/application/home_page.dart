@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:surbased/src/auth/application/pages/login_page.dart';
-import 'package:surbased/src/auth/application/pages/register_page.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
@@ -12,6 +10,7 @@ import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,53 +21,80 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
-    final organizationProvider =
-        Provider.of<OrganizationProvider>(context, listen: false);
-    final categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
-
-    if (authProvider.isAuthenticated) {
-      surveyProvider.getSurveys(
-        authProvider.userId!,
-        authProvider.userRole!,
-        authProvider.token!,
-        null,
-        null,
-      );
-
-      categoryProvider.getCategories(null, authProvider.token!);
-
-      if (authProvider.user!.organizationId != null) {
-        organizationProvider.getOrganizationById(
-          authProvider.user!.organizationId!,
-          authProvider.token!,
-        );
-      }
-    }
+    //_startPeriodicRefresh();
   }
 
   @override
   void dispose() {
     super.dispose();
+    _refreshTimer?.cancel();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    //_startPeriodicRefresh();
+  }
+
+  void _startPeriodicRefresh() {
+    // Refrescar datos cada 5 minutos (ajustable según necesidades)
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (mounted) {
+        _refreshData();
+      }
+    });
   }
 
   Future<void> _onDestinationSelected(int index) async {
+    await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
-      await Future.delayed(const Duration(milliseconds: 100));
+      if (index == 0 || index == 1) {
+        _refreshData();
+      }
+
       setState(() {
         _currentIndex = index;
       });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final surveyProvider =
+          Provider.of<SurveyProvider>(context, listen: false);
+      final organizationProvider =
+          Provider.of<OrganizationProvider>(context, listen: false);
+      final categoryProvider =
+          Provider.of<CategoryProvider>(context, listen: false);
+
+      if (authProvider.isAuthenticated) {
+        surveyProvider.getSurveys(
+          authProvider.userId!,
+          authProvider.userRole!,
+          authProvider.token!,
+          null,
+          null,
+        );
+
+        categoryProvider.getCategories(null, authProvider.token!);
+
+        if (authProvider.user!.organizationId != null) {
+          organizationProvider.getOrganizationById(
+            authProvider.user!.organizationId!,
+            authProvider.token!,
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 

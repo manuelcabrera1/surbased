@@ -48,6 +48,12 @@ class AppTheme {
 
       scaffoldBackgroundColor: offWhite,
 
+      tabBarTheme: TabBarTheme(
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelColor: pureWhite,
+        unselectedLabelColor: pureWhite.withOpacity(0.7),
+        indicatorColor: pureWhite,
+      ),
       // Estilo de las Cards
       cardTheme: CardTheme(
         elevation: 2,

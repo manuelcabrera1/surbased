@@ -48,7 +48,7 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getSurveysParticipant(
+  Future<Map<String, dynamic>> getParticipantSurveys(
       String userId, String token, String? category) async {
     try {
       final existingCategory = category != null ? '?category=$category' : '';
@@ -58,6 +58,27 @@ class SurveyService {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
           });
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(response.body)};
+      } else {
+        return {'success': false, 'data': json.decode(response.body)['detail']};
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getSurveyParticipants(
+      String surveyId, String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/surveys/$surveyId/participants'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         return {'success': true, 'data': json.decode(response.body)};
