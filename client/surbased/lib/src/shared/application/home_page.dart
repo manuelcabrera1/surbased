@@ -29,6 +29,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final organizationProvider =
+        Provider.of<OrganizationProvider>(context, listen: false);
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+
+    if (authProvider.isAuthenticated) {
+      surveyProvider.getSurveys(
+        authProvider.userId!,
+        authProvider.userRole!,
+        authProvider.token!,
+        null,
+        null,
+      );
+
+      categoryProvider.getCategories(null, authProvider.token!);
+
+      if (authProvider.user!.organizationId != null) {
+        organizationProvider.getOrganizationById(
+          authProvider.user!.organizationId!,
+          authProvider.token!,
+        );
+      }
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }

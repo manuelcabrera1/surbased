@@ -47,34 +47,6 @@ class _LoginPageState extends State<LoginPage> {
         );
 
         if (isLogged && mounted) {
-          final authProvider =
-              Provider.of<AuthProvider>(context, listen: false);
-          final surveyProvider =
-              Provider.of<SurveyProvider>(context, listen: false);
-          final organizationProvider =
-              Provider.of<OrganizationProvider>(context, listen: false);
-          final categoryProvider =
-              Provider.of<CategoryProvider>(context, listen: false);
-
-          if (authProvider.isAuthenticated) {
-            surveyProvider.getSurveys(
-              authProvider.userId!,
-              authProvider.userRole!,
-              authProvider.token!,
-              null,
-              null,
-            );
-
-            categoryProvider.getCategories(null, authProvider.token!);
-
-            if (authProvider.user!.organizationId != null) {
-              organizationProvider.getOrganizationById(
-                authProvider.user!.organizationId!,
-                authProvider.token!,
-              );
-            }
-          }
-
           _navigateToHome();
         } else {
           if (mounted) {
