@@ -18,12 +18,12 @@ class CategoryService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'data': json.decode(response.body),
+          'data': json.decode(utf8.decode(response.bodyBytes)),
         };
       } else {
         return {
           'success': false,
-          'data': json.decode(response.body)['detail'],
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail'],
         };
       }
     } catch (e) {

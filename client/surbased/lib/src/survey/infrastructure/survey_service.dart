@@ -19,9 +19,15 @@ class SurveyService {
       );
 
       if (response.statusCode == 201) {
-        return {'success': true, 'data': json.decode(response.body)};
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
       } else {
-        return {'success': false, 'data': json.decode(response.body)['detail']};
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};
@@ -39,9 +45,15 @@ class SurveyService {
       });
 
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(response.body)};
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
       } else {
-        return {'success': false, 'data': json.decode(response.body)['detail']};
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};
@@ -60,9 +72,15 @@ class SurveyService {
           });
 
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(response.body)};
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
       } else {
-        return {'success': false, 'data': json.decode(response.body)['detail']};
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};
@@ -81,9 +99,15 @@ class SurveyService {
       );
 
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(response.body)};
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
       } else {
-        return {'success': false, 'data': json.decode(response.body)['detail']};
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};
@@ -103,9 +127,15 @@ class SurveyService {
       );
 
       if (response.statusCode == 201) {
-        return {'success': true, 'data': json.decode(response.body)};
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
       } else {
-        return {'success': false, 'data': json.decode(response.body)['detail']};
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
       }
     } catch (e) {
       return {
