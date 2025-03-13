@@ -87,17 +87,23 @@ async def get_user(current_user: Annotated[User, Depends(get_current_user)] = No
 
 
 @user_router.get("/users", status_code=200, response_model=UserResponseWithLength, dependencies=[Depends(check_current_user)])
-@required_roles(["admin", "researcher"])
-async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None, org: Optional[uuid.UUID] = None):
+@required_roles(["admin"])
+async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None, role: Optional[UserRoleEnum] = None, org: Optional[uuid.UUID] = None):
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
         if current_user.role == "admin":
-            if org:
+            if org and role:
+                result = await db.execute(select(User).where(User.organization_id == org, User.role == role))
+            elif org:
                 result = await db.execute(select(User).where(User.organization_id == org))
+            elif role:
+                result = await db.execute(select(User).where(User.role == role))
             else:
                 result = await db.execute(select(User))
-
-        if current_user.role == "researcher":
-            result = await db.execute(select(User).where(User.organization_id == current_user.organization_id))
+                
+       
 
         users = result.unique().scalars().all()
         return { "users": users, "length": len(users) }

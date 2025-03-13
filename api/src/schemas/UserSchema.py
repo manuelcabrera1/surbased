@@ -73,6 +73,11 @@ class UserByRoleRequest(BaseModel):
 class UserResponseWithLength(BaseModel):
     users: List[UserResponse]
     length: int
+
+class UsersByRoleAndOrganizationResponse(BaseModel):
+    researchers: List[UserResponse]
+    participants: List[UserResponse]
+
     
 
 class UserUpdatePasswordRequest(BaseModel):

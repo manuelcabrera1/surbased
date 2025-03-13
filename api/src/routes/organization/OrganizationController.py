@@ -7,7 +7,7 @@ from models.OrganizationModel import Organization
 from database import get_db
 from typing import Annotated, List
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.Auth import create_access_token, check_current_user
+from auth.Auth import create_access_token, check_current_user, get_current_user, required_roles
 
 
 
@@ -32,6 +32,7 @@ async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSessio
 
  
 @org_router.get("/orgs", status_code=200, response_model=OrganizationResponseWithLength, dependencies=[Depends(check_current_user)])
+@required_roles(["admin"])
 async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)]):
 
         result = await db.execute(select(Organization))
@@ -51,10 +52,32 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
             raise HTTPException(status_code=404, detail="Organization not found") 
         
         return existing_org
+
+@org_router.get("/orgs/{id}/users", status_code=200, response_model=UsersByRoleAndOrganizationResponse, dependencies=[Depends(check_current_user)])
+@required_roles(["researcher"])
+async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+        
+        if current_user.organization_id != id:
+            raise HTTPException(status_code=403, detail="You are not allowed to access this organization")
+        
+
+        result = await db.execute(select(User).where(User.organization_id == id))
+
+        users = result.unique().scalars().all()
+        users.sort(key=lambda a: (a.name))
+
+        researchers = [user for user in users if user.role == "researcher"]
+        participants = [user for user in users if user.role == "participant"]
+
+        return { "researchers": researchers, "participants": participants }
             
     
 
 @org_router.put("/orgs/{id}", status_code=201, response_model=OrganizationResponse, dependencies=[Depends(check_current_user)])
+@required_roles(["admin"])
 async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)]):
 
         
@@ -83,6 +106,7 @@ async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annota
 
 
 @org_router.delete("/orgs/{id}", status_code=204, dependencies=[Depends(check_current_user)])
+@required_roles(["admin"])
 async def delete_organization(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)]):
 
         #check if org exists
