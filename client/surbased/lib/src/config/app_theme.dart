@@ -42,7 +42,7 @@ class AppTheme {
         surface: pureWhite,
         onSurface: darkText,
         onSurfaceVariant: greyText,
-        outline: primaryBlue.withOpacity(0.2),
+        outline: primaryBlue.withOpacity(0.7),
         shadow: Colors.black.withOpacity(0.1),
       ),
 
@@ -169,6 +169,11 @@ class AppTheme {
         ),
         displayMedium: TextStyle(
           fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: darkText,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24,
           fontWeight: FontWeight.bold,
           color: darkText,
         ),

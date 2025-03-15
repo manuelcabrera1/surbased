@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/survey/application/widgets/survey_add_participants_dialog.dart';
 import 'package:surbased/src/survey/application/widgets/survey_participants.dart';
 
 import '../../../user/domain/user_model.dart';
@@ -47,12 +48,22 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_participantsLoaded) {
-      _loadParticipants();
-      setState(() {
-        _participantsLoaded = true;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_participantsLoaded) {
+        _loadParticipants();
+        setState(() {
+          _participantsLoaded = true;
+        });
+      }
+    });
+  }
+
+  void _showAddParticipantsModal() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => const SurveyAddParticipantsDialog(),
+    );
   }
 
   Future<void> _loadParticipants() async {
@@ -149,10 +160,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
       ),
       floatingActionButton: tabController.index == 1
           ? FloatingActionButton(
-              onPressed: () {
-                // Lógica para añadir participantes
-                print('Add participant button pressed');
-              },
+              onPressed: () => _showAddParticipantsModal(),
               tooltip: 'Add Participant',
               child: const Icon(Icons.person_add),
             )

@@ -14,12 +14,12 @@ class OrganizationService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'data': json.decode(response.body),
+          'data': json.decode(utf8.decode(response.bodyBytes)),
         };
       } else {
         return {
           'success': false,
-          'data': json.decode(response.body)['detail'],
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail'],
         };
       }
     } catch (e) {
@@ -27,6 +27,35 @@ class OrganizationService {
         'success': false,
         'data': e.toString(),
       };
+    }
+  }
+
+  Future<Map<String, dynamic>> getUsersInCurrentOrganization(
+      String token, String organizationId,
+      {String? sortBy, String? order}) async {
+    try {
+      String sortByExists = sortBy != null ? '?sortBy=$sortBy' : '';
+      String orderExists = order != null ? '&order=$order' : '';
+      final response = await http.get(
+        Uri.parse('$_baseUrl/$organizationId/users$sortByExists$orderExists'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
     }
   }
 }

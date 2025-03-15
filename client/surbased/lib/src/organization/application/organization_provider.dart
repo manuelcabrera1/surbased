@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/organization/domain/organization_model.dart';
 import 'package:surbased/src/organization/infrastructure/organization_service.dart';
+import 'package:surbased/src/user/domain/user_model.dart';
 
 class OrganizationProvider with ChangeNotifier {
   final _organizationService = OrganizationService();
   String? _error;
   bool _isLoading = false;
   Organization? _organization;
-
   bool get isLoading => _isLoading;
   String? get error => _error;
   Organization? get organization => _organization;
@@ -41,6 +41,38 @@ class OrganizationProvider with ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getUsersInOrganization(String token,
+      {String? sortBy, String? order}) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      late Map<String, dynamic> getUsersResponse;
+
+      getUsersResponse = await _organizationService
+          .getUsersInCurrentOrganization(token, _organization!.id,
+              sortBy: sortBy, order: order);
+
+      if (getUsersResponse['success']) {
+        _organization!.users =
+            (getUsersResponse['data']['users'] as List<dynamic>)
+                .map((user) => User.fromJson(user))
+                .toList();
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+      } else {
+        _isLoading = false;
+        _error = getUsersResponse['data'];
+        notifyListeners();
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
       notifyListeners();
     }
   }

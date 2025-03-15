@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/organization_users.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _onDestinationSelected(int index) async {
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
-      if (index == 0 || index == 1) {
+      if (index == 0 || index == 1 || index == 2) {
         _refreshData();
       }
 
@@ -89,6 +90,11 @@ class _HomePageState extends State<HomePage> {
             authProvider.user!.organizationId!,
             authProvider.token!,
           );
+          if (authProvider.user!.role == 'researcher') {
+            organizationProvider.getUsersInOrganization(
+              authProvider.token!,
+            );
+          }
         }
       }
     } catch (e) {
@@ -124,7 +130,7 @@ class _HomePageState extends State<HomePage> {
     final researcherPages = [
       const SurveyList(),
       const SurveyEventsCalendar(),
-      const UserProfile(),
+      const OrganizationUsers(),
       const UserProfile()
     ];
 
