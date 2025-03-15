@@ -53,9 +53,11 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
         
         return existing_org
 
-@org_router.get("/orgs/{id}/users", status_code=200, response_model=UsersByRoleAndOrganizationResponse, dependencies=[Depends(check_current_user)])
+@org_router.get("/orgs/{id}/users", status_code=200, response_model=UserResponseWithLength, dependencies=[Depends(check_current_user)])
 @required_roles(["researcher"])
-async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
+async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], 
+                                        current_user: Annotated[User, Depends(get_current_user)] = None, 
+                                        sortBy: Optional[str] = 'name', order: Optional[str] = 'ASC'):
         
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -67,12 +69,14 @@ async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession
         result = await db.execute(select(User).where(User.organization_id == id))
 
         users = result.unique().scalars().all()
-        users.sort(key=lambda a: (a.name))
+        if sortBy == "name":
+            users.sort(key=lambda a: (a.name), reverse=order == 'DESC')
+        elif sortBy == "email":
+            users.sort(key=lambda a: (a.email), reverse=order == 'DESC')
+        elif sortBy == "role":
+            users.sort(key=lambda a: (a.role), reverse=order == 'DESC')
 
-        researchers = [user for user in users if user.role == "researcher"]
-        participants = [user for user in users if user.role == "participant"]
-
-        return { "researchers": researchers, "participants": participants }
+        return { "users": users, "length": len(users) }
             
     
 
