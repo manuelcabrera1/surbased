@@ -44,12 +44,12 @@ class CustomNavigationBar extends StatelessWidget {
         label: 'Dashboard',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.add_chart),
-        label: 'Create',
+        icon: Icon(Icons.calendar_month),
+        label: 'Calendar',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.analytics),
-        label: 'Results',
+        icon: Icon(Icons.people),
+        label: 'Users',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person),

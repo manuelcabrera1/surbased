@@ -135,7 +135,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
             ),
             const SizedBox(height: 8),
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding:
+                  const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 8),
               child: TableCalendar(
                 firstDay: DateTime.utc(1970, 1, 1),
                 lastDay: DateTime.utc(2025, 12, 31),
@@ -163,8 +164,9 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                   ),
                 ),
                 calendarStyle: CalendarStyle(
-                  tablePadding: const EdgeInsets.symmetric(horizontal: 10),
+                  cellMargin: const EdgeInsets.symmetric(vertical: 9),
                   markersMaxCount: 1,
+                  markerSize: 6,
                   markerDecoration: BoxDecoration(
                     color: theme.colorScheme.primary,
                     shape: BoxShape.circle,

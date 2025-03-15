@@ -11,6 +11,7 @@ class AuthProvider with ChangeNotifier {
   User? _user;
   final _prefs = SharedPreferences.getInstance();
   bool _isLoading = false;
+  List<User> _users = [];
 
   // Getters
   bool get isAuthenticated => _isAuthenticated;
@@ -20,7 +21,7 @@ class AuthProvider with ChangeNotifier {
   User? get user => _user;
   String? get userId => _user?.id;
   String? get userRole => _user?.role;
-
+  List<User> get users => _users;
   Future<bool> login(String email, String password) async {
     _error = null;
     _isLoading = true;
@@ -178,6 +179,34 @@ class AuthProvider with ChangeNotifier {
       _error = e.toString();
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<void> getUsers(String token, String? org, String? role) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      late Map<String, dynamic> getUsersResponse;
+      if (_user!.role == 'admin') {
+        getUsersResponse = await _authService.getUsers(token, org, role);
+      }
+      if (getUsersResponse['success']) {
+        _users = (getUsersResponse['data']['users'] as List<dynamic>)
+            .map((user) => User.fromJson(user))
+            .toList();
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+      } else {
+        _isLoading = false;
+        _error = getUsersResponse['data'];
+        notifyListeners();
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
     }
   }
 }

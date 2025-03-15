@@ -25,7 +25,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
       itemCount: surveyProvider.surveyParticipants.length,
       itemBuilder: (context, index) => ListTile(
         title: Text(surveyProvider.surveyParticipants[index].name!),
-        subtitle: Text(surveyProvider.surveyParticipants[index].email!),
+        subtitle: Text(surveyProvider.surveyParticipants[index].email),
       ),
     );
   }

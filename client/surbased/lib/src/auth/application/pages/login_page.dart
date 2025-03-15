@@ -72,6 +72,15 @@ class _LoginPageState extends State<LoginPage> {
                 authProvider.user!.organizationId!,
                 authProvider.token!,
               );
+              if (authProvider.user!.role == 'researcher') {
+                organizationProvider.getUsersInOrganization(
+                  authProvider.token!,
+                );
+              }
+            }
+
+            if (authProvider.user!.role == 'admin') {
+              authProvider.getUsers(authProvider.token!, null, null);
             }
           }
           _navigateToHome();
