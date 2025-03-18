@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/domain/option_model.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyAddEditQuestionDialog extends StatefulWidget {
   final Question? question;
@@ -65,7 +66,7 @@ class _SurveyAddEditQuestionDialogState
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
   }
@@ -100,7 +101,7 @@ class _SurveyAddEditQuestionDialogState
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error when adding question')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.question_add_error)),
           );
         }
       }
@@ -140,7 +141,7 @@ class _SurveyAddEditQuestionDialogState
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error when adding question')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.question_update_error)),
           );
         }
       }
@@ -159,7 +160,7 @@ class _SurveyAddEditQuestionDialogState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.isEdit ? 'Edit Question' : 'New Question',
+                  widget.isEdit ? AppLocalizations.of(context)!.question_edit : AppLocalizations.of(context)!.question_new,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -169,32 +170,32 @@ class _SurveyAddEditQuestionDialogState
                 TextFormField(
                   controller: _questionTextController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Question Text',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.question_text,
+                    border: const OutlineInputBorder(),
                   ),
                   validator: _fieldValidator,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<bool>(
                   value: widget.isEdit ? widget.question!.multipleAnswer : null,
-                  decoration: const InputDecoration(
-                    labelText: 'Question Type',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.question_type,
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: false,
-                      child: Text('Unique Option'),
+                      child: Text(AppLocalizations.of(context)!.unique_option),
                     ),
                     DropdownMenuItem(
                       value: true,
-                      child: Text('Multiple Option'),
+                      child: Text(AppLocalizations.of(context)!.multiple_option),
                     ),
                   ],
                   validator: (value) {
                     if (value == null) {
-                      return 'This field is required';
+                      return AppLocalizations.of(context)!.input_error_required;
                     }
                     return null;
                   },
@@ -208,7 +209,7 @@ class _SurveyAddEditQuestionDialogState
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
-                  title: const Text('Required'),
+                  title: Text(AppLocalizations.of(context)!.required),
                   value: _isRequired,
                   onChanged: (value) {
                     setState(() {
@@ -224,9 +225,9 @@ class _SurveyAddEditQuestionDialogState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Options:',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.options,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -234,7 +235,7 @@ class _SurveyAddEditQuestionDialogState
                         TextButton.icon(
                           onPressed: _addOption,
                           icon: const Icon(Icons.add),
-                          label: const Text('Add Option'),
+                          label: Text(AppLocalizations.of(context)!.add_option),
                         ),
                       ],
                     ),
@@ -249,7 +250,7 @@ class _SurveyAddEditQuestionDialogState
                               child: TextFormField(
                                 initialValue: _options[index],
                                 decoration: InputDecoration(
-                                  labelText: 'Option ${index + 1}',
+                                  labelText: AppLocalizations.of(context)!.option(index + 1),
                                   border: const OutlineInputBorder(),
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.always,
@@ -273,8 +274,10 @@ class _SurveyAddEditQuestionDialogState
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: widget.isEdit ? _updateQuestion : _addQuestion,
-                  label:
-                      Text(widget.isEdit ? 'Update Question' : 'Add Question'),
+                  label: Text(
+                      widget.isEdit
+                          ? AppLocalizations.of(context)!.question_update
+                          : AppLocalizations.of(context)!.question_add),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                   ),

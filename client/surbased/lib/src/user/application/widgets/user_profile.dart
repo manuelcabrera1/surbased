@@ -6,7 +6,7 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/user/application/widgets/user_settings_section.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
 
@@ -49,24 +49,24 @@ class _UserProfileState extends State<UserProfile> {
     final organizationProvider = Provider.of<OrganizationProvider>(context);
 
     final accountSettings = {
-      'Edit Profile': () {
+      AppLocalizations.of(context)!.edit_profile_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userEditInfo);
       },
-      'Change Password': () {
+      AppLocalizations.of(context)!.edit_password_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userEditPassword);
       },
-      'Notifications': () {
+      AppLocalizations.of(context)!.notifications_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userNotifications);
       },
-      'Security': () {
+      AppLocalizations.of(context)!.security_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userSecurity);
       },
     };
     final appearanceSettings = {
-      'Theme': () {
+      AppLocalizations.of(context)!.theme_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userTheme);
       },
-      'Accessibility': () {
+      AppLocalizations.of(context)!.accessibility_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userAccessibility);
       },
     };
@@ -82,8 +82,8 @@ class _UserProfileState extends State<UserProfile> {
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 25),
-                    child:
-                        Text('Profile', style: theme.textTheme.displayMedium),
+                    child: Text(AppLocalizations.of(context)!.profile_page_title, 
+                                style: theme.textTheme.displayMedium),
                   ),
                 ),
                 const SizedBox(height: 35),
@@ -132,17 +132,17 @@ class _UserProfileState extends State<UserProfile> {
                 ),
                 const SizedBox(height: 30),
                 UserSettingsSection(
-                    title: 'Account Settings', items: accountSettings),
+                    title: AppLocalizations.of(context)!.account_settings, items: accountSettings),
                 const SizedBox(height: 20),
                 UserSettingsSection(
-                    title: 'Appearance', items: appearanceSettings),
+                    title: AppLocalizations.of(context)!.appearance, items: appearanceSettings),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: TextButton(
                         onPressed: _logout,
-                        child: Text('Logout',
+                        child: Text(AppLocalizations.of(context)!.logout,
                             style: theme.textTheme.titleMedium?.copyWith(
                                 color: theme.colorScheme.error,
                                 fontWeight: FontWeight.bold))),

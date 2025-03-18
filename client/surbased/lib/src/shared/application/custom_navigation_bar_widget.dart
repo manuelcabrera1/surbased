@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -19,61 +20,57 @@ class CustomNavigationBar extends StatelessWidget {
 
     // Items de navegación para participantes
     final participantItems = [
-      const NavigationDestination(
-        icon: Icon(Icons.list_alt),
-        label: 'Surveys',
+      NavigationDestination(
+        icon: const Icon(Icons.list_alt),
+        label: AppLocalizations.of(context)!.surveys_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month),
-        label: 'Calendar',
+      NavigationDestination(
+        icon: const Icon(Icons.calendar_month),
+        label: AppLocalizations.of(context)!.calendar_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.history),
-        label: 'History',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.person),
-        label: 'Profile',
+      NavigationDestination(
+        icon: const Icon(Icons.person),
+        label: AppLocalizations.of(context)!.profile_page_title,
       ),
     ];
 
     // Items de navegación para investigadores
     final researcherItems = [
-      const NavigationDestination(
-        icon: Icon(Icons.dashboard),
-        label: 'Dashboard',
+      NavigationDestination(
+        icon: const Icon(Icons.dashboard),
+        label: AppLocalizations.of(context)!.dashboard_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month),
-        label: 'Calendar',
+      NavigationDestination(
+        icon: const Icon(Icons.calendar_month),
+        label: AppLocalizations.of(context)!.calendar_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.people),
-        label: 'Users',
+      NavigationDestination(
+        icon: const Icon(Icons.people),
+        label: AppLocalizations.of(context)!.users_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.person),
-        label: 'Profile',
+      NavigationDestination(
+        icon: const Icon(Icons.person),
+        label: AppLocalizations.of(context)!.profile_page_title,
       ),
     ];
 
     // Items de navegación para administradores
     final adminItems = [
-      const NavigationDestination(
-        icon: Icon(Icons.admin_panel_settings),
-        label: 'Panel',
+      NavigationDestination(
+        icon: const Icon(Icons.admin_panel_settings),
+        label: AppLocalizations.of(context)!.panel_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.people),
-        label: 'Users',
+      NavigationDestination(
+        icon: const Icon(Icons.people),
+        label: AppLocalizations.of(context)!.users_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.business),
-        label: 'Organizations',
+      NavigationDestination(
+        icon: const Icon(Icons.business),
+        label: AppLocalizations.of(context)!.organizations_page_title,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.person),
-        label: 'Profile',
+      NavigationDestination(
+        icon: const Icon(Icons.person),
+        label: AppLocalizations.of(context)!.profile_page_title,
       ),
     ];
 

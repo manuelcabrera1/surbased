@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class SurveyWithoutQuestionsCard extends StatelessWidget {
   const SurveyWithoutQuestionsCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.question_answer_outlined,
               size: 48,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'There are no questions added',
-              style: TextStyle(
+              AppLocalizations.of(context)!.survey_no_questions_added,
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 16,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Click \'+\' to add a question',
-              style: TextStyle(
+              AppLocalizations.of(context)!.survey_add_question,
+              style: const TextStyle(
                 color: Colors.grey,
               ),
             ),

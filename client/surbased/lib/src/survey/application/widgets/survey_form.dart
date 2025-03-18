@@ -4,6 +4,7 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../category/application/provider/category_provider.dart';
 
@@ -25,14 +26,14 @@ class SurveyFormState extends State<SurveyForm> {
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
   }
 
   String? _endDateValidator(DateTime? value) {
     if (value != null && _startDate != null && value.isBefore(_startDate!)) {
-      return 'End date cannot be before start date';
+      return AppLocalizations.of(context)!.start_end_date_error;
     }
     return null;
   }
@@ -79,17 +80,17 @@ class SurveyFormState extends State<SurveyForm> {
             TextFormField(
               keyboardType: TextInputType.text,
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Survey Name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.survey_name,
+                border: const OutlineInputBorder(),
               ),
               validator: _fieldValidator,
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.category,
+                border: const OutlineInputBorder(),
               ),
               items: categories
                   .map((category) => DropdownMenuItem(
@@ -107,14 +108,15 @@ class SurveyFormState extends State<SurveyForm> {
               keyboardType: TextInputType.multiline,
               maxLines: 4,
               controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.description,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
             DateFormField(
-              labelText: 'Start Date',
+              context: context,
+              labelText: AppLocalizations.of(context)!.start_date,
               initialDate: _startDate,
               onChanged: (date) => setState(() => _startDate = date),
               required: false,
@@ -122,7 +124,8 @@ class SurveyFormState extends State<SurveyForm> {
             ),
             const SizedBox(height: 20),
             DateFormField(
-              labelText: 'End Date',
+              context: context,
+              labelText: AppLocalizations.of(context)!.end_date,
               initialDate: _endDate,
               onChanged: (date) => setState(() => _endDate = date),
               required: false,
@@ -137,7 +140,7 @@ class SurveyFormState extends State<SurveyForm> {
                       strokeWidth: 2,
                       color: Colors.white,
                     )
-                  : const Text('Continue'),
+                  : Text(AppLocalizations.of(context)!.go_forward),
             ),
           ],
         ),

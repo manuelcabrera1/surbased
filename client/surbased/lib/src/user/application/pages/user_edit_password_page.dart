@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserEditPasswordPage extends StatefulWidget {
   const UserEditPasswordPage({super.key});
@@ -36,15 +37,14 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
           setState(() => _isEditing = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Password updated successfully')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.password_updated)),
             );
           }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content:
-                      Text(authProvider.error ?? 'Error updating password')),
+                  content: Text(authProvider.error ?? AppLocalizations.of(context)!.password_update_error)),
             );
           }
         }
@@ -77,7 +77,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
+        title: Text(AppLocalizations.of(context)!.edit_password_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -103,9 +103,9 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
                   enabled: _isEditing,
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
+                    prefixIcon: const Icon(Icons.lock),
                   ),
                   validator: _fieldValidator,
                 ),
@@ -114,9 +114,9 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
                   enabled: _isEditing,
                   controller: _confirmPasswordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password_confirm,
+                    prefixIcon: const Icon(Icons.lock),
                   ),
                   validator: _confirmPasswordValidator,
                 ),

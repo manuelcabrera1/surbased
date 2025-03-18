@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
@@ -18,9 +19,9 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
   List<User> _usersToShow = [];
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (mounted) {
       final organizationProvider =
           Provider.of<OrganizationProvider>(context, listen: false);
       if (organizationProvider.organization?.users != null) {
@@ -28,7 +29,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
           _usersToShow = organizationProvider.organization!.users!;
         });
       }
-    });
+    }
   }
 
   @override
@@ -84,7 +85,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
             Padding(
               padding: const EdgeInsets.only(left: 25),
               child: Text(
-                'Users',
+                AppLocalizations.of(context)!.users_page_title,
                 style: theme.textTheme.displayMedium,
               ),
             ),
@@ -137,7 +138,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                           });
                           filterUsers();
                         },
-                        hintText: 'Search users',
+                        hintText: AppLocalizations.of(context)!.users_searchbar_placeholder,
                       ),
                     ),
                   ),
@@ -173,7 +174,9 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _usersToShow[index].role,
+                          _usersToShow[index].role == 'researcher'
+                              ? AppLocalizations.of(context)!.researcher
+                              : AppLocalizations.of(context)!.participant,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.onPrimaryContainer,
                           ),

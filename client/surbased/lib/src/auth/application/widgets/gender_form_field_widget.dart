@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GenderFormField extends FormField<String> {
   GenderFormField({
     super.key,
+    required BuildContext context,
     String? initialGender,
     required String labelText,
     void Function(String?)? onChanged,
   }) : super(
           initialValue: initialGender,
-          validator: (value) => value == null ? 'Please select a gender' : null,
+          validator: (value) => value == null ? AppLocalizations.of(context)!.gender_select : null,
           builder: (FormFieldState<String> state) {
             final theme = Theme.of(state.context);
-            final genderOptions = ['Male', 'Female', 'Other'];
+            final genderOptions = [
+              AppLocalizations.of(state.context)!.gender_male,
+              AppLocalizations.of(state.context)!.gender_female,
+              AppLocalizations.of(state.context)!.gender_other
+            ];
 
             return Align(
               alignment: Alignment.centerLeft,

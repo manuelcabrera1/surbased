@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyQuestionCard extends StatefulWidget {
   final Question question;
@@ -82,7 +83,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
                               },
                             ),
                       Text(
-                        option.description ?? 'None',
+                        option.description ?? AppLocalizations.of(context)!.none,
                         style: theme.textTheme.bodyLarge,
                       ),
                     ],

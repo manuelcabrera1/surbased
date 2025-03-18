@@ -5,7 +5,7 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import '../../domain/survey_model.dart';
 import '../widgets/survey_question_card.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class SurveyCompletePage extends StatefulWidget {
   final Survey? survey;
   const SurveyCompletePage({super.key, this.survey});
@@ -45,8 +45,8 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Survey submitted successfully'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.survey_submitted),
             ),
           );
           Navigator.pushNamed(context, AppRoutes.home);
@@ -66,16 +66,16 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Submit Survey'),
-          content: const Text('Are you sure you want to submit this survey?'),
+          title: Text(AppLocalizations.of(context)!.survey_submit),
+          content: Text(AppLocalizations.of(context)!.survey_submit_confirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => _submitSurvey(),
-              child: const Text('Submit'),
+              child: Text(AppLocalizations.of(context)!.submit),
             ),
           ],
         ),
@@ -83,8 +83,8 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please answer all required questions'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.survey_answer_required_questions),
           ),
         );
       }
@@ -99,20 +99,20 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Return'),
-          content: const Text(
-              'Are you sure you want to return to the survey list?\nYour progress will be lost.'),
+          title: Text(AppLocalizations.of(context)!.go_back),
+          content: Text(
+              AppLocalizations.of(context)!.survey_return_confirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 answerProvider.clearAllCurrentInfo();
                 Navigator.pushNamed(context, AppRoutes.home);
               },
-              child: const Text('Return'),
+              child: Text(AppLocalizations.of(context)!.go_back),
             ),
           ],
         ),
@@ -128,7 +128,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
     final answerProvider = Provider.of<AnswerProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Complete survey"),
+        title: Text(AppLocalizations.of(context)!.survey_complete),
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: answerProvider.isLoading
@@ -157,7 +157,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                     : _showSubmitSurveyConfirmationDialog,
                 child: answerProvider.isLoading
                     ? const CircularProgressIndicator(strokeWidth: 2)
-                    : const Text('Submit'),
+                    : Text(AppLocalizations.of(context)!.submit),
               ),
             ],
           ),

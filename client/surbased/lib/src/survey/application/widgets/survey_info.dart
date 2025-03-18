@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyInfo extends StatelessWidget {
   const SurveyInfo({super.key});
@@ -16,7 +17,11 @@ class SurveyInfo extends StatelessWidget {
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     if (survey == null) {
-      return const Center(child: Text('No survey selected'));
+      return Center(
+          child: Text(
+        AppLocalizations.of(context)!.survey_not_selected_error,
+        style: theme.textTheme.titleLarge,
+      ));
     }
 
     if (surveyProvider.isLoading || categoryProvider.isLoading) {
@@ -47,26 +52,26 @@ class SurveyInfo extends StatelessWidget {
                     children: [
                       _buildInfoRow(
                         context,
-                        'Name',
+                        AppLocalizations.of(context)!.name,
                         survey.name,
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         context,
-                        'Category',
+                        AppLocalizations.of(context)!.category,
                         category.name,
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         context,
-                        'Start Date',
+                        AppLocalizations.of(context)!.start_date,
                         dateFormat.format(survey.startDate),
                       ),
                       if (survey.endDate != null) ...[
                         const SizedBox(height: 12),
                         _buildInfoRow(
                           context,
-                          'End Date',
+                          AppLocalizations.of(context)!.end_date,
                           dateFormat.format(survey.endDate!),
                         ),
                       ],
@@ -74,7 +79,7 @@ class SurveyInfo extends StatelessWidget {
                           survey.description!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
-                          'Description:',
+                          AppLocalizations.of(context)!.description,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -109,7 +114,12 @@ class SurveyInfo extends StatelessWidget {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: theme.colorScheme.primary,
-                        child: Text('${index + 1}'),
+                        child: Text(
+                          '${index + 1}',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        ),
                       ),
                       title: Text(question.description ?? 'No description'),
                       subtitle: Text(question.multipleAnswer == true

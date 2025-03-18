@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyCard extends StatelessWidget {
   final Survey survey;
@@ -27,7 +28,7 @@ class SurveyCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: userRole == 'participant'
-            ? survey.startDate!.isBefore(DateTime.now())
+            ? survey.startDate.isBefore(DateTime.now())
                 ? onTap
                 : null
             : onTap,
@@ -50,7 +51,7 @@ class SurveyCard extends StatelessWidget {
               const SizedBox(height: 10),
               category.name.isNotEmpty || category.name != ''
                   ? Text(
-                      'Category: ${category.name}',
+                      AppLocalizations.of(context)!.category_name(category.name),
                       style: theme.textTheme.bodyMedium
                           ?.copyWith(color: theme.colorScheme.onSurface),
                       maxLines: 1,
@@ -63,16 +64,18 @@ class SurveyCard extends StatelessWidget {
                 children: [
                   Text(
                     survey.endDate != null &&
-                            survey.startDate!.isBefore(
+                            survey.startDate.isBefore(
                                 DateTime.now().add(const Duration(days: 1)))
-                        ? 'End date: ${_formatDate(survey.endDate!)}'
-                        : 'Start date: ${_formatDate(survey.startDate!)}',
+                        ? AppLocalizations.of(context)!.survey_end_date(
+                            _formatDate(survey.endDate!))
+                        : AppLocalizations.of(context)!.survey_start_date(
+                            _formatDate(survey.startDate)),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
                   userRole == 'participant'
-                      ? survey.startDate!.isAfter(DateTime.now())
+                      ? survey.startDate.isAfter(DateTime.now())
                           ? Icon(Icons.lock_outline,
                               size: 25, color: theme.colorScheme.onSurface)
                           : Icon(Icons.lock_open_outlined,

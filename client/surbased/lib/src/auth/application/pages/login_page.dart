@@ -5,6 +5,7 @@ import 'package:surbased/src/category/application/provider/category_provider.dar
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -57,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
               Provider.of<CategoryProvider>(context, listen: false);
 
           if (authProvider.isAuthenticated) {
-            surveyProvider.getSurveys(
+            await surveyProvider.getSurveys(
               authProvider.userId!,
               authProvider.userRole!,
               authProvider.token!,
@@ -65,22 +66,23 @@ class _LoginPageState extends State<LoginPage> {
               null,
             );
 
-            categoryProvider.getCategories(null, authProvider.token!);
+            await categoryProvider.getCategories(null, authProvider.token!);
 
             if (authProvider.user!.organizationId != null) {
-              organizationProvider.getOrganizationById(
+              await organizationProvider.getOrganizationById(
                 authProvider.user!.organizationId!,
                 authProvider.token!,
               );
+
               if (authProvider.user!.role == 'researcher') {
-                organizationProvider.getUsersInOrganization(
+                await organizationProvider.getUsersInOrganization(
                   authProvider.token!,
                 );
               }
             }
 
             if (authProvider.user!.role == 'admin') {
-              authProvider.getUsers(authProvider.token!, null, null);
+              await authProvider.getUsers(authProvider.token!, null, null);
             }
           }
           _navigateToHome();
@@ -119,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Logo o Título
                 Text(
-                  'Surbased',
+                  AppLocalizations.of(context)!.app_title,
                   style: theme.textTheme.displayLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -130,11 +132,11 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.email,
                   ),
                   validator: (value) => value == null || value.isEmpty
-                      ? 'Email is required'
+                      ? AppLocalizations.of(context)!.input_error_email
                       : null,
                 ),
 
@@ -143,12 +145,12 @@ class _LoginPageState extends State<LoginPage> {
                 // Campo de contraseña
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
                   ),
                   obscureText: true,
                   validator: (value) => value == null || value.isEmpty
-                      ? 'Password is required'
+                      ? AppLocalizations.of(context)!.input_error_password
                       : null,
                 ),
 
@@ -162,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                           strokeWidth: 2,
                           color: Colors.white,
                         )
-                      : const Text('Log in'),
+                      : Text(AppLocalizations.of(context)!.log_in),
                 ),
 
                 const SizedBox(height: 16),
@@ -172,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     // Implementar navegación a recuperación de contraseña
                   },
-                  child: const Text('I forgot my password'),
+                  child: Text(AppLocalizations.of(context)!.forgot_password),
                 ),
 
                 const SizedBox(height: 24),
@@ -181,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed:
                       authProvider.isLoading ? null : _navigateToRegister,
-                  child: const Text("Don't have an account? Sign up now"),
+                  child: Text(AppLocalizations.of(context)!.dont_have_account),
                 ),
               ],
             ),

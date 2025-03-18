@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DateFormField extends FormField<DateTime> {
   DateFormField({
     super.key,
     DateTime? initialDate,
     required String labelText,
+    required BuildContext context,
     String? Function(DateTime?)? validator,
     void Function(DateTime?)? onChanged,
     bool enabled = true,
@@ -15,7 +17,7 @@ class DateFormField extends FormField<DateTime> {
           initialValue: initialDate,
           validator: validator ??
               (value) =>
-                  value == null && required ? 'This field is required' : null,
+                  value == null && required ? AppLocalizations.of(context)!.input_error_required : null,
           builder: (FormFieldState<DateTime> state) {
             final theme = Theme.of(state.context);
             return InkWell(
@@ -46,7 +48,7 @@ class DateFormField extends FormField<DateTime> {
                   errorText: state.errorText,
                 ),
                 child: state.value == null
-                    ? Text('Select Date',
+                    ? Text(AppLocalizations.of(context)!.select_date,
                         style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant))
                     : Text(DateFormat('dd/MM/yyyy').format(state.value!),

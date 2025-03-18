@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/shared/application/provider/theme_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserThemePage extends StatefulWidget {
   const UserThemePage({super.key});
@@ -17,7 +18,7 @@ class _UserThemePageState extends State<UserThemePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tema'),
+        title: Text(AppLocalizations.of(context)!.theme_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -29,7 +30,7 @@ class _UserThemePageState extends State<UserThemePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Configuración de Tema',
+              AppLocalizations.of(context)!.theme_configuration,
               style: theme.textTheme.headlineMedium,
             ),
             const SizedBox(height: 24),
@@ -53,8 +54,8 @@ class _UserThemePageState extends State<UserThemePage> {
                         const SizedBox(width: 16),
                         Text(
                           themeProvider.isDarkMode
-                              ? 'Tema Oscuro'
-                              : 'Tema Claro',
+                              ? AppLocalizations.of(context)!.theme_dark
+                              : AppLocalizations.of(context)!.theme_light,
                           style: theme.textTheme.titleLarge,
                         ),
                       ],
@@ -75,7 +76,7 @@ class _UserThemePageState extends State<UserThemePage> {
 
             // Explicación del tema
             Text(
-              'Select your preferred theme for the application. The dark theme can help reduce eye strain in low-light environments.',
+              AppLocalizations.of(context)!.theme_helper,
               style: theme.textTheme.bodyMedium,
             ),
 

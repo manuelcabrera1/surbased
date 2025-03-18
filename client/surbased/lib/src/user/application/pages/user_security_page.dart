@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserSecurityPage extends StatefulWidget {
   const UserSecurityPage({super.key});
@@ -12,7 +13,7 @@ class _UserSecurityPageState extends State<UserSecurityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Edit Info'),
+          title: Text(AppLocalizations.of(context)!.security_page_title),
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),

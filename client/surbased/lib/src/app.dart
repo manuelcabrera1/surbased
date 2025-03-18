@@ -3,7 +3,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/config/app_theme.dart';
+import 'package:surbased/src/shared/application/provider/lang_provider.dart';
 import 'package:surbased/src/shared/application/provider/theme_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,6 +13,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final langProvider = Provider.of<LangProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Surbased',
@@ -19,11 +22,13 @@ class App extends StatelessWidget {
       theme: AppTheme.theme(),
       darkTheme: AppTheme.darkTheme(),
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      supportedLocales: const [Locale('es', 'ES'), Locale('en', 'EN')],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: langProvider.locale,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        AppLocalizations.delegate,
       ],
     );
   }

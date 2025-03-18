@@ -6,6 +6,7 @@ import 'package:surbased/src/survey/application/widgets/survey_without_questions
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_add_edit_question_dialog.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyAddQuestionsPage extends StatefulWidget {
   const SurveyAddQuestionsPage({super.key});
@@ -66,16 +67,16 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Save Survey'),
-        content: const Text('Are you sure you want to save this survey?'),
+        title: Text(AppLocalizations.of(context)!.survey_save),
+        content: Text(AppLocalizations.of(context)!.survey_save_confirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () => _createSurvey(),
-            child: const Text('Save'),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),
@@ -92,7 +93,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Survey saved successfully')),
+             SnackBar(content: Text(AppLocalizations.of(context)!.survey_saved)),
           );
           Navigator.pushNamed(context, AppRoutes.home);
         }
@@ -117,7 +118,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Questions'),
+        title: Text(AppLocalizations.of(context)!.survey_add_questions_page_title),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -143,20 +144,20 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        'Added Questions',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.survey_added_questions,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(
-                        '(Drag to reorder)',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.drag_to_reorder,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
                           color: Colors.grey,
@@ -223,12 +224,12 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         onTap: () => _duplicateQuestion(index),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.content_copy),
-                            SizedBox(width: 12),
-                            Text('Duplicate'),
+                            const Icon(Icons.content_copy),
+                            const SizedBox(width: 12),
+                            Text(AppLocalizations.of(context)!.duplicate),
                           ],
                         ),
                       ),
@@ -237,23 +238,23 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                           question: question,
                           index: index,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: 12),
-                            Text('Edit'),
+                            const Icon(Icons.edit),
+                            const SizedBox(width: 12),
+                            Text(AppLocalizations.of(context)!.edit),
                           ],
                         ),
                       ),
                       PopupMenuItem(
                         onTap: () => _removeQuestion(index),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.delete),
-                            SizedBox(width: 12),
-                            Text('Remove'),
+                            const Icon(Icons.delete),
+                            const SizedBox(width: 12),
+                            Text(AppLocalizations.of(context)!.remove),
                           ],
                         ),
                       ),
@@ -266,9 +267,9 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Opciones:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Text(
+                      AppLocalizations.of(context)!.options,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     ...question.options!.map((option) => Padding(
@@ -301,9 +302,9 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                 children: [
                   question.required!
                       ? Chip(
-                          label: const Text(
-                            'Required',
-                            style: TextStyle(
+                          label: Text(
+                            AppLocalizations.of(context)!.required,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white,
                             ),

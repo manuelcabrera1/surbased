@@ -7,6 +7,7 @@ import 'package:surbased/src/auth/application/widgets/gender_form_field_widget.d
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -93,7 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  Text('Create Your Account',
+                  Text(AppLocalizations.of(context)!.create_account,
                       style: theme.textTheme.displayMedium),
                   const SizedBox(height: 30),
                   Form(
@@ -106,9 +107,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               child: TextFormField(
                                 controller: _nameController,
                                 keyboardType: TextInputType.name,
-                                decoration: const InputDecoration(
-                                  labelText: 'First Name',
-                                  prefixIcon: Icon(Icons.person),
+                                decoration: InputDecoration(
+                                  labelText:
+                                      AppLocalizations.of(context)!.first_name,
+                                  prefixIcon: const Icon(Icons.person),
                                 ),
                                 validator: _fieldValidator,
                               ),
@@ -117,9 +119,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             Expanded(
                               child: TextFormField(
                                 controller: _lastNameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Last Name',
-                                  prefixIcon: Icon(Icons.person_outline),
+                                decoration: InputDecoration(
+                                  labelText:
+                                      AppLocalizations.of(context)!.last_name,
+                                  prefixIcon: const Icon(Icons.person_outline),
                                 ),
                                 validator: _fieldValidator,
                               ),
@@ -129,9 +132,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         TextFormField(
                           controller: _organizationController,
-                          decoration: const InputDecoration(
-                            labelText: 'Organization',
-                            prefixIcon: Icon(Icons.business),
+                          decoration: InputDecoration(
+                            labelText:
+                                AppLocalizations.of(context)!.organization,
+                            prefixIcon: const Icon(Icons.business),
                           ),
                           validator: _fieldValidator,
                         ),
@@ -139,9 +143,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email),
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.email,
+                            prefixIcon: const Icon(Icons.email),
                           ),
                           validator: _fieldValidator,
                         ),
@@ -149,22 +153,24 @@ class _RegisterPageState extends State<RegisterPage> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock),
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.password,
+                            prefixIcon: const Icon(Icons.lock),
                           ),
                           validator: _fieldValidator,
                         ),
                         const SizedBox(height: 20),
                         DateFormField(
-                          labelText: 'Birthdate',
+                          context: context,
+                          labelText: AppLocalizations.of(context)!.birthdate,
                           initialDate: _birthdate,
                           onChanged: (date) =>
                               setState(() => _birthdate = date),
                         ),
                         const SizedBox(height: 20),
                         GenderFormField(
-                          labelText: 'Gender',
+                          context: context,
+                          labelText: AppLocalizations.of(context)!.gender,
                           initialGender: _gender,
                           onChanged: (gender) =>
                               setState(() => _gender = gender),
@@ -178,13 +184,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                     strokeWidth: 2,
                                     color: Colors.white,
                                   )
-                                : const Text('Register')),
+                                : Text(AppLocalizations.of(context)!.register)),
                         const SizedBox(height: 20),
                         TextButton(
                           onPressed:
                               authProvider.isLoading ? null : _navigateToLogin,
-                          child: const Text(
-                              "Already have an account? Sign in now"),
+                          child: Text(
+                              AppLocalizations.of(context)!.already_have_account),
                         )
                       ],
                     ),

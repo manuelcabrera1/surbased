@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class OrganizationUsersFilterDialog extends StatelessWidget {
   const OrganizationUsersFilterDialog({super.key});
 
@@ -13,10 +13,10 @@ class OrganizationUsersFilterDialog extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.center,
-            child: Text('Filter', style: theme.textTheme.displaySmall),
+            child: Text(AppLocalizations.of(context)!.filter, style: theme.textTheme.displaySmall),
           ),
           const SizedBox(height: 16),
-          Text('Sort by',
+          Text(AppLocalizations.of(context)!.sort_by,
               style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: theme.colorScheme.primary)),

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserEditInfoPage extends StatefulWidget {
   const UserEditInfoPage({super.key});
@@ -41,7 +42,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
   }
@@ -62,15 +63,14 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
           setState(() => _isEditing = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile updated successfully')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.profile_updated)),
             );
           }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content:
-                      Text(authProvider.error ?? 'Error updating profile')),
+                  content: Text(authProvider.error ?? AppLocalizations.of(context)!.profile_update_error)),
             );
           }
         }
@@ -88,7 +88,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(AppLocalizations.of(context)!.edit_profile_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -117,9 +117,9 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                         enabled: _isEditing,
                         controller: _nameController,
                         keyboardType: TextInputType.name,
-                        decoration: const InputDecoration(
-                          labelText: 'First Name',
-                          prefixIcon: Icon(Icons.person),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.first_name,
+                          prefixIcon: const Icon(Icons.person),
                         ),
                         validator: _fieldValidator,
                       ),
@@ -129,9 +129,9 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                       child: TextFormField(
                         enabled: _isEditing,
                         controller: _lastNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Last Name',
-                          prefixIcon: Icon(Icons.person_outline),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.last_name,
+                          prefixIcon: const Icon(Icons.person_outline),
                         ),
                         validator: _fieldValidator,
                       ),
@@ -143,16 +143,17 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                   enabled: _isEditing,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.email,
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   validator: _fieldValidator,
                 ),
                 const SizedBox(height: 20),
                 DateFormField(
+                  context: context,
                   enabled: _isEditing,
-                  labelText: 'Birthdate',
+                  labelText: AppLocalizations.of(context)!.birthdate,
                   initialDate: _birthdate,
                   onChanged: (date) => setState(() => _birthdate = date),
                 ),

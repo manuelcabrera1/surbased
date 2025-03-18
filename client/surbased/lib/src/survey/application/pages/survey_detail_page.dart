@@ -10,6 +10,7 @@ import '../../../user/domain/user_model.dart';
 import '../../domain/survey_model.dart';
 import '../provider/survey_provider.dart';
 import '../widgets/survey_info.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SurveyDetailPage extends StatefulWidget {
   const SurveyDetailPage({super.key});
@@ -108,13 +109,13 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
             tabAlignment: TabAlignment.fill,
             tabs: [
               Tab(
-                  text: 'Info',
+                  text: AppLocalizations.of(context)!.survey_info,
                   icon: Icon(Icons.info, color: theme.colorScheme.surface)),
               Tab(
-                  text: 'Participants',
+                  text: AppLocalizations.of(context)!.survey_participants,
                   icon: Icon(Icons.people, color: theme.colorScheme.surface)),
               Tab(
-                  text: 'Stats',
+                  text: AppLocalizations.of(context)!.survey_stats,
                   icon:
                       Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
             ],
@@ -132,7 +133,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
                           children: [
                             Icon(Icons.edit, color: theme.colorScheme.primary),
                             const SizedBox(width: 12),
-                            const Text('Edit'),
+                            Text(AppLocalizations.of(context)!.edit),
                           ],
                         ),
                       ),
@@ -144,7 +145,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
                             Icon(Icons.delete,
                                 color: theme.colorScheme.primary),
                             const SizedBox(width: 12),
-                            const Text('Remove'),
+                            Text(AppLocalizations.of(context)!.remove),
                           ],
                         ),
                       ),
@@ -152,16 +153,16 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
           ]),
       body: TabBarView(
         controller: tabController,
-        children: const [
-          SurveyInfo(),
-          SurveyParticipants(),
-          Text('Stats'),
+        children: [
+          const SurveyInfo(),
+          const SurveyParticipants(),
+          Text(AppLocalizations.of(context)!.survey_stats),
         ],
       ),
       floatingActionButton: tabController.index == 1
           ? FloatingActionButton(
               onPressed: () => _showAddParticipantsModal(),
-              tooltip: 'Add Participant',
+              tooltip: AppLocalizations.of(context)!.survey_add_participants,
               child: const Icon(Icons.person_add),
             )
           : null,

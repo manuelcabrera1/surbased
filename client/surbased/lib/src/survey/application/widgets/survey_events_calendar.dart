@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/shared/application/provider/lang_provider.dart';
 
 class SurveyEventsCalendar extends StatefulWidget {
   const SurveyEventsCalendar({super.key});
@@ -83,7 +85,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error while loading your programmed surveys: $e'),
+            content: Text(AppLocalizations.of(context)!.events_loading_error),
           ),
         );
       }
@@ -109,6 +111,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final langProvider = Provider.of<LangProvider>(context);
 
     if (surveyProvider.surveys.isNotEmpty && _events.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -130,7 +133,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.only(left: 25),
-                child: Text('Calendar', style: theme.textTheme.displayMedium),
+                child: Text(AppLocalizations.of(context)!.calendar_page_title,
+                    style: theme.textTheme.displayMedium),
               ),
             ),
             const SizedBox(height: 8),
@@ -138,8 +142,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
               padding:
                   const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 8),
               child: TableCalendar(
+                locale: Localizations.localeOf(context).languageCode,
                 firstDay: DateTime.utc(1970, 1, 1),
                 lastDay: DateTime.utc(2025, 12, 31),
+                startingDayOfWeek: StartingDayOfWeek.monday,
                 focusedDay: _focusedDay,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
@@ -209,7 +215,11 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                       children: [
                         const SizedBox(height: 20),
                         Text(
-                          'Surveys for ${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}',
+                          AppLocalizations.of(context)!.calendar_surveys_for(
+                            _selectedDay!.day,
+                            _selectedDay!.month,
+                            _selectedDay!.year,
+                          ),
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: theme.colorScheme.primary,
@@ -287,8 +297,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                       children: [
                                         Text(
                                           _isExpanded
-                                              ? 'Show Less'
-                                              : 'Show All (${eventCount - 2} more)',
+                                              ? AppLocalizations.of(context)!
+                                                  .show_less
+                                              : AppLocalizations.of(context)!
+                                                  .show_all(eventCount - 2),
                                           style: theme.textTheme.bodyMedium
                                               ?.copyWith(
                                             color: theme.colorScheme.primary,
@@ -315,7 +327,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                             height: 150,
                             child: Center(
                               child: Text(
-                                'No surveys programmed for this day',
+                                AppLocalizations.of(context)!
+                                    .calendar_no_surveys_for_day,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w500,
