@@ -1,14 +1,20 @@
 from typing import List
 import uuid
+from enum import Enum
 from pydantic import BaseModel, Field, model_validator
 
 from .OptionSchema import *
 
+class QuestionTypeEnum(str, Enum):
+    single_choice = "single_choice"
+    multiple_choice = "multiple_choice"
+    likert_scale = "likert_scale"
+    open = "open"
+
 class QuestionBase(BaseModel):
     description: str
-    multiple_answer: bool
+    type: QuestionTypeEnum
     required: bool = True
-    has_correct_answer: bool 
 
     
 class QuestionCreateRequest(QuestionBase):

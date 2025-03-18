@@ -1,7 +1,7 @@
 from typing import List, TYPE_CHECKING
 import uuid
 from database import Base
-from sqlalchemy import Boolean, ForeignKey,  String, UUID
+from sqlalchemy import Boolean, ForeignKey, Integer,  String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -17,8 +17,7 @@ class Option(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, index=True, default=uuid.uuid4)
     description: Mapped[str] = mapped_column(String(250), nullable=False)
-    is_correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
-
+    points: Mapped[int] = mapped_column(Integer, nullable=True)
 
 
 

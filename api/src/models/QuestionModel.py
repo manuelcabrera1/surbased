@@ -19,9 +19,8 @@ class Question(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, index=True, default=uuid.uuid4)
     number: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(250), nullable=False)
-    multiple_answer: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    type: Mapped[str] = mapped_column(String(100), nullable=False)
     required: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    has_correct_answer: Mapped[bool] = mapped_column(Boolean, nullable=False)
     survey_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("surveys.id"), nullable=False)
 
 
@@ -31,6 +30,7 @@ class Question(Base):
 
 
     __table_args__ = (
+        CheckConstraint("type IN ('single_choice', 'multiple_choice', 'likert_scale', 'open')", name="type_check"),
         CheckConstraint("number > 0", name="number_check"),
     )
 

@@ -184,19 +184,15 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
         questions_descriptions.add(question.description)
         
         options_descriptions = set()
-        correct_options_count = 0   
+        options_count = 0   
         for option in question.options:
             if option.description in options_descriptions:
                 raise HTTPException(status_code=400, detail=f"Duplicated option description: {option.description}")
             options_descriptions.add(option.description)
-            if option.is_correct:
-                correct_options_count += 1
+        
+        if options_count <= 1:
+            raise HTTPException(status_code=400, detail=f"Question {question.description} must have at least two options")
 
-        if question.has_correct_answer:
-            if question.multiple_answer and correct_options_count == 0:
-                    raise HTTPException(status_code=400, detail="Multiple answer question must have at least one correct answer")
-            if not question.multiple_answer and correct_options_count > 1:
-                    raise HTTPException(status_code=400, detail="Single answer question must have at most one correct answer")
     
 
     try:
@@ -220,10 +216,9 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             new_question = Question(
                 number=question_number,
                 description=q_data.description,
-                multiple_answer=q_data.multiple_answer,
                 survey_id=new_survey.id,  # Usar el ID directamente
                 required=q_data.required,
-                has_correct_answer=q_data.has_correct_answer
+                type=q_data.type
             )
             db.add(new_question)
             created_questions.append((new_question, q_data.options))
@@ -236,7 +231,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             for option_data in options_data:
                 new_option = Option(
                     description=option_data.description,
-                    is_correct=option_data.is_correct,
+                    points=option_data.points,
                     question_id=question.id  # Usar el ID directamente
                 )
                 db.add(new_option)
@@ -266,15 +261,14 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                     id=q.id,
                     number=q.number,
                     description=q.description,
-                    multiple_answer=q.multiple_answer,
+                    type=q.type,
                     survey_id=q.survey_id,
                     required=q.required,
-                    has_correct_answer=q.has_correct_answer,
                     options=[
                         OptionResponse(
                             id=o.id,
                             description=o.description,
-                            is_correct=o.is_correct,
+                            points=o.points,
                             question_id=o.question_id
                         ) for o in q.options
                     ]
