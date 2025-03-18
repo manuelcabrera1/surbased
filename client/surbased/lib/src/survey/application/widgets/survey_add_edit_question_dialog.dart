@@ -22,8 +22,8 @@ class _SurveyAddEditQuestionDialogState
   final _formKey = GlobalKey<FormState>();
   final _questionTextController = TextEditingController();
   final _options = <String>[];
-  bool _isMultipleAnswer = false;
   bool _isRequired = true;
+  String _questionType = "";
 
   @override
   void initState() {
@@ -35,7 +35,6 @@ class _SurveyAddEditQuestionDialogState
       _questionTextController.text = widget.question!.description!;
       _options.addAll(
           widget.question!.options!.map((option) => option.description!));
-      _isMultipleAnswer = widget.question!.multipleAnswer!;
       _isRequired = widget.question!.required!;
     }
   }
@@ -78,11 +77,9 @@ class _SurveyAddEditQuestionDialogState
         Question(
           surveyId: surveyProvider.currentSurvey!.id,
           description: _questionTextController.text,
-          multipleAnswer: _isMultipleAnswer,
+          type: _questionType,
           required: _isRequired,
-          hasCorrectAnswer: false,
           options: List<Option>.from(_options.map((option) => Option(
-                isCorrect: false,
                 description: option,
               ))),
         ),
@@ -117,12 +114,10 @@ class _SurveyAddEditQuestionDialogState
           id: widget.question!.id,
           surveyId: widget.question!.surveyId,
           description: _questionTextController.text,
-          multipleAnswer: _isMultipleAnswer,
+          type: _questionType,
           required: _isRequired,
-          hasCorrectAnswer: false,
           options: List<Option>.from(_options.map((option) => Option(
                 questionId: widget.question!.id,
-                isCorrect: false,
                 description: option,
               ))),
         ),
@@ -177,21 +172,30 @@ class _SurveyAddEditQuestionDialogState
                   validator: _fieldValidator,
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<bool>(
-                  value: widget.isEdit ? widget.question!.multipleAnswer : null,
+                DropdownButtonFormField<String>(
+                  value: widget.isEdit ? widget.question!.type : null,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.question_type,
                     border: const OutlineInputBorder(),
                   ),
                   items: [
                     DropdownMenuItem(
-                      value: false,
-                      child: Text(AppLocalizations.of(context)!.unique_option),
+                      value: "single_choice",
+                      child: Text(AppLocalizations.of(context)!.single_choice),
                     ),
                     DropdownMenuItem(
-                      value: true,
-                      child: Text(AppLocalizations.of(context)!.multiple_option),
+                      value: "multiple_choice",
+                      child: Text(AppLocalizations.of(context)!.multiple_choice),
                     ),
+                    DropdownMenuItem(
+                      value: "likert_scale",
+                      child: Text(AppLocalizations.of(context)!.likert_scale),
+                    ),
+                    DropdownMenuItem(
+                      value: "open",
+                      child: Text(AppLocalizations.of(context)!.open),
+                    ),
+
                   ],
                   validator: (value) {
                     if (value == null) {
@@ -202,7 +206,7 @@ class _SurveyAddEditQuestionDialogState
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
-                        _isMultipleAnswer = value;
+                        _questionType = value;
                       });
                     }
                   },

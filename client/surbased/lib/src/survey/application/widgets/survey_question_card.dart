@@ -53,7 +53,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      question.multipleAnswer!
+                      question.type == "multiple_choice"
                           ? Checkbox(
                               value:
                                   selectedMultipleOptions.contains(option.id),

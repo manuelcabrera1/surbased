@@ -122,9 +122,7 @@ class SurveyInfo extends StatelessWidget {
                         ),
                       ),
                       title: Text(question.description ?? 'No description'),
-                      subtitle: Text(question.multipleAnswer == true
-                          ? 'Multiple choice'
-                          : 'Single choice'),
+                      subtitle: Text(question.type ?? ''),
                     );
                   },
                 ),

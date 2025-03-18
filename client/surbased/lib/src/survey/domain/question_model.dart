@@ -3,9 +3,8 @@ import 'package:surbased/src/survey/domain/option_model.dart';
 class Question {
   final int? number;
   final String? description;
-  final bool? multipleAnswer;
+  final String? type;
   final bool? required;
-  final bool? hasCorrectAnswer;
   final String? id;
   final String? surveyId;
   final List<Option>? options;
@@ -13,9 +12,8 @@ class Question {
   Question({
     this.number,
     this.description,
-    this.multipleAnswer,
+    this.type,
     this.required,
-    this.hasCorrectAnswer,
     this.id,
     this.surveyId,
     this.options,
@@ -24,9 +22,8 @@ class Question {
   factory Question.fromJson(Map<String, dynamic> json) => Question(
         number: json["number"],
         description: json["description"],
-        multipleAnswer: json["multiple_answer"],
+        type: json["type"],
         required: json["required"],
-        hasCorrectAnswer: json["has_correct_answer"],
         id: json["id"],
         surveyId: json["survey_id"],
         options:
@@ -39,9 +36,8 @@ class Question {
     if (surveyId != null) json["survey_id"] = surveyId;
     if (number != null) json["number"] = number;
     if (description != null) json["description"] = description;
-    if (multipleAnswer != null) json["multiple_answer"] = multipleAnswer;
+    if (type != null) json["type"] = type;
     if (required != null) json["required"] = required;
-    if (hasCorrectAnswer != null) json["has_correct_answer"] = hasCorrectAnswer;
     if (options != null) {
       json["options"] = List<dynamic>.from(options!.map((x) => x.toJson()));
     }

@@ -272,12 +272,13 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
+                    if (question.type != "open_ended")
                     ...question.options!.map((option) => Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
                           child: Row(
                             children: [
                               Icon(
-                                question.multipleAnswer!
+                                question.type == "multiple_choice"
                                     ? Icons.check_box_outline_blank
                                     : Icons.radio_button_unchecked,
                                 size: 20,
