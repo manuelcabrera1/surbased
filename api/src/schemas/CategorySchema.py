@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field
 
 class CategoryBase(BaseModel):
     name: str
-    organization_id: uuid.UUID
 
     class Config:
         from_attributes = True

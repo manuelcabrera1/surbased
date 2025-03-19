@@ -20,18 +20,13 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
         
-        if current_user.role == "admin":
-            result = await db.execute(select(Category).where(and_(Category.name == category.name, Category.organization_id == category.organization_id)))
-        
-        
-        if current_user.role == "researcher":
-            result = await db.execute(select(Category).where(and_(Category.name == category.name, Category.organization_id == category.organization_id)))
+        result = await db.execute(select(Category).where(Category.name == category.name))
         existing_category = result.unique().scalars().first()
 
         if existing_category:
             raise HTTPException(status_code=400, detail="Existing category")
 
-        new_category = Category(name=category.name, organization_id=category.organization_id)
+        new_category = Category(name=category.name)
         db.add(new_category)
         await db.commit()
         await db.refresh(new_category)
@@ -40,19 +35,14 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
 
 
 @category_router.get("/categories", status_code=200, response_model=CategoryResponseWithLength)
-async def get_all_categories(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], org: Optional[uuid.UUID] = None):
+async def get_all_categories(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
         
-        if current_user.role =="admin":
-            if org:
-                result = await db.execute(select(Category).where(Category.organization_id == org))
-            else:
-                result = await db.execute(select(Category))
 
-        if current_user.role == "researcher" or current_user.role == "participant":
-           result = await db.execute(select(Category).where(Category.organization_id == current_user.organization_id))
+        result = await db.execute(select(Category))
+
 
         categories = result.unique().scalars().all()
         return { "categories": categories, "length": len(categories) }
@@ -66,11 +56,7 @@ async def get_category_by_id(id:uuid.UUID, current_user: Annotated[User, Depends
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
         
-        if current_user.role == "admin":
-            result = await db.execute(select(Category).where(Category.id == id))
-        
-        if current_user.role == "researcher":
-            result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
+        result = await db.execute(select(Category).where(Category.id == id))
 
         existing_category = result.unique().scalars().first()
 
@@ -87,11 +73,7 @@ async def update_category_info(id: uuid.UUID, category: CategoryUpdate, current_
         
         #check if category exists
 
-        if current_user.role == "admin":
-            result = await db.execute(select(Category).where(and_(Category.id == id)))
-        
-        if current_user.role == "research":
-            result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
+        result = await db.execute(select(Category).where(Category.id == id))
 
         existing_category = result.unique().scalars().first()
 
@@ -119,7 +101,7 @@ async def update_category_info(id: uuid.UUID, category: CategoryUpdate, current_
 async def delete_category(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
         #check if category exists
-        result = await db.execute(select(Category).where(and_(Category.id == id, Category.organization_id == current_user.organization_id)))
+        result = await db.execute(select(Category).where(Category.id == id))
         existing_category = result.unique().scalars().first()
 
         if not existing_category:
