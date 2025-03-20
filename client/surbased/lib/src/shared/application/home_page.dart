@@ -12,7 +12,6 @@ import 'package:surbased/src/survey/application/widgets/survey_events_calendar.d
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -75,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           Provider.of<CategoryProvider>(context, listen: false);
 
       if (authProvider.isAuthenticated) {
-        surveyProvider.getSurveys(
+        await surveyProvider.getSurveys(
           authProvider.userId!,
           authProvider.userRole!,
           authProvider.token!,
@@ -83,24 +82,26 @@ class _HomePageState extends State<HomePage> {
           null,
         );
 
-        categoryProvider.getCategories(null, authProvider.token!);
+        await categoryProvider.getCategories(null, authProvider.token!);
 
         if (authProvider.user!.organizationId != null) {
-          organizationProvider.getOrganizationById(
+          await organizationProvider.getOrganizationById(
             authProvider.user!.organizationId!,
             authProvider.token!,
           );
           if (authProvider.user!.role == 'researcher') {
-            organizationProvider.getUsersInOrganization(
+            await organizationProvider.getUsersInOrganization(
               authProvider.token!,
             );
           }
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
@@ -122,7 +123,6 @@ class _HomePageState extends State<HomePage> {
     final participantPages = [
       const SurveyList(),
       const SurveyEventsCalendar(),
-      const UserProfile(),
       const UserProfile()
     ];
 

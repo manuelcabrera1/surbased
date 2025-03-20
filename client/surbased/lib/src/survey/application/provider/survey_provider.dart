@@ -38,7 +38,7 @@ class SurveyProvider extends ChangeNotifier {
   }
 
   bool addSurveyInfo(String name, String? description, DateTime startDate,
-      DateTime? endDate, String categoryId, String researcherId) {
+      DateTime? endDate, String categoryId, String ownerId) {
     _currentSurvey = Survey(
       name: name,
       description: description ?? '',
@@ -46,7 +46,7 @@ class SurveyProvider extends ChangeNotifier {
       startDate: startDate,
       endDate: endDate,
       questions: [],
-      researcherId: researcherId,
+      ownerId: ownerId,
     );
     notifyListeners();
     return true;

@@ -9,9 +9,10 @@ String surveyToJson(Survey data) => json.encode(data.toJson());
 class Survey {
   final String name;
   final String categoryId;
-  final String researcherId;
+  final String ownerId;
   final String? id;
   final String? description;
+  final String? scope;
   final DateTime startDate;
   final DateTime? endDate;
   final List<Question> questions;
@@ -19,9 +20,10 @@ class Survey {
   Survey({
     required this.name,
     required this.categoryId,
-    required this.researcherId,
+    required this.ownerId,
     this.id,
     this.description,
+    this.scope,
     required this.startDate,
     this.endDate,
     required this.questions,
@@ -30,9 +32,10 @@ class Survey {
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
         name: json["name"],
         categoryId: json["category_id"],
-        researcherId: json["researcher_id"],
+        ownerId: json["owner_id"],
         id: json["id"],
         description: json["description"] ?? '',
+        scope: json["scope"],
         startDate: DateTime.parse(json["start_date"]),
         endDate:
             json["end_date"] != null ? DateTime.parse(json["end_date"]) : null,
@@ -43,8 +46,9 @@ class Survey {
   Map<String, dynamic> toJson() => {
         "name": name,
         "category_id": categoryId,
-        "researcher_id": researcherId,
+        "owner_id": ownerId,
         "description": description,
+        "scope": scope,
         "start_date":
             "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
         "end_date": endDate != null

@@ -55,7 +55,6 @@ class CategoryProvider extends ChangeNotifier {
       orElse: () => Category(
         id: '',
         name: '',
-        organizationId: '',
       ),
     );
   }
