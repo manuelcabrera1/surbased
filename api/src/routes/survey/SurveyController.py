@@ -19,49 +19,41 @@ from sqlalchemy.orm import selectinload
 
 survey_router = APIRouter(tags=["Survey"])
 
-
-
-
-
 @survey_router.get("/surveys", status_code=200, response_model=SurveyResponseWithLength)
-@required_roles(["admin", "researcher"])
-async def get_all_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], org: Optional[uuid.UUID] = None, category: Optional[uuid.UUID] = None):
+@required_roles(["admin", "researcher", "participant"])
+async def get_all_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
+                          scope: SurveyScopeEnum, org: Optional[uuid.UUID] = None, category: Optional[uuid.UUID] = None, owner: Optional[uuid.UUID] = None):
     
-        
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
         #TODO: try to modularize this in methods (service logic)
 
-        if current_user.role == "admin":
-            if org and not category:
-                result = await db.execute(select(Survey).join(Category).where(Category.organization_id == org))
-            
-            elif category and org:
-                result = await db.execute(select(Survey).join(Category).where(Category.id == category))
-            
-            elif category and not org:
-                raise HTTPException(status_code=400, details="Organization must be specified")
-
+        if scope == SurveyScopeEnum.organization:
+            if current_user.role == "admin":
+                if not org:
+                    raise HTTPException(status_code=400, detail="Organization must be specified")
+                result = await db.execute(select(Survey).where(and_(Survey.organization_id == org, Survey.scope == SurveyScopeEnum.organization)))
             else:
-                result = await db.execute(select(Survey))
+                result = await db.execute(select(Survey).where(and_(Survey.organization_id == current_user.organization_id, Survey.scope == SurveyScopeEnum.organization)))
 
-
-
-        if current_user.role == "researcher":
-            
+        if scope == SurveyScopeEnum.public:
             if category:
-                result = await db.execute(select(Survey).join(Category).where(and_(Category.id == category, Category.organization_id == current_user.organization_id)))
-            
-            if not category:
-                result = await db.execute(select(Survey).join(Category).where(Category.organization_id == current_user.organization_id))
-
-
+                result = await db.execute(select(Survey).join(Category).where(and_(Survey.scope == SurveyScopeEnum.public, Category.id == category)))
+            else:
+                result = await db.execute(select(Survey).where(Survey.scope == SurveyScopeEnum.public))
+        
+        if scope == SurveyScopeEnum.private:
+            if current_user.role == "admin":
+                if not owner:
+                    raise HTTPException(status_code=400, detail="Owner must be specified")
+                result = await db.execute(select(Survey).where(and_(Survey.owner_id == owner, Survey.scope == SurveyScopeEnum.private)))
+            if current_user.role == "researcher":
+                result = await db.execute(select(Survey).where(and_(Survey.owner_id == current_user.id, Survey.scope == SurveyScopeEnum.private)))
+    
         surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys) }
-
-
 
 
 @survey_router.get("/surveys/{id}", status_code=200, response_model=SurveyResponse)
@@ -155,11 +147,17 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     if existing_survey:
         raise HTTPException(status_code=400, detail="Survey name already registered in this category")
     
-    #researcher id: check if researcher org and category org match
-    result = await db.execute(select(User).where(User.id == survey.researcher_id, User.organization_id == category.organization_id))
-    researcher = result.unique().scalars().first()
-    if not researcher:
-        raise HTTPException(status_code=404, detail="Researcher not found")
+    if survey.scope == SurveyScopeEnum.organization:
+        #check if org id is provided
+        if not survey.organization_id:
+            raise HTTPException(status_code=400, detail="Organization must be specified")
+
+        #check if researcher org and survey org match
+        result = await db.execute(select(User).where(User.id == survey.owner_id, User.organization_id == survey.organization_id))
+        researcher = result.unique().scalars().first()
+        if not researcher:
+            raise HTTPException(status_code=404, detail="Researcher does not belong to the specified organization")
+          
     
     #check if start_date is not before today and end_date is after start_date
     if survey.start_date and survey.start_date < date.today():
@@ -189,20 +187,20 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             if option.description in options_descriptions:
                 raise HTTPException(status_code=400, detail=f"Duplicated option description: {option.description}")
             options_descriptions.add(option.description)
+            options_count+=1
         
         if options_count <= 1:
-            raise HTTPException(status_code=400, detail=f"Question {question.description} must have at least two options")
-
-    
+            raise HTTPException(status_code=400, detail=f"Question {question.description} must have at least two options")  
 
     try:
         # Crear el cuestionario
         new_survey = Survey(
             name=survey.name, 
-            description=survey.description, 
+            description=survey.description,
+            scope=survey.scope,
             start_date=survey.start_date, 
             end_date=survey.end_date, 
-            researcher_id=survey.researcher_id, 
+            owner_id=survey.owner_id, 
             category_id=survey.category_id
         )
         db.add(new_survey)
@@ -252,9 +250,10 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             id=new_survey.id,
             name=new_survey.name,
             description=new_survey.description,
+            scope=new_survey.scope,
             start_date=new_survey.start_date,
             end_date=new_survey.end_date,
-            researcher_id=new_survey.researcher_id,
+            owner_id=new_survey.owner_id,
             category_id=new_survey.category_id,
             questions=[
                 QuestionResponse(
@@ -281,6 +280,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Error creating survey: {str(e)}")
+
 
 
 

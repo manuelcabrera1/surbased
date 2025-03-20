@@ -1,4 +1,4 @@
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 import uuid
 from database import Base
 from sqlalchemy import String, UUID
@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from .UserModel import User
-    from .CategoryModel import Category
+    from .SurveyModel import Survey
 
 
 
@@ -21,4 +21,4 @@ class Organization(Base):
 
 
     users: Mapped[List["User"]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")
-    categories: Mapped[List["Category"]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")
+    surveys: Mapped[Optional[List["Survey"]]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")

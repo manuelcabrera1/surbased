@@ -5,11 +5,18 @@ from datetime import date
 
 from .QuestionSchema import *
 
+class SurveyScopeEnum(str, Enum):
+    private = "private"
+    organization = "organization"
+    public = "public"
 
 class SurveyBase(BaseModel):
     name: str
+    scope: SurveyScopeEnum
     category_id: uuid.UUID
-    researcher_id: uuid.UUID
+    owner_id: uuid.UUID
+    organization_id: Optional[uuid.UUID] = Field(default=None)
+
 
 class SurveyCreate(SurveyBase):
     description: Optional[str] = Field(default="")
@@ -23,8 +30,7 @@ class SurveyCreate(SurveyBase):
             raise ValueError("The date cannot be in the past")
         if self.start_date and self.end_date and self.start_date > self.end_date:
             raise ValueError("The start date cannot be after the end date")
-        return self
-    
+        return self   
 
 class SurveyResponse(SurveyBase):
     id: uuid.UUID
@@ -32,6 +38,7 @@ class SurveyResponse(SurveyBase):
     start_date: date
     end_date: Optional[date] = Field(default=None)
     questions: List[QuestionResponse]
+
 class SurveyResponseWithLength(BaseModel):
     surveys: List[SurveyResponse]
     length: int

@@ -5,7 +5,7 @@ from routes.health.HealthController import health_router
 from database import engine, init_models
 from routes.user.UserController import user_router
 import models
-from routes.surveyparticipants.SurveyParticipantsController import survey_participants_router
+from routes.surveyusers.SurveyUsersController import survey_users_router
 from routes.organization.OrganizationController import org_router
 from routes.category.CategoryController import category_router
 from routes.survey.SurveyController import survey_router
@@ -30,7 +30,7 @@ app.include_router(user_router)
 app.include_router(org_router)
 app.include_router(category_router)
 app.include_router(survey_router)
-app.include_router(survey_participants_router)
+app.include_router(survey_users_router)
 app.include_router(metric_router)
 app.include_router(question_router)
 app.include_router(option_router)
