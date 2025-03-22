@@ -111,7 +111,6 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
-    final langProvider = Provider.of<LangProvider>(context);
 
     if (surveyProvider.surveys.isNotEmpty && _events.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -144,13 +143,18 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
               child: TableCalendar(
                 locale: Localizations.localeOf(context).languageCode,
                 firstDay: DateTime.utc(1970, 1, 1),
-                lastDay: DateTime.utc(2025, 12, 31),
+                lastDay: DateTime.utc(2050, 12, 31),
                 startingDayOfWeek: StartingDayOfWeek.monday,
                 focusedDay: _focusedDay,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
                     _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                },
+                onPageChanged: (focusedDay) {
+                  setState(() {
                     _focusedDay = focusedDay;
                   });
                 },
