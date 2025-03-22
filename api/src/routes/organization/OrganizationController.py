@@ -13,7 +13,7 @@ from auth.Auth import create_access_token, check_current_user, get_current_user,
 
 org_router = APIRouter(tags=["Organization"])
 
-@org_router.post("/orgs/create", status_code=201, response_model=OrganizationResponse)
+@org_router.post("/organizations/create", status_code=201, response_model=OrganizationResponse)
 async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
     if not current_user:
@@ -34,7 +34,7 @@ async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSessio
 
 
  
-@org_router.get("/orgs", status_code=200, response_model=OrganizationResponseWithLength)
+@org_router.get("/organizations", status_code=200, response_model=OrganizationResponseWithLength)
 @required_roles(["admin"])
 async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
@@ -47,7 +47,7 @@ async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)], cu
     
 
 
-@org_router.get("/orgs/{id}", status_code=200, response_model=OrganizationResponse)
+@org_router.get("/organizations/{id}", status_code=200, response_model=OrganizationResponse)
 async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
         if not current_user:
@@ -61,7 +61,7 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
         
         return existing_org
 
-@org_router.get("/orgs/{id}/users", status_code=200, response_model=UserResponseWithLength)
+@org_router.get("/organizations/{id}/users", status_code=200, response_model=UserResponseWithLength)
 @required_roles(["researcher", "admin"])
 async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], 
                                         current_user: Annotated[User, Depends(get_current_user)] = None, 
@@ -87,7 +87,7 @@ async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession
             
     
 
-@org_router.put("/orgs/{id}", status_code=201, response_model=OrganizationResponse)
+@org_router.put("/organizations/{id}", status_code=201, response_model=OrganizationResponse)
 @required_roles(["admin"])
 async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
@@ -118,7 +118,7 @@ async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annota
 
 
 
-@org_router.delete("/orgs/{id}", status_code=204)
+@org_router.delete("/organizations/{id}", status_code=204)
 @required_roles(["admin"])
 async def delete_organization(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
