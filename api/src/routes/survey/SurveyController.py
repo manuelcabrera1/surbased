@@ -19,42 +19,23 @@ from sqlalchemy.orm import selectinload
 
 survey_router = APIRouter(tags=["Survey"])
 
-@survey_router.get("/surveys", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/public", status_code=200, response_model=SurveyResponseWithLength)
 @required_roles(["admin", "researcher", "participant"])
-async def get_all_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
-                          scope: SurveyScopeEnum, org: Optional[uuid.UUID] = None, category: Optional[uuid.UUID] = None, owner: Optional[uuid.UUID] = None):
+async def get_public_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
+                        category_id: Optional[uuid.UUID] = None):
     
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-
-        #TODO: try to modularize this in methods (service logic)
-
-        if scope == SurveyScopeEnum.organization:
-            if current_user.role == "admin":
-                if not org:
-                    raise HTTPException(status_code=400, detail="Organization must be specified")
-                result = await db.execute(select(Survey).where(and_(Survey.organization_id == org, Survey.scope == SurveyScopeEnum.organization)))
-            else:
-                result = await db.execute(select(Survey).where(and_(Survey.organization_id == current_user.organization_id, Survey.scope == SurveyScopeEnum.organization)))
-
-        if scope == SurveyScopeEnum.public:
-            if category:
-                result = await db.execute(select(Survey).join(Category).where(and_(Survey.scope == SurveyScopeEnum.public, Category.id == category)))
-            else:
-                result = await db.execute(select(Survey).where(Survey.scope == SurveyScopeEnum.public))
-        
-        if scope == SurveyScopeEnum.private:
-            if current_user.role == "admin":
-                if not owner:
-                    raise HTTPException(status_code=400, detail="Owner must be specified")
-                result = await db.execute(select(Survey).where(and_(Survey.owner_id == owner, Survey.scope == SurveyScopeEnum.private)))
-            if current_user.role == "researcher":
-                result = await db.execute(select(Survey).where(and_(Survey.owner_id == current_user.id, Survey.scope == SurveyScopeEnum.private)))
+    
+        if category_id:
+            result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.public, 
+                                                                Survey.category_id == category_id)))
+        else:
+            result = await db.execute(select(Survey).where(Survey.scope == SurveyScopeEnum.public))
     
         surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys) }
-
 
 @survey_router.get("/surveys/{id}", status_code=200, response_model=SurveyResponse)
 async def get_survey_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
@@ -280,6 +261,33 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Error creating survey: {str(e)}")
+
+
+
+@survey_router.get("/surveys/owner/{owner_id}", status_code=200, response_model=SurveyResponseWithLength)
+@required_roles(["admin", "researcher"])
+async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], owner_id: uuid.UUID):
+    
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+        
+        result = await db.execute(select(User).where(User.id == owner_id))
+        owner = result.unique().scalars().first()
+        if not owner:
+            raise HTTPException(status_code=404, detail="Owner not found")
+        
+        if current_user.role == "researcher" and (owner.organization_id != current_user.organization_id or owner.id != current_user.id):
+            raise HTTPException(status_code=403, detail="Forbidden")
+
+        #de momento no se muestran las encuestas de organizacion en esta vista
+        result = await db.execute(select(Survey).where(and_(Survey.owner_id == owner_id, Survey.scope != SurveyScopeEnum.organization)))
+    
+        surveys = result.unique().scalars().all()
+
+        return { "surveys": surveys, "length": len(surveys) }
+
+
+
 
 
 
