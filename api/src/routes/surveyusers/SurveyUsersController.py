@@ -67,7 +67,7 @@ async def get_all_survey_assigned_users(id: uuid.UUID, current_user: Annotated[U
     
 
 @survey_users_router.get("/users/{id}/surveys", status_code=200, response_model=SurveyResponseWithLength)
-async def get_all_user_assigned_surveys(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], category: Optional[uuid.UUID] = None):
+async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], category: Optional[uuid.UUID] = None):
     
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -84,12 +84,14 @@ async def get_all_user_assigned_surveys(id: uuid.UUID, current_user: Annotated[U
         
         surveys = []
 
-         #buscamos los cuestionarios creados por el usuario
+        """
+        #buscamos los cuestionarios creados por el usuario
         if existing_user.role != "participant":
             result = await db.execute(select(Survey).where(and_(Survey.owner_id == existing_user.id,
                                                                 Survey.scope != SurveyScopeEnum.organization)))
             surveys_owned = result.unique().scalars().all()
             surveys.extend(surveys_owned)
+        """
        
         #buscamos los cuestionarios asignados al usuario
         result = await db.execute(select(Survey).join(survey_user).where(and_(survey_user.c.user_id == id,
