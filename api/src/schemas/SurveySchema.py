@@ -10,6 +10,11 @@ class SurveyScopeEnum(str, Enum):
     organization = "organization"
     public = "public"
 
+
+class SurveyScopeReducedEnum(str, Enum):
+    organization = "organization"
+    public = "public"
+
 class SurveyBase(BaseModel):
     name: str
     scope: SurveyScopeEnum
