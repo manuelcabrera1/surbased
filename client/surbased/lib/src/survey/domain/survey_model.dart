@@ -1,21 +1,23 @@
 import 'dart:convert';
 
 import 'package:surbased/src/survey/domain/question_model.dart';
+import 'package:surbased/src/user/domain/user_model.dart';
 
 Survey surveyFromJson(String str) => Survey.fromJson(json.decode(str));
 
 String surveyToJson(Survey data) => json.encode(data.toJson());
 
 class Survey {
-  final String name;
-  final String categoryId;
-  final String ownerId;
+  String name;
+  String categoryId;
+  String ownerId;
   final String? id;
-  final String? description;
-  final String? scope;
-  final DateTime startDate;
-  final DateTime? endDate;
+  String? description;
+  String? scope;
+  DateTime startDate;
+  DateTime? endDate;
   final List<Question> questions;
+  List<User>? assignedUsers;
 
   Survey({
     required this.name,
@@ -27,7 +29,9 @@ class Survey {
     required this.startDate,
     this.endDate,
     required this.questions,
+    this.assignedUsers,
   });
+
 
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
         name: json["name"],

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:surbased/src/user/domain/user_model.dart';
 
+import '../../survey/domain/survey_model.dart';
+
 Organization organizationFromJson(String str) =>
     Organization.fromJson(json.decode(str));
 
@@ -11,11 +13,13 @@ class Organization {
   final String name;
   final String id;
   List<User>? users;
+  List<Survey>? surveys;
 
   Organization({
     required this.name,
     required this.id,
     this.users,
+    this.surveys,
   });
 
   factory Organization.fromJson(Map<String, dynamic> json) => Organization(

@@ -12,7 +12,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'survey_list_filter_dialog.dart';
 
 class SurveyList extends StatefulWidget {
-  const SurveyList({super.key});
+  final List<Survey> surveys;
+  const SurveyList({super.key, required this.surveys});
 
   @override
   State<SurveyList> createState() => _SurveyListState();
@@ -34,9 +35,9 @@ class _SurveyListState extends State<SurveyList> {
     if (mounted) {
       final surveyProvider =
           Provider.of<SurveyProvider>(context, listen: false);
-      if (surveyProvider.surveys.isNotEmpty) {
+      if (widget.surveys.isNotEmpty) {
         setState(() {
-          _surveysToShow = surveyProvider.surveys;
+          _surveysToShow = widget.surveys;
         });
       }
     }
@@ -76,7 +77,7 @@ class _SurveyListState extends State<SurveyList> {
 
     if (mounted) {
       setState(() {
-        _surveysToShow = surveyProvider.surveys
+        _surveysToShow = widget.surveys
             .where((survey) =>
                 survey.name.toLowerCase().contains(_searchQuery.toLowerCase()))
             .toList();
@@ -108,108 +109,93 @@ class _SurveyListState extends State<SurveyList> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Text(
-                  AppLocalizations.of(context)!.surveys_page_title,
-                  style: theme.textTheme.displayMedium,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 48,
-                        child: SearchBar(
-                          controller: _searchController,
-                          padding: WidgetStateProperty.all(
-                              const EdgeInsets.symmetric(horizontal: 10)),
-                          leading: Icon(Icons.search,
-                              color: theme.colorScheme.onSurfaceVariant),
-                          trailing: [
-                            if (_searchQuery != '')
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _searchController.clear();
-                                    _surveysToShow = surveyProvider.surveys;
-                                  });
-                                },
-                                icon: const Icon(Icons.close),
-                              )
-                          ],
-                          onChanged: (value) {
+              Flexible(
+                fit: FlexFit.loose,
+                flex: 1,
+                child: SizedBox(
+                  height: 48,
+                  child: SearchBar(
+                    controller: _searchController,
+                    padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 10)),
+                    leading: Icon(Icons.search,
+                        color: theme.colorScheme.onSurfaceVariant),
+                    trailing: [
+                      if (_searchQuery != '')
+                        IconButton(
+                          onPressed: () {
                             setState(() {
-                              _searchQuery = value;
+                              _searchController.clear();
+                              _surveysToShow = widget.surveys;
                             });
-                            if (_searchQuery != '') {
-                              filterSurveys();
-                            } else {
-                              setState(() {
-                                _surveysToShow = surveyProvider.surveys;
-                              });
-                            }
                           },
-                          onSubmitted: (value) {
-                            setState(() {
-                              _searchQuery = value;
-                            });
-                            filterSurveys();
-                          },
-                          hintText: AppLocalizations.of(context)!
-                              .surveys_searchbar_placeholder,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: _showFilterDialog,
-                      icon: const Icon(Icons.filter_list_outlined, size: 30),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              if (surveyProvider.surveys.isEmpty)
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.surveys_error_no_surveys,
-                    ),
-                  ),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  itemCount: _surveysToShow.length,
-                  itemBuilder: (context, index) => SurveyCard(
-                    userRole: userRole,
-                    survey: _surveysToShow[index],
-                    category: categoryProvider
-                        .getCategoryById(_surveysToShow[index].categoryId),
-                    onTap: () => _handleOnTap(_surveysToShow[index]),
+                          icon: const Icon(Icons.close),
+                        )
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                      if (_searchQuery != '') {
+                        filterSurveys();
+                      } else {
+                        setState(() {
+                          _surveysToShow = widget.surveys;
+                        });
+                      }
+                    },
+                    onSubmitted: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                      filterSurveys();
+                    },
+                    hintText: AppLocalizations.of(context)!
+                        .surveys_searchbar_placeholder,
                   ),
                 ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: _showFilterDialog,
+                icon: const Icon(Icons.filter_list_outlined, size: 30),
+              ),
             ],
           ),
         ),
-      ),
+        const SizedBox(height: 15),
+        if (widget.surveys.isEmpty || _surveysToShow.isEmpty)
+          Expanded(
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context)!.surveys_error_no_surveys,
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              itemCount: _surveysToShow.length,
+              itemBuilder: (context, index) => SurveyCard(
+                userRole: userRole,
+                survey: _surveysToShow[index],
+                category: categoryProvider
+                    .getCategoryById(_surveysToShow[index].categoryId),
+                onTap: () => _handleOnTap(_surveysToShow[index]),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

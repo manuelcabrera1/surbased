@@ -13,6 +13,7 @@ class SurveyForm extends StatefulWidget {
 
   @override
   State<SurveyForm> createState() => SurveyFormState();
+
 }
 
 class SurveyFormState extends State<SurveyForm> {
@@ -23,6 +24,21 @@ class SurveyFormState extends State<SurveyForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   String? _categoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    if (surveyProvider.currentSurvey != null) {
+      _nameController.text = surveyProvider.currentSurvey!.name;
+      _descriptionController.text = surveyProvider.currentSurvey!.description ?? '';
+      _categoryId = surveyProvider.currentSurvey!.categoryId;
+      _startDate = surveyProvider.currentSurvey!.startDate;
+      _endDate = surveyProvider.currentSurvey!.endDate;
+    }
+  }
+
+
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
@@ -44,7 +60,7 @@ class SurveyFormState extends State<SurveyForm> {
           Provider.of<SurveyProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      bool success = surveyProvider.addSurveyInfo(
+      bool success = surveyProvider.addOrUpdateSurveyInfo(
         _nameController.text,
         _descriptionController.text,
         _startDate ?? DateTime.now(),
@@ -66,6 +82,7 @@ class SurveyFormState extends State<SurveyForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final categories = categoryProvider.categories;
     final surveyProvider = Provider.of<SurveyProvider>(context);
@@ -92,10 +109,11 @@ class SurveyFormState extends State<SurveyForm> {
                 labelText: AppLocalizations.of(context)!.category,
                 border: const OutlineInputBorder(),
               ),
+              value: _categoryId,
               items: categories
                   .map((category) => DropdownMenuItem(
                         value: category.id,
-                        child: Text(category.name),
+                        child: Text(category.name, style: TextStyle(fontWeight: FontWeight.normal, color: theme.colorScheme.tertiary)),
                       ))
                   .toList(),
               onChanged: (categoryId) => setState(() {

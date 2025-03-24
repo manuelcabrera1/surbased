@@ -67,6 +67,50 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
     );
   }
 
+  void _removeSurvey() {
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      if (authProvider.token != null && mounted) {
+        surveyProvider.removeSurvey(authProvider.token!);
+        surveyProvider.clearCurrentSurvey();
+        Navigator.pushNamed(context, AppRoutes.home);
+        if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.survey_removed)),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _showRemoveSurveyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.survey_remove),
+        content: Text(AppLocalizations.of(context)!.survey_remove_confirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => _removeSurvey(),
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _loadParticipants() async {
     try {
       final surveyProvider =
@@ -76,7 +120,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
       survey = surveyProvider.currentSurvey;
 
       if (survey != null && authProvider.token != null) {
-        await surveyProvider.getSurveyParticipants(
+        await surveyProvider.getUsersAssignedToSurvey(
             survey!.id!, authProvider.token!);
       }
     } catch (e) {
@@ -95,16 +139,35 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     survey = surveyProvider.currentSurvey;
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    if (survey == null || surveyProvider.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            survey!.name,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, AppRoutes.home);
+            surveyProvider.clearCurrentSurvey();
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        centerTitle: true,
+        title: Text(
+          survey!.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           bottom: TabBar(
+            dividerHeight: 0,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: theme.colorScheme.surface,
+            unselectedLabelColor: theme.colorScheme.surface.withOpacity(0.7),
+            indicatorColor: theme.colorScheme.surface,
             controller: tabController,
             tabAlignment: TabAlignment.fill,
             tabs: [
@@ -137,8 +200,9 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
                           ],
                         ),
                       ),
+                      if (surveyProvider.currentSurvey!.ownerId == authProvider.user!.id)
                       PopupMenuItem(
-                        onTap: () => {},
+                        onTap: () => _showRemoveSurveyDialog(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [

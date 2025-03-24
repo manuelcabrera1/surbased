@@ -116,6 +116,9 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
   @override
   Widget build(BuildContext context) {
     final surveyProvider = Provider.of<SurveyProvider>(context);
+
+    final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.survey_add_questions_page_title),
@@ -177,6 +180,12 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       return _buildDraggableQuestionCard(index);
                     },
                   ),
+                  /*
+                  ElevatedButton(onPressed: canContinue ? _handleContinue : null, 
+                  child: canContinue 
+                    ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white) 
+                    : Text(AppLocalizations.of(context)!.go_forward)),
+                  */
                 ],
               ),
           ],
@@ -272,7 +281,6 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
-                    if (question.type != "open_ended")
                     ...question.options!.map((option) => Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
                           child: Row(
@@ -286,9 +294,21 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
-                                  option.description!,
-                                  style: const TextStyle(fontSize: 16),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      option.description!,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    if (question.type == "likert_scale" && option.points != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: Text(
+                                          "(value: ${option.points})",
+                                          style: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ],

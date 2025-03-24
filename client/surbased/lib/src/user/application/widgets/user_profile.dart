@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/user/application/widgets/user_settings_section.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

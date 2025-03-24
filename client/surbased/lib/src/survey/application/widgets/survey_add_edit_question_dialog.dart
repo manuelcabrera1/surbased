@@ -21,9 +21,10 @@ class _SurveyAddEditQuestionDialogState
     extends State<SurveyAddEditQuestionDialog> {
   final _formKey = GlobalKey<FormState>();
   final _questionTextController = TextEditingController();
-  final _options = <String>[];
+  final _options = <Option>[];
   bool _isRequired = true;
   String _questionType = "";
+  int _likertScale = 3; 
 
   @override
   void initState() {
@@ -34,8 +35,12 @@ class _SurveyAddEditQuestionDialogState
         widget.question!.options != null) {
       _questionTextController.text = widget.question!.description!;
       _options.addAll(
-          widget.question!.options!.map((option) => option.description!));
+          widget.question!.options!.map((option) => Option(description: option.description!, points: option.points)));
       _isRequired = widget.question!.required!;
+      _questionType = widget.question!.type!;
+      if (_questionType == "likert_scale") {
+        _likertScale = _options.length;
+      }
     }
   }
 
@@ -47,13 +52,13 @@ class _SurveyAddEditQuestionDialogState
 
   void _addOption() {
     setState(() {
-      _options.add('');
+      _options.add(Option(description: '', points: null));
     });
   }
 
   void _updateOption(int index, String value) {
     setState(() {
-      _options[index] = value;
+      _options[index] = Option(description: value, points: _options[index].points);
     });
   }
 
@@ -80,7 +85,8 @@ class _SurveyAddEditQuestionDialogState
           type: _questionType,
           required: _isRequired,
           options: List<Option>.from(_options.map((option) => Option(
-                description: option,
+                description: option.description!,
+                points: _questionType == "likert_scale" ? option.points : null,
               ))),
         ),
       );
@@ -91,7 +97,7 @@ class _SurveyAddEditQuestionDialogState
             _questionTextController.clear();
             _isRequired = true;
             _options.clear();
-            _options.add('');
+            _options.add(Option(description: '', points: null));
             Navigator.pop(context);
           });
         }
@@ -118,7 +124,8 @@ class _SurveyAddEditQuestionDialogState
           required: _isRequired,
           options: List<Option>.from(_options.map((option) => Option(
                 questionId: widget.question!.id,
-                description: option,
+                description: option.description!,
+                points: _questionType == "likert_scale" ? option.points : null,
               ))),
         ),
       );
@@ -129,7 +136,7 @@ class _SurveyAddEditQuestionDialogState
             _questionTextController.clear();
             _isRequired = true;
             _options.clear();
-            _options.add('');
+            _options.add(Option(description: '', points: null));
             Navigator.pop(context);
           });
         }
@@ -141,6 +148,28 @@ class _SurveyAddEditQuestionDialogState
         }
       }
     }
+  }
+
+  void _updateLikertScale(int scale) {
+    if (scale < 2) scale = 2; 
+    if (scale > 10) scale = 10; 
+    
+    setState(() {
+      _likertScale = scale;
+      if (_options.length > scale) {
+        _options.removeRange(scale, _options.length);
+      } else if (_options.length < scale) {
+        for (int i = _options.length; i < scale; i++) {
+          _options.add(Option(description: '', points: null));
+        }
+      }
+    });
+  }
+
+  void _updateOptionPoints(int index, int points) {
+    setState(() {
+      _options[index] = Option(description: _options[index].description!, points: points);
+    });
   }
 
   @override
@@ -207,6 +236,12 @@ class _SurveyAddEditQuestionDialogState
                     if (value != null) {
                       setState(() {
                         _questionType = value;
+                        if (value == "likert_scale" && _options.isEmpty) {
+                          _options.clear();
+                          for (int i = 0; i < _likertScale; i++) {
+                            _options.add(Option(description: '', points: i + 1));
+                          }
+                        }
                       });
                     }
                   },
@@ -222,6 +257,43 @@ class _SurveyAddEditQuestionDialogState
                   },
                   contentPadding: EdgeInsets.zero,
                 ),
+                 if (_questionType == "likert_scale") 
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Configuración de escala Likert",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Text("Número de niveles:"),
+                          const SizedBox(width: 16),
+                          DropdownButton<int>(
+                            value: _likertScale,
+                            items: List.generate(9, (index) => index + 2)
+                                .map((int value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text('$value'),
+                              );
+                            }).toList(),
+                            onChanged: (int? newValue) {
+                              if (newValue != null) {
+                                _updateLikertScale(newValue);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                if (_questionType != "open" && _questionType != "")
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -230,31 +302,39 @@ class _SurveyAddEditQuestionDialogState
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.options,
+                          _questionType == "likert_scale"
+                              ? "Niveles de la escala"
+                              : _questionType == "single_choice" || _questionType == "multiple_choice"
+                                ? AppLocalizations.of(context)!.options
+                                : "",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        TextButton.icon(
-                          onPressed: _addOption,
-                          icon: const Icon(Icons.add),
-                          label: Text(AppLocalizations.of(context)!.add_option),
-                        ),
+                        if (_questionType == "single_choice" || _questionType == "multiple_choice") // Solo mostrar botón añadir si no es escala Likert
+                          TextButton.icon(
+                            onPressed: _addOption,
+                            icon: const Icon(Icons.add),
+                            label: Text(AppLocalizations.of(context)!.add_option),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    ...List.generate(
+                    if (_questionType != "open")
+                      ...List.generate(
                       _options.length,
                       (index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
+                        padding: const EdgeInsets.only(top: 8.0),
                         child: Row(
                           children: [
                             Expanded(
                               child: TextFormField(
-                                initialValue: _options[index],
+                                initialValue: _options[index].description,
                                 decoration: InputDecoration(
-                                  labelText: AppLocalizations.of(context)!.option(index + 1),
+                                  labelText: _questionType == "likert_scale"
+                                      ? "Nivel ${index + 1}"
+                                      : AppLocalizations.of(context)!.option(index + 1),
                                   border: const OutlineInputBorder(),
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.always,
@@ -264,18 +344,38 @@ class _SurveyAddEditQuestionDialogState
                                     _updateOption(index, value),
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.remove_circle,
-                                  color: Colors.red),
-                              onPressed: () => _removeOption(index),
+                            if (_questionType == "likert_scale")
+                            Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                SizedBox(
+                                width: 70,
+                                child: TextFormField(
+                                  initialValue: "${index + 1}",
+                                  decoration: const InputDecoration(
+                                    labelText: "Valor",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) => _updateOptionPoints(index, int.parse(value)),
+                                ),
+                                ),
+                              ],
                             ),
+                            
+                            if (_questionType == "single_choice" || _questionType == "multiple_choice") // Solo mostrar botón eliminar si no es escala Likert
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle,
+                                    color: Colors.red),
+                                onPressed: () => _removeOption(index),
+                              ),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
-                const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: widget.isEdit ? _updateQuestion : _addQuestion,
                   label: Text(

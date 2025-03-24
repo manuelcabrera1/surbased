@@ -34,12 +34,11 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getSurveys(
-      String token, String? org, String? category) async {
+  Future<Map<String, dynamic>> getPublicSurveys(String token, {String? category}) async {
     try {
       final existingCategory = category != null ? '?category=$category' : '';
       final response = await http
-          .get(Uri.parse('$_baseUrl/surveys$existingCategory'), headers: {
+          .get(Uri.parse('$_baseUrl/surveys/public$existingCategory'), headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });
@@ -60,16 +59,13 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getParticipantSurveys(
-      String userId, String token, String? category) async {
+  Future<Map<String, dynamic>> getSurveysByOwner(String ownerId, String token) async {
     try {
-      final existingCategory = category != null ? '?category=$category' : '';
-      final response = await http.get(
-          Uri.parse('$_baseUrl/participants/$userId/surveys$existingCategory'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          });
+      final response = await http
+          .get(Uri.parse('$_baseUrl/surveys/owner/$ownerId'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
 
       if (response.statusCode == 200) {
         return {
@@ -87,11 +83,13 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getSurveyParticipants(
+  
+
+  Future<Map<String, dynamic>> getUsersAssignedToSurvey(
       String surveyId, String token) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/surveys/$surveyId/participants'),
+        Uri.parse('$_baseUrl/surveys/$surveyId/users'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -142,6 +140,26 @@ class SurveyService {
         'success': false,
         'data': e.toString(),
       };
+    }
+  }
+
+  Future<Map<String, dynamic>> removeSurvey(String surveyId, String token ) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/surveys/$surveyId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 204) {
+        return {'success': true, 'data': 'Survey removed successfully'};
+      } else {
+        return {'success': false, 'data': 'Failed to remove survey'};
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
     }
   }
 }

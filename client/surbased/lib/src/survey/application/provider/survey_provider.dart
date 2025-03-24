@@ -7,27 +7,29 @@ import '../../../user/domain/user_model.dart';
 
 class SurveyProvider extends ChangeNotifier {
   final SurveyService _surveyService = SurveyService();
-  List<Survey> _surveys = [];
+  List<Survey> _publicSurveys = [];
+  List<Survey> _surveysOwned = [];
   bool _isLoading = false;
   String? _error;
   Survey? _currentSurvey;
-  List<User> _surveyParticipants = [];
 
-  List<Survey> get surveys => _surveys;
+  List<Survey> get publicSurveys => _publicSurveys;
+  List<Survey> get surveysOwned => _surveysOwned;
   bool get isLoading => _isLoading;
   String? get error => _error;
   Survey? get currentSurvey => _currentSurvey;
-  List<User> get surveyParticipants => _surveyParticipants;
 
   set currentSurvey(Survey? value) {
     _currentSurvey = value;
     notifyListeners();
   }
 
+
   void clearState() {
     _isLoading = false;
     _error = null;
-    _surveys = [];
+    _publicSurveys = [];
+    _surveysOwned = [];
     _currentSurvey = null;
     notifyListeners();
   }
@@ -37,20 +39,31 @@ class SurveyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool addSurveyInfo(String name, String? description, DateTime startDate,
+  bool addOrUpdateSurveyInfo(String name, String? description, DateTime startDate,
       DateTime? endDate, String categoryId, String ownerId) {
-    _currentSurvey = Survey(
-      name: name,
-      description: description ?? '',
-      categoryId: categoryId,
-      startDate: startDate,
-      endDate: endDate,
+    if (_currentSurvey != null) {
+      _currentSurvey!.name = name;
+      _currentSurvey!.description = description ?? '';
+      _currentSurvey!.categoryId = categoryId;
+      _currentSurvey!.startDate = startDate;
+      _currentSurvey!.endDate = endDate;
+      notifyListeners();
+      return true;
+    } else {
+      _currentSurvey = Survey(
+        name: name,
+        description: description ?? '',
+        categoryId: categoryId,
+        startDate: startDate,
+        endDate: endDate,
       questions: [],
       ownerId: ownerId,
     );
     notifyListeners();
     return true;
+    }
   }
+
 
   bool addQuestion(Question question) {
     _currentSurvey!.questions.add(question);
@@ -88,7 +101,7 @@ class SurveyProvider extends ChangeNotifier {
       );
 
       if (response['success']) {
-        _surveys.add(_currentSurvey!);
+        _surveysOwned.add(_currentSurvey!);
         _isLoading = false;
         _error = null;
         _currentSurvey = null;
@@ -108,39 +121,19 @@ class SurveyProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getSurveys(String userId, String userRole, String token,
-      String? org, String? category) async {
+  Future<void> getPublicSurveys(String token, {String? category}) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
-      late Map<String, dynamic> getSurveysResponse;
 
-      if (userRole == 'admin') {
-        getSurveysResponse = await _surveyService.getSurveys(
-          token,
-          org,
-          category,
+      final getSurveysResponse = await _surveyService.getPublicSurveys(
+        token,
+        category: category,
         );
-      }
-
-      if (userRole == 'admin' || userRole == 'researcher') {
-        getSurveysResponse = await _surveyService.getSurveys(
-          token,
-          null,
-          category,
-        );
-      }
-      if (userRole == 'participant') {
-        getSurveysResponse = await _surveyService.getParticipantSurveys(
-          userId,
-          token,
-          category,
-        );
-      }
 
       if (getSurveysResponse['success']) {
-        _surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+        _publicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
         _error = null;
@@ -158,28 +151,26 @@ class SurveyProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getSurveyParticipants(String surveyId, String token) async {
+  Future<void> getSurveysByOwner(String ownerId, String token) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
 
-      final getSurveyParticipantsResponse =
-          await _surveyService.getSurveyParticipants(
-        surveyId,
+      final getSurveysResponse = await _surveyService.getSurveysByOwner(
+        ownerId,
         token,
       );
-
-      if (getSurveyParticipantsResponse['success']) {
-        _surveyParticipants =
-            (getSurveyParticipantsResponse['data']['users'] as List<dynamic>)
-                .map((s) => User.fromJson(s))
-                .toList();
+        
+      if (getSurveysResponse['success']) {
+        _surveysOwned = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+            .map((s) => Survey.fromJson(s))
+            .toList();
         _error = null;
         _isLoading = false;
         notifyListeners();
       } else {
-        _error = getSurveyParticipantsResponse['data'];
+        _error = getSurveysResponse['error'];
         _isLoading = false;
         notifyListeners();
       }
@@ -187,6 +178,75 @@ class SurveyProvider extends ChangeNotifier {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+
+
+
+  Future<void> getUsersAssignedToSurvey(String surveyId, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final getSurveyUsersResponse =
+          await _surveyService.getUsersAssignedToSurvey(
+        surveyId,
+        token,
+      );
+
+      if (getSurveyUsersResponse['success']) {
+        _currentSurvey!.assignedUsers =
+            (getSurveyUsersResponse['data']['users'] as List<dynamic>)
+                .map((s) => User.fromJson(s))
+                .toList();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveyUsersResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> removeSurvey(String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await _surveyService.removeSurvey(
+        _currentSurvey!.id!,
+        token,
+      );
+
+      if (response['success']) {
+        _surveysOwned.removeWhere((survey) => survey.id == _currentSurvey!.id);
+
+        _isLoading = false;
+        _error = null;
+        _currentSurvey = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = response['data'];
+        notifyListeners();
+        return false;
+      }
+    
+  } catch (e) {
+    _error = e.toString();
+    _isLoading = false;
+    notifyListeners();
+    return false;
     }
   }
 }

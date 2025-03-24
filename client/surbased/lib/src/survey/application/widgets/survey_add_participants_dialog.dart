@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../provider/survey_provider.dart';
 
@@ -25,9 +25,9 @@ class _SurveyAddParticipantsDialogState
     if (mounted) {
       final surveyProvider =
           Provider.of<SurveyProvider>(context, listen: false);
-      if (surveyProvider.surveyParticipants.isNotEmpty) {
+      if (surveyProvider.currentSurvey!.assignedUsers!.isNotEmpty) {
         _participantsInSurvey =
-            surveyProvider.surveyParticipants.map((p) => p.email).toList();
+            surveyProvider.currentSurvey!.assignedUsers!.map((p) => p.email).toList();
       }
     }
   }
@@ -59,8 +59,6 @@ class _SurveyAddParticipantsDialogState
     if (surveyProvider.isLoading || organizationProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    print(_participantsInSurvey);
-    print(organizationProvider.organization?.users);
     return Dialog.fullscreen(
       child: SingleChildScrollView(
         child: Padding(

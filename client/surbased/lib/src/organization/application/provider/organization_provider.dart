@@ -3,6 +3,8 @@ import 'package:surbased/src/organization/domain/organization_model.dart';
 import 'package:surbased/src/organization/infrastructure/organization_service.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
+import '../../../survey/domain/survey_model.dart';
+
 class OrganizationProvider with ChangeNotifier {
   final _organizationService = OrganizationService();
   String? _error;
@@ -68,6 +70,34 @@ class OrganizationProvider with ChangeNotifier {
       } else {
         _isLoading = false;
         _error = getUsersResponse['data'];
+        notifyListeners();
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> getSurveysInOrganization(String token, {String? category}) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final getSurveysResponse = await _organizationService
+          .getSurveysInOrganization(_organization!.id, token, category: category);
+
+      if (getSurveysResponse['success']) {
+        _organization!.surveys =
+            (getSurveysResponse['data']['surveys'] as List<dynamic>)
+                .map((survey) => Survey.fromJson(survey))
+                .toList();
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+      } else {
+        _isLoading = false;
+        _error = getSurveysResponse['data'];
         notifyListeners();
       }
     } catch (e) {

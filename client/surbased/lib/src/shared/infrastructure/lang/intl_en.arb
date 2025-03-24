@@ -54,7 +54,9 @@
     "survey_return_confirmation": "Are you sure you want to return to the survey list?\nYour progress will be lost.",
     "survey_complete": "Complete Survey",
     "survey_submit_confirmation": "Are you sure you want to submit this survey?",
-    "survey_submit": "Save Survey",
+    "survey_submit": "Submit Survey",
+    "survey_remove_confirmation": "Are you sure you want to remove this survey?",
+    "survey_remove": "Remove Survey",
     "survey_answer_required_questions": "Please answer all required questions",
     "survey_submitted": "Please answer all required questions",
     "survey_new": "New Survey",
@@ -79,7 +81,7 @@
     "survey_add_participants": "Add Participants",
     "survey_add_new": "Add New",
     "category_name": "Category {name}",
-    "category": "category",
+    "category": "Category",
     "survey_start_date": "Start date: {date}",
     "survey_end_date": "End date: {date}",
     "events_loading_error": "Error while loading your programmed surveys",
@@ -119,5 +121,8 @@
     "appearance": "Appearance",
     "logout": "Log out",
     "researcher": "Researcher",
-    "participant": "Participant"
+    "participant": "Participant",
+    "explore_page_title": "Explore",
+    "users_error_no_users": "No users found",
+    "survey_removed": "Survey removed successfully"
 }

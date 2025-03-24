@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
-import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/organization/application/organization_users_filter_dialog.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
@@ -75,28 +75,16 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                AppLocalizations.of(context)!.users_page_title,
-                style: theme.textTheme.displayMedium,
-              ),
-            ),
-            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  Flexible(
+                    fit: FlexFit.loose,
                     flex: 1,
                     child: SizedBox(
                       height: 48,
@@ -151,59 +139,67 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
               ),
             ),
             const SizedBox(height: 15),
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(top: 8, left: 7),
-              shrinkWrap: true,
-              itemCount: _usersToShow.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+            if (_usersToShow.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.users_error_no_users,
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          _usersToShow[index].role == 'researcher'
-                              ? AppLocalizations.of(context)!.researcher
-                              : AppLocalizations.of(context)!.participant,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(top: 8, left: 7),
+                itemCount: _usersToShow.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            _usersToShow[index].role == 'researcher'
+                                ? AppLocalizations.of(context)!.researcher
+                                : AppLocalizations.of(context)!.participant,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 30),
-                      const Icon(Icons.arrow_forward_ios),
-                    ],
-                  ),
-                  leading: CircleAvatar(
-                    backgroundColor: theme.colorScheme.primary,
-                    child: Text(
-                      _usersToShow[index].name![0],
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
+                        const SizedBox(width: 30),
+                        const Icon(Icons.arrow_forward_ios),
+                      ],
+                    ),
+                    leading: CircleAvatar(
+                      backgroundColor: theme.colorScheme.primary,
+                      child: Text(
+                        _usersToShow[index].name?.substring(0, 1) ?? '',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  title: Text(_usersToShow[index].name ?? ''),
-                  subtitle: Text(_usersToShow[index].email),
-                );
-              },
-            ),
+                    title: Text(_usersToShow[index].name ?? ''),
+                    subtitle: Text(_usersToShow[index].email),
+                  );
+                },
+                            ),
+              ),
           ],
-        ),
-      ),
     );
   }
 }

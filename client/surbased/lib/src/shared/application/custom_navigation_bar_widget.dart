@@ -25,6 +25,10 @@ class CustomNavigationBar extends StatelessWidget {
         label: AppLocalizations.of(context)!.surveys_page_title,
       ),
       NavigationDestination(
+        icon: const Icon(Icons.explore),
+        label: AppLocalizations.of(context)!.explore_page_title,
+      ),
+      NavigationDestination(
         icon: const Icon(Icons.calendar_month),
         label: AppLocalizations.of(context)!.calendar_page_title,
       ),
@@ -45,8 +49,8 @@ class CustomNavigationBar extends StatelessWidget {
         label: AppLocalizations.of(context)!.calendar_page_title,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.people),
-        label: AppLocalizations.of(context)!.users_page_title,
+        icon: const Icon(Icons.business),
+        label: AppLocalizations.of(context)!.organization,
       ),
       NavigationDestination(
         icon: const Icon(Icons.person),

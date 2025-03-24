@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/shared/application/provider/lang_provider.dart';
+
+import '../../../auth/application/provider/auth_provider.dart';
+import '../../../organization/application/provider/organization_provider.dart';
 
 class SurveyEventsCalendar extends StatefulWidget {
   const SurveyEventsCalendar({super.key});
@@ -21,12 +25,6 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       false; // Variable para controlar si la lista está expandida
 
   @override
-  void dispose() {
-    super.dispose();
-    _events.clear();
-  }
-
-  @override
   void initState() {
     super.initState();
     _events = {};
@@ -35,7 +33,13 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadEvents();
+    if (_events.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (mounted) {
+          _loadEvents();
+        }
+      });
+    }
   }
 
   void _loadEvents() {
@@ -45,6 +49,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       final categoryProvider =
           Provider.of<CategoryProvider>(context, listen: false);
 
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final organizationProvider =
+          Provider.of<OrganizationProvider>(context, listen: false);
+
       _events.clear();
 
       DateTime now = DateTime(
@@ -53,8 +61,23 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
         DateTime.now().day,
       );
 
-      if (surveyProvider.surveys.isNotEmpty) {
-        for (var survey in surveyProvider.surveys) {
+      List<Survey> allSurveys = [];
+
+      if (organizationProvider.organization != null && organizationProvider.organization!.surveys != null && organizationProvider.organization!.surveys!.isNotEmpty) {
+        allSurveys.addAll(organizationProvider.organization!.surveys!);
+      }
+
+      if (surveyProvider.surveysOwned.isNotEmpty) {
+        allSurveys.addAll(surveyProvider.surveysOwned);
+      }
+
+      if (authProvider.surveysAssigned.isNotEmpty) {
+        allSurveys.addAll(authProvider.surveysAssigned);
+      }
+
+
+      if (allSurveys.isNotEmpty) {
+        for (var survey in allSurveys) {
           if (survey.endDate != null) {
             if (survey.endDate!.isAfter(now) ||
                 survey.endDate!.isAtSameMomentAs(now)) {
@@ -78,9 +101,6 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
         }
       }
 
-      if (mounted) {
-        setState(() {});
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -112,13 +132,6 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
 
-    if (surveyProvider.surveys.isNotEmpty && _events.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _loadEvents();
-        }
-      });
-    }
 
     if (surveyProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());

@@ -3,15 +3,19 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/organization_section.dart';
 import 'package:surbased/src/organization/application/organization_users.dart';
-import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
 import 'package:surbased/src/survey/application/widgets/survey_list.dart';
+import 'package:surbased/src/survey/application/widgets/survey_section.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
+
+import '../../survey/application/widgets/survey_explore.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -26,7 +30,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    //_startPeriodicRefresh();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _refreshData();
+    });
   }
 
   @override
@@ -63,39 +69,53 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _refreshData() async {
+  void _refreshData() async {
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final surveyProvider =
-          Provider.of<SurveyProvider>(context, listen: false);
-      final organizationProvider =
-          Provider.of<OrganizationProvider>(context, listen: false);
-      final categoryProvider =
-          Provider.of<CategoryProvider>(context, listen: false);
+      final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
+          final surveyProvider =
+              Provider.of<SurveyProvider>(context, listen: false);
+          final organizationProvider =
+              Provider.of<OrganizationProvider>(context, listen: false);
+          final categoryProvider =
+              Provider.of<CategoryProvider>(context, listen: false);
 
-      if (authProvider.isAuthenticated) {
-        await surveyProvider.getSurveys(
-          authProvider.userId!,
-          authProvider.userRole!,
-          authProvider.token!,
-          null,
-          null,
-        );
-
-        await categoryProvider.getCategories(null, authProvider.token!);
-
-        if (authProvider.user!.organizationId != null) {
-          await organizationProvider.getOrganizationById(
-            authProvider.user!.organizationId!,
-            authProvider.token!,
-          );
-          if (authProvider.user!.role == 'researcher') {
-            await organizationProvider.getUsersInOrganization(
+          if (authProvider.isAuthenticated) {
+            await authProvider.getSurveysAssignedToUser(
+              authProvider.userId!,
               authProvider.token!,
             );
+            await surveyProvider.getPublicSurveys(
+              authProvider.token!,
+            );
+
+            await categoryProvider.getCategories(null, authProvider.token!);
+
+            if (authProvider.user!.organizationId != null) {
+              await organizationProvider.getOrganizationById(
+                authProvider.user!.organizationId!,
+                authProvider.token!,
+              );
+
+              await organizationProvider.getSurveysInOrganization(
+              authProvider.token!,
+            );
+
+              if (authProvider.user!.role == 'researcher') {
+                await organizationProvider.getUsersInOrganization(
+                  authProvider.token!,
+                );
+                await surveyProvider.getSurveysByOwner(
+                  authProvider.user!.id,
+                  authProvider.token!,
+                );
+              }
+            }
+
+            if (authProvider.user!.role == 'admin') {
+              await authProvider.getUsers(authProvider.token!, null, null);
+            }
           }
-        }
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -110,8 +130,7 @@ class _HomePageState extends State<HomePage> {
     final authProvider = Provider.of<AuthProvider>(context);
     final role = authProvider.userRole;
 
-    // Si el usuario no está autenticado o el rol es null, mostramos un indicador de carga
-    if (!authProvider.isAuthenticated || role == null) {
+    if (!authProvider.isAuthenticated || role == null || authProvider.isLoading) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -121,22 +140,23 @@ class _HomePageState extends State<HomePage> {
 
     // Páginas para participantes
     final participantPages = [
-      const SurveyList(),
+      const SurveySection(),
+      const SurveyExplore(),
       const SurveyEventsCalendar(),
       const UserProfile()
     ];
 
     // Páginas para investigadores
     final researcherPages = [
-      const SurveyList(),
+      const SurveySection(),
       const SurveyEventsCalendar(),
-      const OrganizationUsers(),
+      const OrganizationSection(),
       const UserProfile()
     ];
 
     // Páginas para administradores
     final adminPages = [
-      const SurveyList(),
+      const SurveySection(),
       const SurveyCreatePage(),
       const UserProfile(),
       const UserProfile()

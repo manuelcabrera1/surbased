@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/organization/application/organization_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -48,43 +48,6 @@ class _LoginPageState extends State<LoginPage> {
         );
 
         if (isLogged && mounted) {
-          final authProvider =
-              Provider.of<AuthProvider>(context, listen: false);
-          final surveyProvider =
-              Provider.of<SurveyProvider>(context, listen: false);
-          final organizationProvider =
-              Provider.of<OrganizationProvider>(context, listen: false);
-          final categoryProvider =
-              Provider.of<CategoryProvider>(context, listen: false);
-
-          if (authProvider.isAuthenticated) {
-            await surveyProvider.getSurveys(
-              authProvider.userId!,
-              authProvider.userRole!,
-              authProvider.token!,
-              null,
-              null,
-            );
-
-            await categoryProvider.getCategories(null, authProvider.token!);
-
-            if (authProvider.user!.organizationId != null) {
-              await organizationProvider.getOrganizationById(
-                authProvider.user!.organizationId!,
-                authProvider.token!,
-              );
-
-              if (authProvider.user!.role == 'researcher') {
-                await organizationProvider.getUsersInOrganization(
-                  authProvider.token!,
-                );
-              }
-            }
-
-            if (authProvider.user!.role == 'admin') {
-              await authProvider.getUsers(authProvider.token!, null, null);
-            }
-          }
           _navigateToHome();
         } else {
           if (mounted) {

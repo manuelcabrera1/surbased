@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../survey/domain/survey_model.dart';
 import '../../infrastructure/auth_service.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
@@ -12,7 +13,7 @@ class AuthProvider with ChangeNotifier {
   final _prefs = SharedPreferences.getInstance();
   bool _isLoading = false;
   List<User> _users = [];
-
+  List<Survey> _surveysAssigned = [];
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   String? get token => _token;
@@ -22,6 +23,9 @@ class AuthProvider with ChangeNotifier {
   String? get userId => _user?.id;
   String? get userRole => _user?.role;
   List<User> get users => _users;
+  List<Survey> get surveysAssigned => _surveysAssigned;
+
+
   Future<bool> login(String email, String password) async {
     _error = null;
     _isLoading = true;
@@ -206,6 +210,37 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> getSurveysAssignedToUser(String userId, String token, {String? category}) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final getSurveysResponse = await _authService.getSurveysAssignedToUser(
+        userId,
+        token,
+        category: category,
+      );
+        
+      if (getSurveysResponse['success']) {
+        _surveysAssigned = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+            .map((s) => Survey.fromJson(s))
+            .toList();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
       notifyListeners();
     }
   }
