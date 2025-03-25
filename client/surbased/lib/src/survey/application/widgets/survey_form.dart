@@ -24,6 +24,7 @@ class SurveyFormState extends State<SurveyForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   String? _categoryId;
+  String? _scope;
 
   @override
   void initState() {

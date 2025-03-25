@@ -124,5 +124,16 @@
     "participant": "Participant",
     "explore_page_title": "Explore",
     "users_error_no_users": "No users found",
-    "survey_removed": "Survey removed successfully"
+    "survey_removed": "Survey removed successfully",
+    "scope": "Scope",
+    "scope_private": "Private",
+    "scope_private_explanation": "Visible for you and invited users only",
+    "scope_organization": "Organization",
+    "scope_organization_explanation": "Visible for members of your organization",
+    "scope_public": "Public",
+    "scope_public_explanation": "Anyone can request access",
+    "please_add_question": "Please add at least one question",
+    "survey_save_publish": "Save and Publish",
+    "survey_publish_explanation": "Now you have finished the survey, you can publish it.",
+    "please_select_scope": "Please select the survey scope"
 }

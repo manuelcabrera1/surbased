@@ -124,6 +124,16 @@
     "participant": "Participante",
     "explore_page_title": "Explorar",
     "users_error_no_users": "No se encontraron usuarios",
-    "survey_removed": "Cuestionario eliminado correctamente"
-
+    "survey_removed": "Cuestionario eliminado correctamente",
+    "scope": "Visibilidad",
+    "scope_private": "Privado",
+    "scope_private_explanation": "Visible solo para ti y usuarios invitados",
+    "scope_organization": "Organización",
+    "scope_organization_explanation": "Visible para miembros de tu organización",
+    "scope_public": "Público",
+    "scope_public_explanation": "Cualquiera puede solicitar acceso",
+    "please_add_question": "Por favor añade al menos una pregunta",
+    "survey_save_publish": "Guardar y Publicar",
+    "survey_publish_explanation": "Ahora que has terminado el cuestionario, puedes publicarlo.",
+    "please_select_scope": "Por favor selecciona la visibilidad del cuestionario"
 }

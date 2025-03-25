@@ -89,11 +89,13 @@ class SurveyProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<bool> createSurvey(String token) async {
+  Future<bool> createSurvey(String token, String scope) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
+
+      _currentSurvey!.scope = scope;
 
       final response = await _surveyService.createSurvey(
         _currentSurvey!.toJson(),

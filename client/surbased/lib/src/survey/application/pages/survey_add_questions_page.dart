@@ -8,6 +8,8 @@ import 'package:surbased/src/survey/application/widgets/survey_add_edit_question
 import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../widgets/survey_save_publish_dialog.dart';
+
 class SurveyAddQuestionsPage extends StatefulWidget {
   const SurveyAddQuestionsPage({super.key});
 
@@ -66,58 +68,16 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
   void _showSaveSurveyDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.survey_save),
-        content: Text(AppLocalizations.of(context)!.survey_save_confirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          TextButton(
-            onPressed: () => _createSurvey(),
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
-      ),
+      builder: (context) => const SurveySavePublishDialog(),
     );
   }
 
-  Future<void> _createSurvey() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
-    try {
-      bool success = await surveyProvider.createSurvey(
-        authProvider.token!,
-      );
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(AppLocalizations.of(context)!.survey_saved)),
-          );
-          Navigator.pushNamed(context, AppRoutes.home);
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(surveyProvider.error!)),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final surveyProvider = Provider.of<SurveyProvider>(context);
 
-    final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
+    //final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
     
     return Scaffold(
       appBar: AppBar(
