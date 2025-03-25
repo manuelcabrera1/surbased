@@ -33,12 +33,12 @@ class Survey(Base):
 
  
 
-    assigned_users: Mapped[Optional[List["User"]]] = relationship(secondary=survey_user, back_populates="surveys_assigned", cascade="all, delete", lazy="selectin")
-    owner: Mapped["User"] = relationship(back_populates="surveys_owned", cascade="all, delete", lazy="selectin")
-    category: Mapped["Category"] = relationship(back_populates="surveys", cascade="all, delete", lazy="selectin")
-    metrics: Mapped[Optional[List["Metric"]]] = relationship(secondary=survey_metric, back_populates="surveys", cascade="all, delete", lazy="selectin")
+    assigned_users: Mapped[Optional[List["User"]]] = relationship(secondary=survey_user, back_populates="surveys_assigned",lazy="selectin")
+    owner: Mapped["User"] = relationship(back_populates="surveys_owned", lazy="selectin")
+    category: Mapped["Category"] = relationship(back_populates="surveys", lazy="selectin")
+    metrics: Mapped[Optional[List["Metric"]]] = relationship(secondary=survey_metric, back_populates="surveys", lazy="selectin")
     questions: Mapped[Optional[List["Question"]]] = relationship(back_populates="survey", cascade="all, delete", lazy="selectin")
-    organization: Mapped[Optional["Organization"]] = relationship(back_populates="surveys", cascade="all, delete", lazy="selectin")
+    organization: Mapped[Optional["Organization"]] = relationship(back_populates="surveys", lazy="selectin")
 
 
     __table_args__ = (

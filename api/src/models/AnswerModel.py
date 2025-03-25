@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, UUID, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
+    from .QuestionModel import Question
     from .OptionModel import Option
     from .UserModel import User
 
@@ -21,7 +22,8 @@ class Answer(Base):
 
 
 
-    option: Mapped["Option"] = relationship(back_populates="answers", cascade="all, delete", lazy="selectin")
-    participant: Mapped["User"] = relationship(back_populates="answers", cascade="all, delete", lazy="selectin")
+    option: Mapped["Option"] = relationship(back_populates="answers", lazy="selectin")
+    participant: Mapped["User"] = relationship(back_populates="answers", lazy="selectin")
+    question: Mapped["Question"] = relationship(back_populates="answers", lazy="selectin")
 
 

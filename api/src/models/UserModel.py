@@ -35,8 +35,8 @@ class User(Base):
     
     
 
-    organization: Mapped["Organization"] = relationship(back_populates="users", cascade="all, delete", lazy="selectin")
-    surveys_assigned: Mapped[Optional[List["Survey"]]]=relationship(secondary=survey_user, back_populates="assigned_users", cascade="all, delete", lazy="selectin")
+    organization: Mapped["Organization"] = relationship(back_populates="users", lazy="selectin")
+    surveys_assigned: Mapped[Optional[List["Survey"]]]=relationship(secondary=survey_user, back_populates="assigned_users", lazy="selectin")
     surveys_owned: Mapped[Optional[List["Survey"]]] = relationship(back_populates="owner", cascade="all, delete", lazy="selectin")
     answers: Mapped[Optional[List["Answer"]]] = relationship(back_populates="participant", cascade="all, delete", lazy="selectin")
 

@@ -24,4 +24,4 @@ class Metric(Base):
     formula: Mapped[str] = mapped_column(String(200), nullable=True)
 
 
-    surveys: Mapped[Optional[List["Survey"]]] = relationship(secondary=survey_metric, back_populates="metrics", cascade="all, delete", lazy="selectin")
+    surveys: Mapped[Optional[List["Survey"]]] = relationship(secondary=survey_metric, back_populates="metrics", lazy="selectin")

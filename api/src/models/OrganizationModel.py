@@ -20,5 +20,5 @@ class Organization(Base):
 
 
 
-    users: Mapped[List["User"]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")
-    surveys: Mapped[Optional[List["Survey"]]] = relationship(back_populates="organization", cascade="all, delete", lazy="selectin")
+    users: Mapped[List["User"]] = relationship(back_populates="organization", lazy="selectin")
+    surveys: Mapped[Optional[List["Survey"]]] = relationship(back_populates="organization", lazy="selectin")

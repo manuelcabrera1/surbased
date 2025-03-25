@@ -1,5 +1,6 @@
 from typing import List, TYPE_CHECKING
 import uuid
+from .AnswerModel import Answer
 from database import Base
 from sqlalchemy import Boolean, CheckConstraint, Column, ForeignKey, Integer, String, Date, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -25,8 +26,9 @@ class Question(Base):
 
 
 
-    survey: Mapped["Survey"] = relationship(back_populates="questions", cascade="all, delete", lazy="selectin")
+    survey: Mapped["Survey"] = relationship(back_populates="questions", lazy="selectin")
     options: Mapped[List["Option"]] = relationship(back_populates="question", cascade="all, delete", lazy="selectin")
+    answers: Mapped[List["Answer"]] = relationship(back_populates="question", cascade="all, delete", lazy="selectin")
 
 
     __table_args__ = (
