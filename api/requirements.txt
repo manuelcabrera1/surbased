@@ -9,3 +9,5 @@ bcrypt
 sqlalchemy[asyncio]
 typing
 asyncpg
+fastapi-mail
+jinja2
