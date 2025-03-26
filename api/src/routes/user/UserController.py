@@ -26,7 +26,7 @@ async def create_user(user: UserCreateRequest, db: Annotated[AsyncSession, Depen
             raise HTTPException(status_code=400, detail="This email is already in use")  
         
         #check if org already exists
-        result = await db.execute(select(Organization).where(Organization.name == user.organization))
+        result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
         existing_org = result.unique().scalars().first()
 
         if not existing_org:
@@ -110,12 +110,18 @@ async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_us
     
 
 
-@user_router.get("/users/{id}", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
-async def get_user_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)]):
+@user_router.get("/users/{id}", status_code=200, response_model=UserResponse)
+@required_roles(["admin", "researcher"])
+async def get_user_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
-        #check if user exists
         result = await db.execute(select(User).where(User.id == id))
         existing_user = result.unique().scalars().first()
+
+        if current_user.role == "researcher" and existing_user.organization_id != current_user.organization_id:
+            raise HTTPException(status_code=403, detail="You are not allowed to access this user")
 
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found") 
