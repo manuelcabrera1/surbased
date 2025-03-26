@@ -21,7 +21,7 @@ class OrganizationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getOrganizationById(String id, String token) async {
+  Future<Organization?> getOrganizationById(String id, String token) async {
     _error = null;
     _isLoading = true;
     notifyListeners();
@@ -31,12 +31,40 @@ class OrganizationProvider with ChangeNotifier {
           await _organizationService.getOrganizationById(id, token);
 
       if (getOrganizationResponse['success']) {
-        _organization = Organization.fromJson(getOrganizationResponse['data']);
+        final organization = Organization.fromJson(getOrganizationResponse['data']);
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return organization;
+      } else {
+        _error = getOrganizationResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return null;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  Future<void> getCurrentOrganization(String id, String token) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final organization = await getOrganizationById(id, token);
+
+      if (organization != null) {
+        _organization = organization;
         _error = null;
         _isLoading = false;
         notifyListeners();
       } else {
-        _error = getOrganizationResponse['data'];
+        _error = 'Error getting organization';
         _isLoading = false;
         notifyListeners();
       }

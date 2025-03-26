@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
             await categoryProvider.getCategories(null, authProvider.token!);
 
             if (authProvider.user!.organizationId != null) {
-              await organizationProvider.getOrganizationById(
+              await organizationProvider.getCurrentOrganization(
                 authProvider.user!.organizationId!,
                 authProvider.token!,
               );

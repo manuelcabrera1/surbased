@@ -1,0 +1,453 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
+import 'package:surbased/src/user/domain/user_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
+
+class UserDetailsPage extends StatefulWidget {
+  final String userId;
+  const UserDetailsPage({super.key, required this.userId});
+
+  @override
+  State<UserDetailsPage> createState() => _UserDetailsPageState();
+}
+
+class _UserDetailsPageState extends State<UserDetailsPage> {
+  User? _user;
+  String? _organizationName;
+  bool _isSendingInvitation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _loadUserDetails();
+    });
+  }
+
+  void _loadUserDetails() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+
+    if (authProvider.token != null && widget.userId != '') {
+      try {
+        final user = await userProvider.getUserById(widget.userId, authProvider.token!);
+        if (user != null) {
+          setState(() {
+            _user = user;
+          });
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(userProvider.error!)),
+            );
+          }
+        }
+        if (user != null && user.organizationId != null) {
+          final organization = await organizationProvider.getOrganizationById(user.organizationId!, authProvider.token!);
+          if (organization != null) {
+            setState(() {
+              _organizationName = organization.name;
+            });
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.toString())),
+          );
+        }
+      }
+    }
+  }
+
+  String _getGenderTranslation(String? gender) {
+    if (gender == null) return '-';
+    
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return AppLocalizations.of(context)!.gender_male;
+      case 'female':
+        return AppLocalizations.of(context)!.gender_female;
+      case 'other':
+        return AppLocalizations.of(context)!.gender_other;
+      default:
+        return gender;
+    }
+  }
+
+  String _getRoleTranslation(String role) {
+    switch (role.toLowerCase()) {
+      case 'researcher':
+        return AppLocalizations.of(context)!.researcher;
+      case 'participant':
+        return AppLocalizations.of(context)!.participant;
+      default:
+        return role;
+    }
+  }
+
+  void _sendInvitation() {
+    // Aquí implementar la lógica para enviar invitaciones 
+    setState(() {
+      _isSendingInvitation = true;
+    });
+
+    // Simular un delay para mostrar la animación
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isSendingInvitation = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invitation sent successfully')),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final organizationProvider = Provider.of<OrganizationProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    if (userProvider.isLoading || organizationProvider.isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.profile_page_title),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Verificar si el usuario actual coincide con el usuario de la página
+    final bool isCurrentUser = _user != null && authProvider.userId == _user!.id;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_user?.name != null 
+            ? '${_user!.name} ${_user!.lastname ?? ''}'
+            : AppLocalizations.of(context)!.profile_page_title),
+      ),
+      body: SafeArea(
+        child: _user == null
+            ? Center(
+                child: Text(
+                  'User not found',
+                  style: theme.textTheme.titleLarge,
+                ),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Encabezado con avatar y nombre
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withOpacity(0.7),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: theme.colorScheme.primary,
+                            child: Text(
+                              _user!.name != null && _user!.name!.isNotEmpty
+                                  ? _user!.name![0].toUpperCase()
+                                  : _user!.email[0].toUpperCase(),
+                              style: theme.textTheme.displayMedium?.copyWith(
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (_user!.name != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: Text(
+                                '${_user!.name} ${_user!.lastname ?? ''}',
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _user!.email,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Chip(
+                            label: Text(
+                              _getRoleTranslation(_user!.role),
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            backgroundColor: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                    
+                    // Sección de información personal
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Personal Information',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Tarjeta con información personal
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  _buildInfoRow(
+                                    'Organization', 
+                                    _organizationName ?? 'Not assigned',
+                                    Icons.business,
+                                    theme,
+                                  ),
+                                  const Divider(),
+                                  _buildInfoRow(
+                                    'Gender', 
+                                    _getGenderTranslation(_user!.gender),
+                                    Icons.person,
+                                    theme,
+                                  ),
+                                  if (_user!.birthdate != null) ...[
+                                    const Divider(),
+                                    _buildInfoRow(
+                                      'Birthdate', 
+                                      DateFormat('dd/MM/yyyy').format(_user!.birthdate!),
+                                      Icons.cake,
+                                      theme,
+                                    ),
+                                  ],
+                                  if (_user!.age != null) ...[
+                                    const Divider(),
+                                    _buildInfoRow(
+                                      'Age', 
+                                      '${_user!.age} years',
+                                      Icons.view_timeline,
+                                      theme,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                          
+                          // Sección de estadísticas (simuladas)
+                          const SizedBox(height: 24),
+                          Text(
+                            'Activity',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  _buildStatRow(
+                                    'Surveys Completed', 
+                                    '5',
+                                    Icons.check_circle,
+                                    Colors.green,
+                                    theme,
+                                  ),
+                                  const Divider(),
+                                  _buildStatRow(
+                                    'Avg. Response Time', 
+                                    '3.2 min',
+                                    Icons.timer,
+                                    Colors.blue,
+                                    theme,
+                                  ),
+                                  const Divider(),
+                                  _buildStatRow(
+                                    'Last Activity', 
+                                    '2 days ago',
+                                    Icons.calendar_today,
+                                    Colors.orange,
+                                    theme,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          
+                          // Botones de acción
+                          if (!isCurrentUser) ...[
+                            const SizedBox(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildActionButton(
+                                  label: 'Send Message',
+                                  icon: Icons.message,
+                                  onPressed: () {
+                                    // Implementar la lógica para enviar mensaje
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Message feature coming soon')),
+                                    );
+                                  },
+                                  theme: theme,
+                                ),
+                                _buildActionButton(
+                                  label: 'Send Invitation',
+                                  icon: Icons.send,
+                                  isLoading: _isSendingInvitation,
+                                  onPressed: _sendInvitation,
+                                  theme: theme,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ),
+      );
+  }
+  
+  Widget _buildInfoRow(String label, String value, IconData icon, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: theme.colorScheme.primary),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildStatRow(String label, String value, IconData icon, Color color, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required ThemeData theme,
+    bool isLoading = false,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        minimumSize: const Size(150, 48),
+      ),
+      icon: isLoading
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: theme.colorScheme.onPrimary,
+              ),
+            )
+          : Icon(icon),
+      label: Text(label),
+    );
+  }
+}

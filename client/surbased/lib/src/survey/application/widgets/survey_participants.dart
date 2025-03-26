@@ -18,7 +18,9 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
 
-    if (surveyProvider.currentSurvey!.assignedUsers!.isEmpty) {
+    if (surveyProvider.currentSurvey == null || 
+    surveyProvider.currentSurvey!.assignedUsers == null || 
+    surveyProvider.currentSurvey!.assignedUsers!.isEmpty) {
       return Center(
         child: Text(
           AppLocalizations.of(context)!.survey_no_participants_assigned,

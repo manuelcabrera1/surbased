@@ -18,6 +18,7 @@ class SurveyQuestionCard extends StatefulWidget {
 class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
   List<String> selectedMultipleOptions = [];
   String? selectedSingleOption;
+  final textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 10),
-            if (question.options != null && question.options!.isNotEmpty) ...[
+            if (question.type != "open" && question.options != null && question.options!.isNotEmpty) ...[
               ...question.options!.map((option) => Padding(
                   padding: const EdgeInsets.all(0),
                   child: Row(
@@ -88,6 +89,18 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
                       ),
                     ],
                   ))),
+            ],
+            if (question.type == "open") ...[
+              TextField(
+                controller: textController,
+                minLines: 1,
+                maxLines: 3,
+                onChanged: (value) {
+                  setState(() {
+                    answerProvider.setTextToQuestion(question, value);
+                  });
+                },
+              ),
             ],
           ],
         ),

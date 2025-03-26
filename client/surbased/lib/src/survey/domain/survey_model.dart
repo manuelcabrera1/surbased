@@ -18,6 +18,7 @@ class Survey {
   DateTime? endDate;
   final List<Question> questions;
   List<User>? assignedUsers;
+  String? organizationId;
 
   Survey({
     required this.name,
@@ -30,6 +31,7 @@ class Survey {
     this.endDate,
     required this.questions,
     this.assignedUsers,
+    this.organizationId,
   });
 
 
@@ -40,11 +42,13 @@ class Survey {
         id: json["id"],
         description: json["description"] ?? '',
         scope: json["scope"],
+         organizationId: json["organization_id"],
         startDate: DateTime.parse(json["start_date"]),
         endDate:
             json["end_date"] != null ? DateTime.parse(json["end_date"]) : null,
         questions: List<Question>.from(
             json["questions"].map((x) => Question.fromJson(x))),
+       
       );
 
   Map<String, dynamic> toJson() => {
@@ -53,11 +57,13 @@ class Survey {
         "owner_id": ownerId,
         "description": description,
         "scope": scope,
+        "organization_id": organizationId,
         "start_date":
             "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
         "end_date": endDate != null
             ? "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}"
             : null,
         "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
+       
       };
 }

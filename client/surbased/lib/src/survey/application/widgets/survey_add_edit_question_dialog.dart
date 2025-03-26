@@ -21,7 +21,7 @@ class _SurveyAddEditQuestionDialogState
     extends State<SurveyAddEditQuestionDialog> {
   final _formKey = GlobalKey<FormState>();
   final _questionTextController = TextEditingController();
-  final _options = <Option>[];
+  List<Option> _options = [];
   bool _isRequired = true;
   String _questionType = "";
   int _likertScale = 3; 
@@ -193,7 +193,8 @@ class _SurveyAddEditQuestionDialogState
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _questionTextController,
-                  maxLines: 2,
+                  minLines: 1,
+                  maxLines: 4,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.question_text,
                     border: const OutlineInputBorder(),
@@ -236,10 +237,16 @@ class _SurveyAddEditQuestionDialogState
                     if (value != null) {
                       setState(() {
                         _questionType = value;
-                        if (value == "likert_scale" && _options.isEmpty) {
-                          _options.clear();
-                          for (int i = 0; i < _likertScale; i++) {
-                            _options.add(Option(description: '', points: i + 1));
+                        if (value == "likert_scale") {
+                          if (_options.isEmpty) {
+                            _options.clear();
+                            for (int i = 0; i < _likertScale; i++) {
+                              _options.add(Option(description: '', points: i + 1));
+                            }
+                          } else {
+                            for (int i = 0; i < _likertScale; i++) {
+                              _options[i] = Option(description: _options[i].description!, points: i + 1);
+                            }
                           }
                         }
                       });

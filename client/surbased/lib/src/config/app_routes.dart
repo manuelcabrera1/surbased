@@ -8,6 +8,7 @@ import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_detail_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_edit_page.dart';
 import 'package:surbased/src/user/application/pages/user_accessibility_page.dart';
+import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_info_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
 import 'package:surbased/src/user/application/pages/user_notifications_page.dart';
@@ -29,6 +30,8 @@ class AppRoutes {
   static const String userSecurity = '/user/security';
   static const String userTheme = '/user/theme';
   static const String userAccessibility = '/user/accessibility';
+  static const String userDetails = '/user/details';
+
 
   static Map<String, WidgetBuilder> routes = {
     register: (_) => const RegisterPage(),
@@ -44,6 +47,7 @@ class AppRoutes {
     userSecurity: (_) => const UserSecurityPage(),
     userTheme: (_) => const UserThemePage(),
     userAccessibility: (_) => const UserAccessibilityPage(),
+    userDetails: (context) => UserDetailsPage(userId: ModalRoute.of(context)!.settings.arguments as String),
     surveyAddQuestions: (_) => const SurveyAddQuestionsPage(),
     //researcherHome: (_) => const ResearcherHomePage(),
     //adminHome: (_) => const AdminHomePage(),

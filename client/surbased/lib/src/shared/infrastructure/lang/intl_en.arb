@@ -58,7 +58,7 @@
     "survey_remove_confirmation": "Are you sure you want to remove this survey?",
     "survey_remove": "Remove Survey",
     "survey_answer_required_questions": "Please answer all required questions",
-    "survey_submitted": "Please answer all required questions",
+    "survey_submitted": "Survey submitted successfully",
     "survey_new": "New Survey",
     "survey_info": "Info",
     "survey_participants": "Participants",

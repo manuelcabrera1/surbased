@@ -125,6 +125,7 @@ class SurveyFormState extends State<SurveyForm> {
             const SizedBox(height: 20),
             TextFormField(
               keyboardType: TextInputType.multiline,
+              minLines: 2,
               maxLines: 4,
               controller: _descriptionController,
               decoration: InputDecoration(

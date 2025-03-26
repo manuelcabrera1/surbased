@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -20,6 +21,7 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
     Future<void> _createSurvey() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
     try {
       if (surveyProvider.currentSurvey!.questions.isEmpty) {
         if (mounted) {
@@ -41,10 +43,16 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
 
 
       
-      // Convertir el scope seleccionado a minúsculas para el backend
       String scope = _selectedScope.toLowerCase();
+
+      print(organizationProvider.organization!.id);
+      print(scope);
       
-      bool success = await surveyProvider.createSurvey(
+      bool success = scope == 'organization' ? await surveyProvider.createSurvey(
+        authProvider.token!,
+        scope,
+        organizationId: organizationProvider.organization!.id,
+      ) : await surveyProvider.createSurvey(
         authProvider.token!,
         scope,
       );

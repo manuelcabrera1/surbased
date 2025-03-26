@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/organization/application/organization_users_filter_dialog.dart';
+import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
 class OrganizationUsers extends StatefulWidget {
@@ -155,6 +157,9 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                 itemCount: _usersToShow.length,
                 itemBuilder: (context, index) {
                   return ListTile(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.userDetails, arguments: _usersToShow[index].id);
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

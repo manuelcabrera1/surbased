@@ -8,13 +8,13 @@ from schemas.QuestionSchema import *
 class AnswerBase(BaseModel):...
 
 class AnswerCreate(AnswerBase):
-    questions: List[QuestionWithId]
+    questions: List[QuestionAnswer]
 
 class AnswerUpdate(AnswerBase): ...
 
 class AnswerResponse(AnswerBase):
     survey_id: UUID
-    questions: List[QuestionWithId]
+    questions: List[QuestionAnswer]
 
 class AnswerResponseWithLength(AnswerBase):
     answers: List[AnswerResponse]

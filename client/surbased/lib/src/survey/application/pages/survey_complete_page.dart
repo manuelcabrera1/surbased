@@ -28,7 +28,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       isRequired = widget.survey!.questions
           .firstWhere((q) => q.id == question.id)
           .required!;
-      if (isRequired && question.options == null || question.options!.isEmpty) {
+      if (isRequired && question.options == null || question.options!.isEmpty && question.text == null) {
         answerProvider.addQuestionToBeAnswered(question.id!);
         result = false;
       }
@@ -49,7 +49,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
               content: Text(AppLocalizations.of(context)!.survey_submitted),
             ),
           );
-          Navigator.pushNamed(context, AppRoutes.home);
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       } else {
         if (mounted) {
@@ -110,7 +110,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
             TextButton(
               onPressed: () {
                 answerProvider.clearAllCurrentInfo();
-                Navigator.pushNamed(context, AppRoutes.home);
+                Navigator.pushReplacementNamed(context, AppRoutes.home);
               },
               child: Text(AppLocalizations.of(context)!.go_back),
             ),
@@ -119,7 +119,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       );
     } else {
       answerProvider.clearAllCurrentInfo();
-      Navigator.pushNamed(context, AppRoutes.home);
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
 

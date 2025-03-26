@@ -170,7 +170,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             options_descriptions.add(option.description)
             options_count+=1
         
-        if options_count <= 1:
+        if options_count <= 1 and question.type != "open":
             raise HTTPException(status_code=400, detail=f"Question {question.description} must have at least two options")  
 
     try:
@@ -179,6 +179,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             name=survey.name, 
             description=survey.description,
             scope=survey.scope,
+            organization_id=survey.organization_id,
             start_date=survey.start_date, 
             end_date=survey.end_date, 
             owner_id=survey.owner_id, 

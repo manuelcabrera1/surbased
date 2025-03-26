@@ -32,7 +32,13 @@ class QuestionResponseWithLength(BaseModel):
     questions: List[QuestionResponse]
     length: int
 
+
 class QuestionWithId(BaseModel):
     id: uuid.UUID
     options: List[OptionWithId]
+class QuestionAnswer(BaseModel):
+    id: uuid.UUID
+    type: QuestionTypeEnum
+    options: Optional[List[OptionWithId]]
+    text: Optional[str]
 

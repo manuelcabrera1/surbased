@@ -192,17 +192,6 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                     icon: const Icon(Icons.more_vert),
                     itemBuilder: (context) => [
                       PopupMenuItem(
-                        onTap: () => _duplicateQuestion(index),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.content_copy),
-                            const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.duplicate),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
                         onTap: () => _showAddEditQuestionDialog(
                           question: question,
                           index: index,
@@ -213,6 +202,17 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                             const Icon(Icons.edit),
                             const SizedBox(width: 12),
                             Text(AppLocalizations.of(context)!.edit),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => _duplicateQuestion(index),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.content_copy),
+                            const SizedBox(width: 12),
+                            Text(AppLocalizations.of(context)!.duplicate),
                           ],
                         ),
                       ),

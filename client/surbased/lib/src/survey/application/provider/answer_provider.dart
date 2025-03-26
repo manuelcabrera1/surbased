@@ -34,7 +34,7 @@ class AnswerProvider extends ChangeNotifier {
   void setCurrentSurveyBeingAnswered(Survey survey) {
     _currentSurveyBeingAnswered = Answer(
         questions: survey.questions
-            .map((q) => Question(id: q.id, options: []))
+            .map((q) => Question(id: q.id, type: q.type, options: [], text: ''))
             .toList());
     notifyListeners();
   }
@@ -44,6 +44,13 @@ class AnswerProvider extends ChangeNotifier {
         .firstWhere((q) => q.id == question.id)
         .options!
         .add(Option(id: option.id));
+    notifyListeners();
+  }
+
+  void setTextToQuestion(Question question, String text) {
+    _currentSurveyBeingAnswered!.questions
+        .firstWhere((q) => q.id == question.id)
+        .text = text;
     notifyListeners();
   }
 

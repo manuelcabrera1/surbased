@@ -4,6 +4,7 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/widgets/survey_add_participants_dialog.dart';
+import 'package:surbased/src/survey/application/widgets/survey_answers.dart';
 import 'package:surbased/src/survey/application/widgets/survey_participants.dart';
 
 import '../../../user/domain/user_model.dart';
@@ -217,10 +218,10 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
           ]),
       body: TabBarView(
         controller: tabController,
-        children: [
-          const SurveyInfo(),
-          const SurveyParticipants(),
-          Text(AppLocalizations.of(context)!.survey_stats),
+        children: const [
+          SurveyInfo(),
+          SurveyParticipants(),
+          SurveyAnswers(),
         ],
       ),
       floatingActionButton: tabController.index == 1
