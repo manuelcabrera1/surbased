@@ -249,6 +249,9 @@ class _SurveyAddEditQuestionDialogState
                             }
                           }
                         }
+                        if (value == "open") {
+                          _options.clear();
+                        }
                       });
                     }
                   },
