@@ -295,6 +295,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                             Text(
                                               '${event['surveyDescription']}',
                                               style: theme.textTheme.bodyMedium,
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),

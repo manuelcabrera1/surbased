@@ -9,7 +9,6 @@ class SurveyService {
   Future<Map<String, dynamic>> createSurvey(
       Map<String, dynamic> survey, String token) async {
     try {
-      print(json.encode(survey));
       final response = await http.post(
         Uri.parse('$_baseUrl/surveys'),
         headers: {
@@ -115,6 +114,7 @@ class SurveyService {
   
   Future<Map<String, dynamic>> registerSurveyAnswers(
       String surveyId, Answer answer, String token) async {
+
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/surveys/$surveyId/answers'),
@@ -124,7 +124,6 @@ class SurveyService {
         },
         body: json.encode(answer),
       );
-      print(json.decode(utf8.decode(response.bodyBytes)));
 
       if (response.statusCode == 201) {
         return {

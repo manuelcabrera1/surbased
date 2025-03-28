@@ -19,20 +19,35 @@ class SurveyCreatePage extends StatefulWidget {
 class SurveyCreatePageState extends State<SurveyCreatePage> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.survey_new),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => {
-            Navigator.pop(context),
-            surveyProvider.clearCurrentSurvey(),
-          },
-        ),
-      ),
-      body: const SingleChildScrollView(
-        child: SurveyForm(),
+      body: SafeArea(
+          child: SingleChildScrollView(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back),
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Create a New Survey',
+                          style: theme.textTheme.displayMedium?.copyWith(
+                            fontSize: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SurveyForm(),
+                ],
+              ),
+          ),
       ),
     );
   }

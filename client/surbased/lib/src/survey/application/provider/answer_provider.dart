@@ -84,6 +84,7 @@ class AnswerProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+
       final areSurveyAnswersRegistered = await _surveyService
           .registerSurveyAnswers(surveyId, _currentSurveyBeingAnswered!, token);
       if (areSurveyAnswersRegistered['success']) {

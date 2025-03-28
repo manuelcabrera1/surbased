@@ -6,7 +6,7 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_section.dart';
 import 'package:surbased/src/organization/application/organization_users.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/shared/application/custom_navigation_bar_widget.dart';
+import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
@@ -15,7 +15,7 @@ import 'package:surbased/src/survey/application/widgets/survey_section.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
 
-import '../../survey/application/widgets/survey_explore.dart';
+import '../../../survey/application/widgets/survey_explore.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -150,6 +150,7 @@ class _HomePageState extends State<HomePage> {
     final researcherPages = [
       const SurveySection(),
       const SurveyEventsCalendar(),
+      const SizedBox(),
       const OrganizationSection(),
       const UserProfile()
     ];
@@ -175,17 +176,21 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: pages,
       ),
-      floatingActionButton: role == 'researcher' && _currentIndex == 0
+      floatingActionButton: role == 'researcher'
           ? FloatingActionButton(
+            
+              shape: const CircleBorder(),
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.surveyCreate),
               child: const Icon(Icons.add),
             )
           : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
       bottomNavigationBar: CustomNavigationBar(
         currentIndex: _currentIndex,
         onDestinationSelected: _onDestinationSelected,
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }
