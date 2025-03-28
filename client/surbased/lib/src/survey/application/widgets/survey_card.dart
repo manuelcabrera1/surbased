@@ -49,19 +49,36 @@ class SurveyCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 10),
-              category.name.isNotEmpty || category.name != ''
-                  ? Text(
-                      AppLocalizations.of(context)!.category_name(category.name),
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: theme.colorScheme.onSurface),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : const SizedBox.shrink(),
+              Row(
+                children: [
+                  Icon(
+                    Icons.question_answer_outlined,
+                    size: 18,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    survey.questions.length > 1
+                        ? '${survey.questions.length} preguntas'
+                        : '1 pregunta',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  
+                ],
+                  ),
               const SizedBox(height: 8),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  Icon(
+                    Icons.calendar_month_outlined,
+                    size: 18,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
                   Text(
                     survey.endDate != null &&
                             survey.startDate.isBefore(
@@ -71,9 +88,11 @@ class SurveyCard extends StatelessWidget {
                         : AppLocalizations.of(context)!.survey_start_date(
                             _formatDate(survey.startDate)),
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  const Spacer(),
                   userRole == 'participant'
                       ? survey.startDate.isAfter(DateTime.now())
                           ? Icon(Icons.lock_outline,
