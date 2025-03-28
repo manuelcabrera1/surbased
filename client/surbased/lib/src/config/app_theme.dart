@@ -14,7 +14,7 @@ class AppTheme {
   static const Color pureWhite = Color(0xFFFFFFFF); // Blanco puro
   static const Color offWhite = Color(0xFFF5F5F5); // Blanco hueso para fondos
   static const Color greyText =
-      Color(0xFF757575); // Gris para textos secundarios
+      Color.fromARGB(255, 77, 73, 73); // Gris para textos secundarios
   static const Color blackText =
       Color(0xFF000000); // Negro para textos principales
 
