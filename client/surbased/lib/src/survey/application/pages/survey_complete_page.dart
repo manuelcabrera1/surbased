@@ -135,20 +135,23 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                 ? null
                 : _showGoBackConfirmationDialog),
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.survey!.questions.length,
-                itemBuilder: (context, index) {
-                  return SurveyQuestionCard(
-                    question: widget.survey!.questions[index],
-                  );
-                },
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(0),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: widget.survey!.questions.length,
+                  itemBuilder: (context, index) {
+                    return SurveyQuestionCard(
+                      question: widget.survey!.questions[index],
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
