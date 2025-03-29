@@ -152,7 +152,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.home);
+            Navigator.pop(context);
             surveyProvider.clearCurrentSurvey();
           },
           icon: const Icon(Icons.arrow_back),
