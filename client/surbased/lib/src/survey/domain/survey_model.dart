@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:surbased/src/survey/domain/question_model.dart';
+import 'package:surbased/src/survey/domain/tag_model.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
 Survey surveyFromJson(String str) => Survey.fromJson(json.decode(str));
@@ -19,6 +20,7 @@ class Survey {
   final List<Question> questions;
   List<User>? assignedUsers;
   String? organizationId;
+  List<Tag>? tags;
 
   Survey({
     required this.name,
@@ -32,6 +34,7 @@ class Survey {
     required this.questions,
     this.assignedUsers,
     this.organizationId,
+    this.tags,
   });
 
 
@@ -47,7 +50,7 @@ class Survey {
         endDate: DateTime.parse(json["end_date"]),
         questions: List<Question>.from(
             json["questions"].map((x) => Question.fromJson(x))),
-       
+        tags: json["tags"] != null ? List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -62,6 +65,6 @@ class Survey {
         "end_date":
             "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
         "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
-       
+        "tags": List<dynamic>.from(tags?.map((x) => x.toJson()) ?? []),
       };
 }
