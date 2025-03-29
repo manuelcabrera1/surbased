@@ -1,5 +1,6 @@
 from typing import List, Optional, TYPE_CHECKING
 import uuid
+from models.TagModel import Tag
 from database import Base
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Date, UniqueConstraint, func, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -7,6 +8,7 @@ from datetime import date
 from sqlalchemy.orm import  Mapped, mapped_column, relationship
 from .SurveyMetricModel import survey_metric
 from .SurveyUserModel import survey_user
+from .SurveyTagModel import survey_tag
 
 
 if TYPE_CHECKING:
@@ -15,7 +17,6 @@ if TYPE_CHECKING:
     from .CategoryModel import Category
     from .MetricModel import Metric
     from .QuestionModel import Question
-
 
 class Survey(Base):
     __tablename__ = "surveys"
@@ -39,6 +40,7 @@ class Survey(Base):
     metrics: Mapped[Optional[List["Metric"]]] = relationship(secondary=survey_metric, back_populates="surveys", lazy="selectin")
     questions: Mapped[Optional[List["Question"]]] = relationship(back_populates="survey", cascade="all, delete", lazy="selectin")
     organization: Mapped[Optional["Organization"]] = relationship(back_populates="surveys", lazy="selectin")
+    tags: Mapped[Optional[List["Tag"]]] = relationship(secondary=survey_tag, back_populates="surveys", lazy="selectin")
 
 
     __table_args__ = (
