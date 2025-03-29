@@ -21,7 +21,7 @@ class SurveyList extends StatefulWidget {
 
 class _SurveyListState extends State<SurveyList> {
   final _searchController = SearchController();
-  String _searchQuery = '';
+  String? _selectedCategory;
   List<Survey> _surveysToShow = [];
 
   @override
@@ -45,6 +45,8 @@ class _SurveyListState extends State<SurveyList> {
 
   Future<void> _handleOnTap(Survey survey) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final surveyProvider =
+            Provider.of<SurveyProvider>(context, listen: false);
 
     if (mounted && authProvider.userRole != null) {
       final userRole = authProvider.userRole;
@@ -52,17 +54,14 @@ class _SurveyListState extends State<SurveyList> {
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
         answerProvider.setCurrentSurveyBeingAnswered(survey);
+        surveyProvider.currentSurvey = survey;
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SurveyCompletePage(
-              survey: survey,
-            ),
+            builder: (context) => const SurveyCompletePage(),
           ),
         );
       } else {
-        final surveyProvider =
-            Provider.of<SurveyProvider>(context, listen: false);
         surveyProvider.currentSurvey = survey;
 
         if (mounted) {
@@ -74,12 +73,18 @@ class _SurveyListState extends State<SurveyList> {
 
   void filterSurveys() {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
     if (mounted) {
       setState(() {
         _surveysToShow = widget.surveys
-            .where((survey) =>
-                survey.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+            .where((survey) {
+                String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
+                bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                categoryName.toLowerCase().contains(_searchController.text.toLowerCase());
+                bool category = _selectedCategory == null || _selectedCategory == survey.categoryId;
+                return search && category;
+            })
             .toList();
       });
     }
@@ -113,78 +118,131 @@ class _SurveyListState extends State<SurveyList> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 20, right: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
             children: [
-              Flexible(
-                fit: FlexFit.loose,
-                flex: 1,
-                child: SizedBox(
-                  height: 48,
-                  child: SearchBar(
-                    controller: _searchController,
-                    padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(horizontal: 10)),
-                    leading: Icon(Icons.search,
-                        color: theme.colorScheme.onSurfaceVariant),
-                    trailing: [
-                      if (_searchQuery != '')
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _searchController.clear();
-                              _surveysToShow = widget.surveys;
-                            });
-                          },
-                          icon: const Icon(Icons.close),
-                        )
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                      if (_searchQuery != '') {
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                Flexible(
+                  fit: FlexFit.loose,
+                  flex: 1,
+                  child: SizedBox(
+                    height: 48,
+                    child: SearchBar(
+                      controller: _searchController,
+                      padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(horizontal: 10)),
+                      leading: Icon(Icons.search,
+                          color: theme.colorScheme.onSurfaceVariant),
+                      trailing: [
+                        if (_searchController.text != '')
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _surveysToShow = widget.surveys;
+                              });
+                            },
+                            icon: const Icon(Icons.close),
+                          )
+                      ],
+                      onChanged: (value) {
+                        if (_searchController.text != '') {
+                          filterSurveys();
+                        } else {
+                          setState(() {
+                            _surveysToShow = widget.surveys;
+                          });
+                        }
+                      },
+                      onSubmitted: (value) {
                         filterSurveys();
-                      } else {
-                        setState(() {
-                          _surveysToShow = widget.surveys;
-                        });
-                      }
-                    },
-                    onSubmitted: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                      filterSurveys();
-                    },
-                    hintText: AppLocalizations.of(context)!
-                        .surveys_searchbar_placeholder,
+                      },
+                      hintText: AppLocalizations.of(context)!
+                          .surveys_searchbar_placeholder,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: _showFilterDialog,
+                  icon: const Icon(Icons.filter_list_outlined, size: 30),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.only(left: 18, right: 10),
+              child: SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categoryProvider.categories.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: const Text('Todas'),
+                          selected: _selectedCategory == null,
+                          onSelected: (selected) {
+                            setState(() => _selectedCategory = null);
+                            filterSurveys();
+                          },
+                        ),
+                      );
+                    }
+                    final category = categoryProvider.categories[index - 1];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(category.name),
+                        selected: _selectedCategory == category.id,
+                        onSelected: (selected) {
+                          setState(() => _selectedCategory = category.id);
+                          filterSurveys();
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: _showFilterDialog,
-                icon: const Icon(Icons.filter_list_outlined, size: 30),
-              ),
+            ),
             ],
           ),
         ),
-        const SizedBox(height: 15),
-        if (widget.surveys.isEmpty || _surveysToShow.isEmpty)
+        if (widget.surveys.isEmpty || _surveysToShow.isEmpty) ...[
           Expanded(
-            child: Center(
-              child: Text(
-                AppLocalizations.of(context)!.surveys_error_no_surveys,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [    
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off,
+                        size: 64,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.surveys_error_no_surveys,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           )
-        else
+        ] else ...[
+          const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               itemCount: _surveysToShow.length,
               itemBuilder: (context, index) => SurveyCard(
                 userRole: userRole,
@@ -194,7 +252,8 @@ class _SurveyListState extends State<SurveyList> {
                 onTap: () => _handleOnTap(_surveysToShow[index]),
               ),
             ),
-          ),
+            ),
+        ]
       ],
     );
   }
