@@ -8,12 +8,14 @@ import '../../../user/domain/user_model.dart';
 class SurveyProvider extends ChangeNotifier {
   final SurveyService _surveyService = SurveyService();
   List<Survey> _publicSurveys = [];
+  List<Survey> _highlightedPublicSurveys = [];
   List<Survey> _surveysOwned = [];
   bool _isLoading = false;
   String? _error;
   Survey? _currentSurvey;
 
   List<Survey> get publicSurveys => _publicSurveys;
+  List<Survey> get highlightedPublicSurveys => _highlightedPublicSurveys;
   List<Survey> get surveysOwned => _surveysOwned;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -40,7 +42,7 @@ class SurveyProvider extends ChangeNotifier {
   }
 
   bool addOrUpdateSurveyInfo(String name, String? description, DateTime startDate,
-      DateTime? endDate, String categoryId, String ownerId) {
+      DateTime endDate, String categoryId, String ownerId) {
     if (_currentSurvey != null) {
       _currentSurvey!.name = name;
       _currentSurvey!.description = description ?? '';
@@ -53,6 +55,7 @@ class SurveyProvider extends ChangeNotifier {
       _currentSurvey = Survey(
         name: name,
         description: description ?? '',
+        scope: 'private',
         categoryId: categoryId,
         startDate: startDate,
         endDate: endDate,
@@ -137,6 +140,35 @@ class SurveyProvider extends ChangeNotifier {
 
       if (getSurveysResponse['success']) {
         _publicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+            .map((s) => Survey.fromJson(s))
+            .toList();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getHighlightedPublicSurveys(String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final getSurveysResponse = await _surveyService.getHighlightedPublicSurveys(
+        token,
+      );
+
+      if (getSurveysResponse['success']) {
+        _highlightedPublicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
         _error = null;

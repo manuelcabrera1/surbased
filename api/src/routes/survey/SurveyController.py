@@ -312,7 +312,44 @@ async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current
 
         return { "surveys": surveys, "length": len(surveys) }
 
+@survey_router.get("/surveys/public/highlighted", status_code=200, response_model=SurveyResponseWithLength)
+async def get_highlighted_public_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+    
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    
+    # Consulta para obtener las encuestas más populares basadas en el número de respuestas
+    result = await db.execute(
+        select(
+            Survey
+        )
+        .join(Question, Survey.id == Question.survey_id)
+        .join(Answer, Question.id == Answer.question_id)
+        .where(and_(
+            or_(Survey.end_date >= date.today(), Survey.end_date != None),
+        ))
+        .group_by(
+            Survey.id,
+            Survey.name,
+            Survey.description,
+            Survey.start_date,
+            Survey.end_date,
+            Survey.scope,
+            Survey.organization_id,
+            Survey.owner_id,
+            Survey.category_id
+        )
+        .order_by(func.count(Survey.id).desc())
+        .limit(5)
+    )
+    
+    surveys = result.unique().scalars().all()
+    
 
+    print(surveys)
+
+
+    return {"surveys": surveys, "length": len(surveys)}
 
 
 

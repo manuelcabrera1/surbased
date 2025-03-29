@@ -89,6 +89,10 @@ class _HomePageState extends State<HomePage> {
               authProvider.token!,
             );
 
+            await surveyProvider.getHighlightedPublicSurveys(
+              authProvider.token!,
+            );
+
             await categoryProvider.getCategories(null, authProvider.token!);
 
             if (authProvider.user!.organizationId != null) {
@@ -178,7 +182,6 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: role == 'researcher'
           ? FloatingActionButton(
-            
               shape: const CircleBorder(),
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.surveyCreate),
