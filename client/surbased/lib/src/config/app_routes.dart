@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:surbased/src/auth/application/pages/enter_reset_code_page.dart';
+import 'package:surbased/src/auth/application/pages/send_forgot_password_mail_page.dart';
 import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
 import 'package:surbased/src/shared/application/pages/home_page.dart';
@@ -20,6 +22,8 @@ class AppRoutes {
   static const String home = '/home';
   static const String register = '/register';
   static const String login = '/login';
+  static const String forgotPassword = '/forgot-password';
+  static const String enterResetCode = '/enter-reset-code';
   static const String surveyDetail = '/survey/detail';
   static const String surveyComplete = '/survey/complete';
   static const String surveyCreate = '/survey/create';
@@ -38,6 +42,8 @@ class AppRoutes {
     register: (_) => const RegisterPage(),
     login: (_) => const LoginPage(),
     home: (_) => const HomePage(),
+    forgotPassword: (_) => const SendForgotPasswordMailPage(),
+    enterResetCode: (_) => const EnterResetCodePage(),
     surveyDetail: (_) => const SurveyDetailPage(),
     surveyComplete: (_) => const SurveyCompletePage(),
     surveyCreate: (_) => const SurveyCreatePage(),

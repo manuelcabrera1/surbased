@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                 // Link "Olvidé mi contraseña"
                 TextButton(
                   onPressed: () {
-                    // Implementar navegación a recuperación de contraseña
+                    Navigator.pushNamed(context, AppRoutes.forgotPassword);
                   },
                   child: Text(AppLocalizations.of(context)!.forgot_password),
                 ),

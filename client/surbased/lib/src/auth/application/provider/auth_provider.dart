@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:surbased/src/shared/infrastructure/mail_service.dart';
 import '../../../survey/domain/survey_model.dart';
 import '../../infrastructure/auth_service.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
+  final MailService _mailService = MailService();
   bool _isAuthenticated = false;
   String? _token;
   String? _error;
@@ -14,6 +17,7 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   List<User> _users = [];
   List<Survey> _surveysAssigned = [];
+  int? _resetCode;
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   String? get token => _token;
@@ -24,7 +28,12 @@ class AuthProvider with ChangeNotifier {
   String? get userRole => _user?.role;
   List<User> get users => _users;
   List<Survey> get surveysAssigned => _surveysAssigned;
+  int? get resetCode => _resetCode;
 
+  void clearResetCode() {
+    _resetCode = null;
+    notifyListeners();
+  }
 
   Future<bool> login(String email, String password) async {
     _error = null;
@@ -181,6 +190,32 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> sendForgotPasswordMail(String email) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final isSent = await _mailService.sendForgotPasswordMail(email);
+      if (isSent['success']) {
+        _resetCode = isSent['data']['reset_code'];
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return true;
+      } else {
+        _error = isSent['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
       notifyListeners();
       return false;
     }
