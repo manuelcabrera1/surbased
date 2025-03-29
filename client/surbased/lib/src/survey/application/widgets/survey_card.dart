@@ -8,6 +8,7 @@ class SurveyCard extends StatelessWidget {
   final VoidCallback onTap;
   final String userRole;
   final Category category;
+  static const int _maxVisibleTags = 5;
 
   const SurveyCard({
     super.key,
@@ -21,13 +22,50 @@ class SurveyCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  // Lista de colores para las tags
+  static const List<Color> _tagColors = [
+    Color(0xFFE8F5E9), // green.shade50
+    Color(0xFFFFF3E0), // orange.shade50
+    Color(0xFFF3E5F5), // purple.shade50
+    Color(0xFFE3F2FD), // blue.shade50
+    Color(0xFFFFEBEE), // red.shade50
+    Color(0xFFE0F2F1), // teal.shade50
+    Color(0xFFFCE4EC), // pink.shade50
+    Color(0xFFE8EAF6), // indigo.shade50
+  ];
+
+  Widget _buildTagChip(BuildContext context, String text, Color color) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(right: 2, bottom: 4),
+      child: Chip(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        label: Text(
+          text,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: color.computeLuminance() > 0.5 
+                ? Colors.black87 
+                : Colors.white,
+            fontSize: 11,
+          ),
+        ),
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     final isSurveyAvailable = survey.startDate.isBefore(
                                 DateTime.now().add(const Duration(days: 1))) &&
-                            (survey.endDate == null || survey.endDate!.isAfter(DateTime.now()));
+                            survey.endDate.isAfter(DateTime.now());
 
     return Card(
       child: InkWell(
@@ -52,7 +90,7 @@ class SurveyCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               Row(
                 children: [
                   Icon(
@@ -70,10 +108,9 @@ class SurveyCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  
                 ],
-                  ),
-              const SizedBox(height: 8),
+              ),
+              const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -86,9 +123,9 @@ class SurveyCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    isSurveyAvailable && survey.endDate != null
+                    isSurveyAvailable
                         ? AppLocalizations.of(context)!.survey_end_date(
-                            _formatDate(survey.endDate!))
+                            _formatDate(survey.endDate))
                         : AppLocalizations.of(context)!.survey_start_date(
                             _formatDate(survey.startDate)),
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -99,6 +136,34 @@ class SurveyCard extends StatelessWidget {
                   const Spacer(),
                 ],
               ),
+              if (survey.tags != null && survey.tags!.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text(
+                  'Tags:', 
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: [
+                    ...survey.tags!.take(_maxVisibleTags).map((tag) {
+                      final index = survey.tags!.indexOf(tag);
+                      final color = _tagColors[index % _tagColors.length];
+                      return _buildTagChip(context, tag.name, color);
+                    }),
+                    if (survey.tags!.length > _maxVisibleTags)
+                      _buildTagChip(
+                        context,
+                        '+${survey.tags!.length - _maxVisibleTags}',
+                        theme.colorScheme.tertiaryContainer,
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

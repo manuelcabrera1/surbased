@@ -184,6 +184,11 @@ class AppTheme {
           fontWeight: FontWeight.bold,
           color: darkText,
         ),
+        headlineSmall: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: darkText,
+        ),
         bodyLarge: TextStyle(
           fontSize: 16,
           color: blackText,
