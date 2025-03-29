@@ -65,7 +65,7 @@ class SurveyFormState extends State<SurveyForm> {
         _nameController.text,
         _descriptionController.text,
         _startDate ?? DateTime.now(),
-        _endDate,
+        _endDate ?? DateTime.now().add(const Duration(days: 7)),
         _categoryId!,
         authProvider.user!.id,
       );

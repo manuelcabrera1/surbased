@@ -82,12 +82,10 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
         tabTitles = const [
           Tab(text: 'Assigned'),
           Tab(text: 'Organization'),
-          Tab(text: 'Public'),
         ];
         tabViews = [
           SurveyList(surveys: authProvider.surveysAssigned),
           SurveyList(surveys: organizationProvider.organization!.surveys!),
-          SurveyList(surveys: surveyProvider.publicSurveys),
         ];
     }
 

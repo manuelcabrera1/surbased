@@ -1,7 +1,7 @@
 from typing import List, Optional
 import uuid
 from pydantic import BaseModel, Field, field_validator, model_validator
-from datetime import date
+from datetime import date, timedelta
 
 from .QuestionSchema import *
 
@@ -26,7 +26,7 @@ class SurveyBase(BaseModel):
 class SurveyCreate(SurveyBase):
     description: Optional[str] = Field(default="")
     start_date: Optional[date] = Field(default_factory=date.today)
-    end_date: Optional[date] = Field(default=None)
+    end_date: Optional[date] = Field(default_factory=lambda: date.today() + timedelta(days=7))
     questions: List[QuestionCreateRequest]
 
     @model_validator(mode="after")

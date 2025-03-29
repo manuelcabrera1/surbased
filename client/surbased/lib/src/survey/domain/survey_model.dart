@@ -13,9 +13,9 @@ class Survey {
   String ownerId;
   final String? id;
   String? description;
-  String? scope;
+  String scope;
   DateTime startDate;
-  DateTime? endDate;
+  DateTime endDate;
   final List<Question> questions;
   List<User>? assignedUsers;
   String? organizationId;
@@ -26,9 +26,9 @@ class Survey {
     required this.ownerId,
     this.id,
     this.description,
-    this.scope,
+    required this.scope,
     required this.startDate,
-    this.endDate,
+    required this.endDate,
     required this.questions,
     this.assignedUsers,
     this.organizationId,
@@ -44,8 +44,7 @@ class Survey {
         scope: json["scope"],
          organizationId: json["organization_id"],
         startDate: DateTime.parse(json["start_date"]),
-        endDate:
-            json["end_date"] != null ? DateTime.parse(json["end_date"]) : null,
+        endDate: DateTime.parse(json["end_date"]),
         questions: List<Question>.from(
             json["questions"].map((x) => Question.fromJson(x))),
        
@@ -60,9 +59,8 @@ class Survey {
         "organization_id": organizationId,
         "start_date":
             "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-        "end_date": endDate != null
-            ? "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}"
-            : null,
+        "end_date":
+            "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
         "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
        
       };

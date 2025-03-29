@@ -16,7 +16,6 @@ class OrganizationUsers extends StatefulWidget {
 }
 
 class _OrganizationUsersState extends State<OrganizationUsers> {
-  String _searchQuery = '';
   final SearchController _searchController = SearchController();
   List<User> _usersToShow = [];
 
@@ -50,11 +49,11 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
       setState(() {
         _usersToShow = organizationProvider.organization!.users!
             .where((user) =>
-                user.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+                user.name?.toLowerCase().contains(_searchController.text.toLowerCase()) ??
                 false ||
                     user.email
                         .toLowerCase()
-                        .contains(_searchQuery.toLowerCase()))
+                        .contains(_searchController.text.toLowerCase()))
             .toList();
       });
     }
@@ -97,7 +96,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                         leading: Icon(Icons.search,
                             color: theme.colorScheme.onSurfaceVariant),
                         trailing: [
-                          if (_searchQuery != '')
+                          if (_searchController.text != '')
                             IconButton(
                               onPressed: () {
                                 setState(() {
@@ -110,10 +109,8 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                             )
                         ],
                         onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
-                          if (_searchQuery != '') {
+
+                          if (_searchController.text != '') {
                             filterUsers();
                           } else {
                             setState(() {
@@ -123,9 +120,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                           }
                         },
                         onSubmitted: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
+
                           filterUsers();
                         },
                         hintText: AppLocalizations.of(context)!.users_searchbar_placeholder,

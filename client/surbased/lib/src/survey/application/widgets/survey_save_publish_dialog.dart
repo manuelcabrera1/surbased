@@ -40,13 +40,9 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
         }
         return;
       }
-
-
       
       String scope = _selectedScope.toLowerCase();
 
-      print(organizationProvider.organization!.id);
-      print(scope);
       
       bool success = scope == 'organization' ? await surveyProvider.createSurvey(
         authProvider.token!,

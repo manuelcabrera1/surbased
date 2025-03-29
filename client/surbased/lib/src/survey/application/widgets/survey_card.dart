@@ -25,6 +25,10 @@ class SurveyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final isSurveyAvailable = survey.startDate.isBefore(
+                                DateTime.now().add(const Duration(days: 1))) &&
+                            (survey.endDate == null || survey.endDate!.isAfter(DateTime.now()));
+
     return Card(
       child: InkWell(
         onTap: userRole == 'participant'
@@ -74,15 +78,15 @@ class SurveyCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Icon(
-                    Icons.calendar_month_outlined,
+                    isSurveyAvailable
+                        ? Icons.calendar_month_outlined
+                        : Icons.lock_outline,
                     size: 18,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    survey.endDate != null &&
-                            survey.startDate.isBefore(
-                                DateTime.now().add(const Duration(days: 1)))
+                    isSurveyAvailable && survey.endDate != null
                         ? AppLocalizations.of(context)!.survey_end_date(
                             _formatDate(survey.endDate!))
                         : AppLocalizations.of(context)!.survey_start_date(
@@ -93,14 +97,6 @@ class SurveyCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  userRole == 'participant'
-                      ? survey.startDate.isAfter(DateTime.now())
-                          ? Icon(Icons.lock_outline,
-                              size: 25, color: theme.colorScheme.onSurface)
-                          : Icon(Icons.lock_open_outlined,
-                              size: 25, color: theme.colorScheme.onSurface)
-                      : Icon(Icons.arrow_forward_ios_rounded,
-                          size: 25, color: theme.colorScheme.onSurface),
                 ],
               ),
             ],
