@@ -7,6 +7,7 @@ import 'package:surbased/src/survey/application/pages/survey_complete_page.dart'
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_detail_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_edit_page.dart';
+import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/user/application/pages/user_accessibility_page.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_info_page.dart';

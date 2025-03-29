@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
-import '../../domain/survey_model.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import '../widgets/survey_question_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class SurveyCompletePage extends StatefulWidget {
-  final Survey? survey;
-  const SurveyCompletePage({super.key, this.survey});
+  const SurveyCompletePage({super.key});
 
   @override
   State<SurveyCompletePage> createState() => _SurveyCompletePageState();
@@ -19,13 +18,14 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
 
   bool allRequiredQuestionsAreAnswered() {
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final questions = answerProvider.currentSurveyBeingAnswered!.questions;
 
     bool isRequired;
     bool result = true;
 
     for (var question in questions) {
-      isRequired = widget.survey!.questions
+      isRequired = surveyProvider.currentSurvey!.questions
           .firstWhere((q) => q.id == question.id)
           .required!;
       if (isRequired && question.options == null || question.options!.isEmpty && question.text == null) {
@@ -39,9 +39,10 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
   void _submitSurvey() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     if (authProvider.token != null) {
       bool success = await answerProvider.registerSurveyAnswers(
-          widget.survey!.id!, authProvider.token!);
+          surveyProvider.currentSurvey!.id!, authProvider.token!);
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +111,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
             TextButton(
               onPressed: () {
                 answerProvider.clearAllCurrentInfo();
-                Navigator.pushReplacementNamed(context, AppRoutes.home);
+                Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.go_back),
             ),
@@ -119,13 +120,19 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       );
     } else {
       answerProvider.clearAllCurrentInfo();
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final answerProvider = Provider.of<AnswerProvider>(context);
+    final surveyProvider = Provider.of<SurveyProvider>(context);
+
+    if (answerProvider.isLoading || surveyProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.survey_complete),
@@ -145,10 +152,10 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                 child: ListView.builder(
                   padding: const EdgeInsets.all(0),
                   physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: widget.survey!.questions.length,
+                  itemCount: surveyProvider.currentSurvey!.questions.length,
                   itemBuilder: (context, index) {
                     return SurveyQuestionCard(
-                      question: widget.survey!.questions[index],
+                      question: surveyProvider.currentSurvey!.questions[index],
                     );
                   },
                 ),
