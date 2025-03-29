@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, update, and_
+from sqlalchemy import func, insert, or_, select, update, and_
+from models.TagModel import Tag
+from models.AnswerModel import Answer
 from models.QuestionModel import Question
 from models.OptionModel import Option
 from schemas.OptionSchema import OptionResponse
@@ -15,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.Auth import create_access_token, check_current_user, oauth_scheme, get_current_user, required_roles
 from sqlalchemy.orm import selectinload
+from models.SurveyTagModel import survey_tag
 
 
 survey_router = APIRouter(tags=["Survey"])
@@ -146,6 +149,8 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
         raise HTTPException(status_code=400, detail="Start date cannot be after end date")
     
+
+    
     #questions
     # descriptions and number should be unique
     #options:
@@ -226,6 +231,26 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
             .order_by(Question.number)
         )
         loaded_questions = result.unique().scalars().all()
+
+        #check if tags exist, if not, create them
+        result = await db.execute(select(Tag).where(Tag.name.in_(survey.tags)))
+        existing_tags = result.unique().scalars().all()
+
+        new_tags = []
+
+        if len(existing_tags) != len(survey.tags):
+            existing_tags_names = [t.name for t in existing_tags]
+            tags_to_add = list(set(survey.tags) - set(existing_tags_names))
+            
+            new_tags = [Tag(name=tag) for tag in tags_to_add]
+
+            db.add_all(new_tags)
+            await db.flush()
+        
+        await db.execute(insert(survey_tag).values(
+            [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in new_tags] + 
+            [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in existing_tags]))
+        await db.commit()
         
         # Construir la respuesta
         response = SurveyResponse(
@@ -286,6 +311,8 @@ async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current
         surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys) }
+
+
 
 
 

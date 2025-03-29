@@ -3,6 +3,8 @@ import uuid
 from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import date, timedelta
 
+from schemas.TagSchema import *
+
 from .QuestionSchema import *
 
 class SurveyScopeEnum(str, Enum):
@@ -28,6 +30,7 @@ class SurveyCreate(SurveyBase):
     start_date: Optional[date] = Field(default_factory=date.today)
     end_date: Optional[date] = Field(default_factory=lambda: date.today() + timedelta(days=7))
     questions: List[QuestionCreateRequest]
+    tags: Optional[List[str]] = Field(default=None)
 
     @model_validator(mode="after")
     def validate_start_date(self):
@@ -43,6 +46,7 @@ class SurveyResponse(SurveyBase):
     start_date: date
     end_date: Optional[date] = Field(default=None)
     questions: List[QuestionResponse]
+    tags: Optional[List[TagResponse]] = Field(default=None)
 
 class SurveyResponseWithLength(BaseModel):
     surveys: List[SurveyResponse]
