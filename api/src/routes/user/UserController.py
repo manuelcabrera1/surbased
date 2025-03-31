@@ -142,6 +142,18 @@ async def update_password(current_user: Annotated[User, Depends(get_current_user
 
         return None
 
+@user_router.put("/users/reset-password", status_code=200)
+async def reset_password(pw: UserResetPasswordRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+    
+
+        hashed_password = bcrypt.hashpw(pw.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        await db.execute(update(User).where(User.email == pw.email).values(password=hashed_password))
+        await db.commit()
+
+        return None
+
+
 @user_router.put("/users/{id}", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
 async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], user: UserUpdateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
         if not current_user:

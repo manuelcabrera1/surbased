@@ -36,7 +36,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
 
 
   void _navigateToEnterResetCodePage() {
-    Navigator.pushReplacementNamed(context, AppRoutes.enterResetCode);
+    Navigator.pushReplacementNamed(context, AppRoutes.enterResetCode, arguments: _emailController.text);
   }
 
   Future<void> _handleSendForgotPasswordMail() async {
@@ -141,6 +141,24 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                                             color: Colors.white,
                                           )
                                         : Text(AppLocalizations.of(context)!.send_email)),
+                                const SizedBox(height: 30),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, AppRoutes.login);
+                                      },
+                                      child: const Icon(Icons.arrow_back),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, AppRoutes.login);
+                                      },
+                                      child: const Text('Back to login'),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),

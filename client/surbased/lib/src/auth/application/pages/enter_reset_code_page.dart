@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/custom_otp_field.dart';
+import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
 class EnterResetCodePage extends StatefulWidget {
-  const EnterResetCodePage({super.key});
+  final String email;
+  const EnterResetCodePage({super.key, required this.email});
 
   @override
   State<EnterResetCodePage> createState() => _EnterResetCodePageState();
@@ -91,7 +93,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
               ElevatedButton(
                 onPressed:  () {
                   if (inputResetCode.join() == authProvider.resetCode!.toString()) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const UserEditPasswordPage()));
+                    Navigator.pushNamed(context, AppRoutes.resetPassword, arguments: widget.email);
                   }
                   else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -100,6 +102,24 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                   }
                 },
                 child: const Text('Submit'),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.login);
+                    },
+                    child: const Icon(Icons.arrow_back),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRoutes.login);
+                    },
+                    child: const Text('Back to login'),
+                  ),
+                ],
               ),
             ],
           ),

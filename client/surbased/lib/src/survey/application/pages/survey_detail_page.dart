@@ -226,6 +226,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
       ),
       floatingActionButton: tabController.index == 1
           ? FloatingActionButton(
+              heroTag: 'participants',
               onPressed: () => _showAddParticipantsModal(),
               tooltip: AppLocalizations.of(context)!.survey_add_participants,
               child: const Icon(Icons.person_add),

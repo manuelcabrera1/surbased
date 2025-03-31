@@ -78,3 +78,8 @@ class UserResponseWithLength(BaseModel):
 class UserUpdatePasswordRequest(BaseModel):
     password: str
 
+class UserResetPasswordRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+

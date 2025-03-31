@@ -182,6 +182,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: role == 'researcher'
           ? FloatingActionButton(
+              heroTag: 'create',
               shape: const CircleBorder(),
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.surveyCreate),

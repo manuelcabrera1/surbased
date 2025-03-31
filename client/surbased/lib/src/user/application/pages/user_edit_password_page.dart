@@ -16,12 +16,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
   final _confirmPasswordController = TextEditingController();
   bool _isEditing = false;
 
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
+
 
   Future<void> _handleSave() async {
     if (_formKey.currentState!.validate()) {
@@ -60,7 +55,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
   }
@@ -68,7 +63,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
   String? _confirmPasswordValidator(String? value) {
     _fieldValidator(value);
     if (value != _passwordController.text) {
-      return 'Passwords do not match';
+      return AppLocalizations.of(context)!.password_dont_match;
     }
     return null;
   }

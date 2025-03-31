@@ -152,6 +152,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'add',
         onPressed: () => _showAddEditQuestionDialog(),
         child: const Icon(Icons.add),
       ),
