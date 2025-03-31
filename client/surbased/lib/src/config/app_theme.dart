@@ -17,6 +17,8 @@ class AppTheme {
       Color.fromARGB(255, 77, 73, 73); // Gris para textos secundarios
   static const Color blackText =
       Color(0xFF000000); // Negro para textos principales
+  static const Color lightGreyText =
+      Color.fromARGB(255, 185, 185, 185); // Gris para campos deshabilitados
 
   static ThemeData theme() {
     return ThemeData(
@@ -44,6 +46,7 @@ class AppTheme {
         onSurfaceVariant: greyText,
         outline: primaryBlue.withOpacity(0.7),
         shadow: Colors.black.withOpacity(0.1),
+        surfaceTint: lightGreyText,
       ),
 
       scaffoldBackgroundColor: offWhite,

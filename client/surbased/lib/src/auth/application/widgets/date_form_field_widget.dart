@@ -50,11 +50,11 @@ class DateFormField extends FormField<DateTime> {
                 child: state.value == null
                     ? Text(AppLocalizations.of(context)!.select_date,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant))
+                            color: theme.colorScheme.surfaceTint))
                     : Text(DateFormat('dd/MM/yyyy').format(state.value!),
                         style: theme.textTheme.bodyLarge!.copyWith(
                             color: !enabled
-                                ? theme.colorScheme.onSurfaceVariant
+                                ? theme.colorScheme.surfaceTint
                                 : theme.colorScheme.tertiary)),
               ),
             );
