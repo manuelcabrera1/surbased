@@ -80,7 +80,7 @@ class _SurveyAddEditQuestionDialogState
     if (_formKey.currentState?.validate() ?? false) {
       bool success = surveyProvider.addQuestion(
         Question(
-          surveyId: surveyProvider.currentSurvey!.id,
+          surveyId: surveyProvider.currentSurvey?.id,
           description: _questionTextController.text,
           type: _questionType,
           required: _isRequired,
@@ -117,13 +117,13 @@ class _SurveyAddEditQuestionDialogState
       bool success = surveyProvider.updateQuestion(
         widget.index!,
         Question(
-          id: widget.question!.id,
-          surveyId: widget.question!.surveyId,
+          id: widget.question?.id,
+          surveyId: widget.question?.surveyId,
           description: _questionTextController.text,
           type: _questionType,
           required: _isRequired,
           options: List<Option>.from(_options.map((option) => Option(
-                questionId: widget.question!.id,
+                questionId: widget.question?.id,
                 description: option.description!,
                 points: _questionType == "likert_scale" ? option.points : null,
               ))),

@@ -9,6 +9,18 @@ class SurveyService {
   Future<Map<String, dynamic>> createSurvey(
       Map<String, dynamic> survey, String token) async {
     try {
+      // Formatear las fechas a formato YYYY-MM-DD
+      if (survey['start_date'] != null) {
+        final startDate = DateTime.parse(survey['start_date']);
+        survey['start_date'] = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}';
+      }
+      
+      if (survey['end_date'] != null) {
+        final endDate = DateTime.parse(survey['end_date']);
+        survey['end_date'] = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+      }
+
+      print(survey);
       final response = await http.post(
         Uri.parse('$_baseUrl/surveys'),
         headers: {
@@ -42,7 +54,6 @@ class SurveyService {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });
-
       if (response.statusCode == 200) {
         return {
           'success': true,

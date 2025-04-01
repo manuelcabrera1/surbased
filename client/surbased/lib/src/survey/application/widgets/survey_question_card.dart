@@ -27,6 +27,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
     final answerProvider = Provider.of<AnswerProvider>(context);
 
     return Card(
+      elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 10),
       color: theme.colorScheme.primaryContainer.withOpacity(0.3),
       child: Padding(

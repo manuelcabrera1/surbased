@@ -21,6 +21,7 @@ class Survey {
   List<User>? assignedUsers;
   String? organizationId;
   List<Tag>? tags;
+  int? responseCount;
 
   Survey({
     required this.name,
@@ -35,8 +36,8 @@ class Survey {
     this.assignedUsers,
     this.organizationId,
     this.tags,
+    this.responseCount,
   });
-
 
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
         name: json["name"],
@@ -45,26 +46,30 @@ class Survey {
         id: json["id"],
         description: json["description"] ?? '',
         scope: json["scope"],
-         organizationId: json["organization_id"],
+        organizationId: json["organization_id"],
         startDate: DateTime.parse(json["start_date"]),
         endDate: DateTime.parse(json["end_date"]),
         questions: List<Question>.from(
             json["questions"].map((x) => Question.fromJson(x))),
         tags: json["tags"] != null ? List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))) : null,
+        responseCount: json["response_count"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "category_id": categoryId,
-        "owner_id": ownerId,
-        "description": description,
-        "scope": scope,
-        "organization_id": organizationId,
-        "start_date":
-            "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-        "end_date":
-            "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
-        "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
-        "tags": List<dynamic>.from(tags?.map((x) => x.toJson()) ?? []),
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> json = {};
+    json["name"] = name;
+    json["category_id"] = categoryId;
+    json["owner_id"] = ownerId;
+    if (id != null) json["id"] = id;
+    if (description != null) json["description"] = description;
+    json["scope"] = scope;
+    if (organizationId != null) json["organization_id"] = organizationId;
+    json["start_date"] = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}';
+    json["end_date"] = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+    json["questions"] = List<dynamic>.from(questions.map((x) => x.toJson()));
+    if (assignedUsers != null) json["assigned_users"] = List<dynamic>.from(assignedUsers!.map((x) => x.toJson()));
+    if (tags != null) json["tags"] = List<dynamic>.from(tags!.map((x) => x.toJson()));
+    if (responseCount != null) json["response_count"] = responseCount;
+    return json;
+  }
 }

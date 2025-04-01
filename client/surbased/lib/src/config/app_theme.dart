@@ -45,7 +45,7 @@ class AppTheme {
         onSurface: darkText,
         onSurfaceVariant: greyText,
         outline: primaryBlue.withOpacity(0.7),
-        shadow: Colors.black.withOpacity(0.1),
+        shadow: Colors.black.withOpacity(0.5),
         surfaceTint: lightGreyText,
       ),
 

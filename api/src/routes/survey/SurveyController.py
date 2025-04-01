@@ -233,24 +233,25 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
         loaded_questions = result.unique().scalars().all()
 
         #check if tags exist, if not, create them
-        result = await db.execute(select(Tag).where(Tag.name.in_(survey.tags)))
-        existing_tags = result.unique().scalars().all()
+        if survey.tags:  # Solo procesar tags si hay alguno
+            result = await db.execute(select(Tag).where(Tag.name.in_(survey.tags)))
+            existing_tags = result.unique().scalars().all()
 
-        new_tags = []
+            new_tags = []
 
-        if len(existing_tags) != len(survey.tags):
-            existing_tags_names = [t.name for t in existing_tags]
-            tags_to_add = list(set(survey.tags) - set(existing_tags_names))
+            if len(existing_tags) != len(survey.tags):
+                existing_tags_names = [t.name for t in existing_tags]
+                tags_to_add = list(set(survey.tags) - set(existing_tags_names))
+                
+                new_tags = [Tag(name=tag) for tag in tags_to_add]
+
+                db.add_all(new_tags)
+                await db.flush()
             
-            new_tags = [Tag(name=tag) for tag in tags_to_add]
-
-            db.add_all(new_tags)
-            await db.flush()
-        
-        await db.execute(insert(survey_tag).values(
-            [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in new_tags] + 
-            [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in existing_tags]))
-        await db.commit()
+            await db.execute(insert(survey_tag).values(
+                [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in new_tags] + 
+                [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in existing_tags]))
+            await db.commit()
         
         # Construir la respuesta
         response = SurveyResponse(
@@ -321,33 +322,23 @@ async def get_highlighted_public_surveys(current_user: Annotated[User, Depends(g
     # Consulta para obtener las encuestas más populares basadas en el número de respuestas
     result = await db.execute(
         select(
-            Survey
+            Survey,
+            func.count(Answer.question_id).label("response_count")
         )
         .join(Question, Survey.id == Question.survey_id)
         .join(Answer, Question.id == Answer.question_id)
-        .where(and_(
-            or_(Survey.end_date >= date.today(), Survey.end_date != None),
-        ))
-        .group_by(
-            Survey.id,
-            Survey.name,
-            Survey.description,
-            Survey.start_date,
-            Survey.end_date,
-            Survey.scope,
-            Survey.organization_id,
-            Survey.owner_id,
-            Survey.category_id
-        )
-        .order_by(func.count(Survey.id).desc())
+        .where(and_(Survey.end_date >= date.today(), Survey.end_date.isnot(None)))
+        .group_by(Survey.id)
+        .order_by(func.count(Answer.question_id).desc())
         .limit(5)
     )
     
-    surveys = result.unique().scalars().all()
-    
-
-    print(surveys)
-
+    # Obtener los resultados y asignar el conteo a cada encuesta
+    surveys_with_counts = result.all()
+    surveys = []
+    for survey, count in surveys_with_counts:
+        survey.response_count = count
+        surveys.append(survey)
 
     return {"surveys": surveys, "length": len(surveys)}
 

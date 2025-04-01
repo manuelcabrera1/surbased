@@ -68,6 +68,7 @@ class SurveyCard extends StatelessWidget {
                             survey.endDate.isAfter(DateTime.now());
 
     return Card(
+      elevation: 4,
       child: InkWell(
         onTap: userRole == 'participant'
             ? survey.startDate.isBefore(DateTime.now())

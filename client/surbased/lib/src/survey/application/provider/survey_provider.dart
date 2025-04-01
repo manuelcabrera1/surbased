@@ -127,31 +127,29 @@ class SurveyProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getPublicSurveys(String token, {String? category}) async {
+  Future<bool> getPublicSurveys(String token, {String? category}) async {
     try {
       _error = null;
       _isLoading = true;
       notifyListeners();
 
-      final getSurveysResponse = await _surveyService.getPublicSurveys(
-        token,
-        category: category,
-        );
+      final response = await _surveyService.getPublicSurveys(token, category: category);
 
-      if (getSurveysResponse['success']) {
-        _publicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
-            .map((s) => Survey.fromJson(s))
-            .toList();
-        _error = null;
-        _isLoading = false;
+      if (response['success']) {
+        _publicSurveys = 
+          (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
         notifyListeners();
+        return true;
       } else {
-        _error = getSurveysResponse['error'];
-        _isLoading = false;
+        _error = response['data'];
         notifyListeners();
+        return false;
       }
     } catch (e) {
       _error = e.toString();
+      notifyListeners();
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -166,7 +164,7 @@ class SurveyProvider extends ChangeNotifier {
       final getSurveysResponse = await _surveyService.getHighlightedPublicSurveys(
         token,
       );
-
+      
       if (getSurveysResponse['success']) {
         _highlightedPublicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))

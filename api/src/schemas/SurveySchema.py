@@ -46,6 +46,7 @@ class SurveyResponse(SurveyBase):
     start_date: date
     end_date: Optional[date] = Field(default=None)
     questions: List[QuestionResponse]
+    response_count: Optional[int] = Field(default=None)
     tags: Optional[List[TagResponse]] = Field(default=None)
 
 class SurveyResponseWithLength(BaseModel):
