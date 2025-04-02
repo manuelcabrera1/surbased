@@ -65,21 +65,23 @@ class CustomNavigationBar extends StatelessWidget {
     // Items de navegación para administradores
     final adminItems = [
       NavigationDestination(
-        icon: const Icon(Icons.admin_panel_settings, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.panel_page_title,
+          icon: const Icon(Icons.quiz_sharp, size: ICON_SIZE),
+          label: AppLocalizations.of(context)!.surveys_page_title,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.people, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.users_page_title,
+          icon: const Icon(Icons.calendar_month, size: ICON_SIZE),
+          label: AppLocalizations.of(context)!.calendar_page_title, 
       ),
+      const SizedBox(),
       NavigationDestination(
-        icon: const Icon(Icons.business, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.organizations_page_title,
+          icon: const Icon(Icons.business, size: ICON_SIZE),
+          label: AppLocalizations.of(context)!.organizations_page_title,
       ),
-      NavigationDestination(
-        icon: const Icon(Icons.person, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.profile_page_title,
-      ),
+         NavigationDestination(
+          icon: const Icon(Icons.person, size: ICON_SIZE),
+          label: AppLocalizations.of(context)!.profile_page_title,
+        ),
+
     ];
 
     // Seleccionar los items según el rol

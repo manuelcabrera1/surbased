@@ -10,15 +10,52 @@ class OrganizationProvider with ChangeNotifier {
   String? _error;
   bool _isLoading = false;
   Organization? _organization;
+  List<Organization> _organizations = [];
+
   bool get isLoading => _isLoading;
   String? get error => _error;
   Organization? get organization => _organization;
+  List<Organization> get organizations => _organizations;
 
   void clearState() {
     _organization = null;
     _error = null;
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<bool> getOrganizations(String token) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final getOrganizationsResponse = await _organizationService.getOrganizations(token);
+
+      if (getOrganizationsResponse['success']) {
+        _organizations = (getOrganizationsResponse['data']['organizations'] as List<dynamic>)
+        .map((organization) => Organization.fromJson(organization))
+        .toList();
+
+        print(_organizations.map((org) => org.usersCount));
+        print(_organizations.map((org) => org.surveysCount));
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {  
+        _error = getOrganizationsResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
   }
 
   Future<Organization?> getOrganizationById(String id, String token) async {

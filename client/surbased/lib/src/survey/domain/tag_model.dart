@@ -19,7 +19,7 @@ class Tag {
       );
 
   Map<String, dynamic> toJson() => {
+        if (id != null) "id": id,
         "name": name,
-        "id": id,
       };
 }

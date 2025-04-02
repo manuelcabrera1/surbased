@@ -14,7 +14,7 @@ from routes.question.QuestionController import question_router
 from routes.option.OptionController import option_router
 from routes.answer.AnswerController import answer_router
 from routes.mailing.MailController import mail_router
-
+from routes.tag.TagController import tag_router
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -37,3 +37,4 @@ app.include_router(question_router)
 app.include_router(option_router)
 app.include_router(answer_router)
 app.include_router(mail_router)
+app.include_router(tag_router)

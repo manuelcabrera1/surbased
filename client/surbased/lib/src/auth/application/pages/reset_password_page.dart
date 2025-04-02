@@ -139,7 +139,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed:  _handleChangePassword,
-                  child: const Text('Submit'),
+                  child: Text(AppLocalizations.of(context)!.submit),
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -155,7 +155,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       onPressed: () {
                         Navigator.pushNamed(context, AppRoutes.login);
                       },
-                      child: const Text('Back to login'),
+                      child: Text(AppLocalizations.of(context)!.back_to_login),
                     ),
                   ],
                 ),

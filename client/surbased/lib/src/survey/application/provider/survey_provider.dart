@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
+import 'package:surbased/src/survey/domain/tag_model.dart';
 import 'package:surbased/src/survey/infrastructure/survey_service.dart';
 
 import '../../../user/domain/user_model.dart';
@@ -42,13 +43,14 @@ class SurveyProvider extends ChangeNotifier {
   }
 
   bool addOrUpdateSurveyInfo(String name, String? description, DateTime startDate,
-      DateTime endDate, String categoryId, String ownerId) {
+      DateTime endDate, String categoryId, String ownerId, List<String> selectedTags) {
     if (_currentSurvey != null) {
       _currentSurvey!.name = name;
       _currentSurvey!.description = description ?? '';
       _currentSurvey!.categoryId = categoryId;
       _currentSurvey!.startDate = startDate;
       _currentSurvey!.endDate = endDate;
+      _currentSurvey!.tags = selectedTags.map((tag) => Tag(name: tag)).toList();
       notifyListeners();
       return true;
     } else {
@@ -61,6 +63,7 @@ class SurveyProvider extends ChangeNotifier {
         endDate: endDate,
       questions: [],
       ownerId: ownerId,
+      tags: selectedTags.map((tag) => Tag(name: tag)).toList(),
     );
     notifyListeners();
     return true;

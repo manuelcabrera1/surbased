@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import 'package:surbased/src/survey/application/widgets/highlighted_survey_card.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
@@ -27,30 +27,35 @@ class _SurveyExploreState extends State<SurveyExplore> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadInitialData();
+      //_loadInitialData();
     });
   }
 
   void _loadInitialData() {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+    final tagProvider = Provider.of<TagsProvider>(context, listen: false);
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated && authProvider.token != null) {
       categoryProvider.getCategories(null, authProvider.token ?? '');
       surveyProvider.getPublicSurveys(authProvider.token ?? '');
+      tagProvider.getTags(authProvider.token ?? '');
     }
   }
 
   void filterSurveys() {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
     if (mounted) {
       setState(() {
         _surveysToShow = surveyProvider.publicSurveys.where((survey) {
-          final matchesSearch = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-              (survey.description?.toLowerCase().contains(_searchController.text.toLowerCase()) ?? false);
-          return matchesSearch;
+          String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
+          bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+          categoryName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+          (survey.tags?.any((tag) => tag.name.toLowerCase().contains(_searchController.text.toLowerCase())) ?? false);
+          return search;
         }).toList();
       });
     }
@@ -255,7 +260,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                              childAspectRatio: 1.1,
+                              childAspectRatio: 0.95,
                               mainAxisSpacing: 2,
                             ),
                             itemCount: surveyProvider.publicSurveys.length,
@@ -297,8 +302,9 @@ class _SurveyExploreState extends State<SurveyExplore> {
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                              childAspectRatio: 1.1,
-                              mainAxisSpacing: 2,
+                          childAspectRatio: 0.85,
+                          mainAxisSpacing: 2,
+                          crossAxisSpacing: 2,
                         ),
                         itemCount: _surveysToShow.length,
                         itemBuilder: (context, index) {

@@ -54,7 +54,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
                             color: theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text('External',
+                          child: Text(AppLocalizations.of(context)!.external_user,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onPrimaryContainer,
                             ),

@@ -21,7 +21,7 @@ class _SurveyAddEditQuestionDialogState
     extends State<SurveyAddEditQuestionDialog> {
   final _formKey = GlobalKey<FormState>();
   final _questionTextController = TextEditingController();
-  List<Option> _options = [];
+  final List<Option> _options = [];
   bool _isRequired = true;
   String _questionType = "";
   int _likertScale = 3; 
@@ -272,16 +272,16 @@ class _SurveyAddEditQuestionDialogState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 8),
-                      const Text(
-                        "Configuración de escala Likert",
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.likert_scale_configuration,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Row(
                         children: [
-                          const Text("Número de niveles:"),
+                          Text(AppLocalizations.of(context)!.likert_scale_levels_number),
                           const SizedBox(width: 16),
                           DropdownButton<int>(
                             value: _likertScale,
@@ -313,7 +313,7 @@ class _SurveyAddEditQuestionDialogState
                       children: [
                         Text(
                           _questionType == "likert_scale"
-                              ? "Niveles de la escala"
+                              ? AppLocalizations.of(context)!.likert_scale_levels
                               : _questionType == "single_choice" || _questionType == "multiple_choice"
                                 ? AppLocalizations.of(context)!.options
                                 : "",
@@ -343,7 +343,7 @@ class _SurveyAddEditQuestionDialogState
                                 initialValue: _options[index].description,
                                 decoration: InputDecoration(
                                   labelText: _questionType == "likert_scale"
-                                      ? "Nivel ${index + 1}"
+                                      ? AppLocalizations.of(context)!.likert_scale_level(index + 1)
                                       : AppLocalizations.of(context)!.option(index + 1),
                                   border: const OutlineInputBorder(),
                                   floatingLabelBehavior:
@@ -362,9 +362,9 @@ class _SurveyAddEditQuestionDialogState
                                 width: 70,
                                 child: TextFormField(
                                   initialValue: "${index + 1}",
-                                  decoration: const InputDecoration(
-                                    labelText: "Valor",
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!.likert_scale_option_value,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) => _updateOptionPoints(index, int.parse(value)),

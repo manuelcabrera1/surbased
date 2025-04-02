@@ -16,7 +16,6 @@ class SurveySection extends StatefulWidget {
 }
 
 class _SurveySectionState extends State<SurveySection> with TickerProviderStateMixin{
-  bool _isInitialized = false;
   late TabController tabController;
   List<Tab> tabTitles = [];
   List<Widget> tabViews = [];
@@ -59,10 +58,10 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
 
     switch(authProvider.userRole) {
       case 'admin':
-        tabTitles = const [
-          Tab(text: 'Private'),
-          Tab(text: 'Organization'),
-          Tab(text: 'Public'),
+        tabTitles = [
+          Tab(text: AppLocalizations.of(context)!.scope_private),
+          Tab(text: AppLocalizations.of(context)!.scope_organization),
+          Tab(text: AppLocalizations.of(context)!.scope_public),
         ];
         tabViews = [
           SurveyList(surveys: surveyProvider.surveysOwned),
@@ -70,18 +69,18 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           SurveyList(surveys: surveyProvider.publicSurveys),
         ];
       case 'researcher':
-        tabTitles = const [
-          Tab(text: 'Owned'),
-          Tab(text: 'Assigned'),
+        tabTitles = [
+          Tab(text: AppLocalizations.of(context)!.surveys_owned),
+          Tab(text: AppLocalizations.of(context)!.surveys_assigned),
         ];
         tabViews = [
           SurveyList(surveys: surveyProvider.surveysOwned),
           SurveyList(surveys: authProvider.surveysAssigned),
         ];
       case 'participant':
-        tabTitles = const [
-          Tab(text: 'Assigned'),
-          Tab(text: 'Organization'),
+        tabTitles = [
+          Tab(text: AppLocalizations.of(context)!.surveys_assigned),
+          Tab(text: AppLocalizations.of(context)!.organization),
         ];
         tabViews = [
           SurveyList(surveys: authProvider.surveysAssigned),

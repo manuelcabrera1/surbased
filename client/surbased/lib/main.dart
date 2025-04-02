@@ -8,6 +8,7 @@ import 'package:surbased/src/shared/application/provider/theme_provider.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_answers_provider.dart';
 
@@ -23,5 +24,6 @@ void main() async {
     ChangeNotifierProvider(create: (_) => LangProvider()),
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => SurveyAnswersProvider()),
+    ChangeNotifierProvider(create: (_) => TagsProvider()),
   ], child: const App()));
 }

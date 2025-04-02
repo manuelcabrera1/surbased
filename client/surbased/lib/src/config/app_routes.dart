@@ -8,7 +8,7 @@ import 'package:surbased/src/shared/application/pages/home_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_add_questions_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
-import 'package:surbased/src/survey/application/pages/survey_detail_page.dart';
+import 'package:surbased/src/survey/application/pages/survey_details_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_edit_page.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/user/application/pages/user_accessibility_page.dart';
@@ -26,7 +26,7 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String enterResetCode = '/enter-reset-code';
   static const String resetPassword = '/reset-password';
-  static const String surveyDetail = '/survey/detail';
+  static const String surveyDetails = '/survey/details';
   static const String surveyComplete = '/survey/complete';
   static const String surveyCreate = '/survey/create';
   static const String surveyEdit = '/survey/edit';
@@ -47,7 +47,7 @@ class AppRoutes {
     forgotPassword: (_) => const SendForgotPasswordMailPage(),
     enterResetCode: (context) => EnterResetCodePage(email: ModalRoute.of(context)!.settings.arguments as String),
     resetPassword: (context) => ResetPasswordPage(email: ModalRoute.of(context)!.settings.arguments as String),
-    surveyDetail: (_) => const SurveyDetailPage(),
+    surveyDetails: (_) => const SurveyDetailsPage(),
     surveyComplete: (_) => const SurveyCompletePage(),
     surveyCreate: (_) => const SurveyCreatePage(),
     surveyEdit: (_) => const SurveyEditPage(),

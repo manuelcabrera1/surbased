@@ -7,7 +7,7 @@ class PublicSurveyCard extends StatelessWidget {
   final Category? category;
   final VoidCallback onTap;
   final int responseCount;
-  static const int _maxVisibleTags = 3;
+  static const int _maxVisibleTags = 2;
 
     static const List<Color> _tagColors = [
     Color(0xFFE8F5E9), // green.shade50
@@ -22,25 +22,20 @@ class PublicSurveyCard extends StatelessWidget {
 
   Widget _buildTagChip(BuildContext context, String text, Color color) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(right: 2, bottom: 4),
-      child: Chip(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: color.computeLuminance() > 0.5 
+              ? Colors.black87 
+              : Colors.white,
+          fontSize: 12,
         ),
-        label: Text(
-          text,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: color.computeLuminance() > 0.5 
-                ? Colors.black87 
-                : Colors.white,
-            fontSize: 11,
-          ),
-        ),
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
       ),
     );
   }
@@ -66,7 +61,7 @@ class PublicSurveyCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,18 +71,19 @@ class PublicSurveyCard extends StatelessWidget {
                 survey.name,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  fontSize: survey.name.length > 20 ? 16 : 17,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               // Categoría
               if (category != null)
                 Row(
                   children: [
                     Icon(
                       Icons.label_outline,
-                      size: 14,
+                      size: 18,
                       color: theme.colorScheme.primary,
                     ),
                     const SizedBox(width: 4),
@@ -95,20 +91,13 @@ class PublicSurveyCard extends StatelessWidget {
                       category!.name,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.primary,
+                        fontSize: 14,
                       ),
                     ),
                   ],
                 ),
-             if (survey.tags != null && survey.tags!.isNotEmpty) ...[
-                const SizedBox(height: 5),
-                Text(
-                  'Tags:', 
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
+              if (survey.tags != null && survey.tags!.isNotEmpty) ...[
+                const SizedBox(height: 10),
                 Wrap(
                   spacing: 4,
                   runSpacing: 4,
@@ -126,9 +115,8 @@ class PublicSurveyCard extends StatelessWidget {
                       ),
                   ],
                 ),
-              ] else ...[
-                const Spacer(),
               ],
+              const Spacer(),
               // Información adicional
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,13 +132,13 @@ class PublicSurveyCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '$responseCount respuestas',
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   // Fecha
                   Row(
                     children: [
@@ -162,7 +150,7 @@ class PublicSurveyCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         _formatDate(survey.startDate),
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),

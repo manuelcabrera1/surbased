@@ -30,7 +30,7 @@ class SurveyCreate(SurveyBase):
     start_date: Optional[date] = Field(default_factory=date.today)
     end_date: Optional[date] = Field(default_factory=lambda: date.today() + timedelta(days=7))
     questions: List[QuestionCreateRequest]
-    tags: Optional[List[str]] = Field(default=None)
+    tags: Optional[List[TagCreateRequest]] = Field(default=None)
 
     @model_validator(mode="after")
     def validate_start_date(self):
@@ -44,7 +44,7 @@ class SurveyResponse(SurveyBase):
     id: uuid.UUID
     description: str
     start_date: date
-    end_date: Optional[date] = Field(default=None)
+    end_date: date
     questions: List[QuestionResponse]
     response_count: Optional[int] = Field(default=None)
     tags: Optional[List[TagResponse]] = Field(default=None)

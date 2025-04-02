@@ -50,7 +50,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
           _navigateToEnterResetCodePage();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Email sent successfully')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.email_sent)),
             );
           }
 
@@ -117,7 +117,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [   
-                                Text('Please enter the email associated with your account and we will send you the instructions to reset your password.',
+                                Text(AppLocalizations.of(context)!.forgot_password_instructions,
                                       style: theme.textTheme.bodyLarge?.copyWith(
                                         color: theme.colorScheme.onSurfaceVariant,
                                       )),
@@ -155,7 +155,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                                       onPressed: () {
                                         Navigator.pushNamed(context, AppRoutes.login);
                                       },
-                                      child: const Text('Back to login'),
+                                      child: Text(AppLocalizations.of(context)!.back_to_login),
                                     ),
                                   ],
                                 ),

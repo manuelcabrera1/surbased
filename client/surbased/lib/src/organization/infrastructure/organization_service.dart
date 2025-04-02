@@ -5,6 +5,32 @@ import 'package:http/http.dart' as http;
 class OrganizationService {
   final String _baseUrl = 'http://10.0.2.2:8000/organizations';
 
+
+  Future<Map<String, dynamic>> getOrganizations(String token) async {
+    try {
+      final response = await http.get(Uri.parse(_baseUrl),
+          headers: {'Authorization': 'Bearer $token'});
+
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail'],
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'data': e.toString(),
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> getOrganizationById(
       String id, String token) async {
     try {

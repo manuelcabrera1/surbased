@@ -9,5 +9,8 @@ class TagCreateRequest(TagBase):...
 class TagResponse(TagBase):
     id: uuid.UUID
 
+class TagResponseWithLength(BaseModel):
+    tags: list[TagResponse]
+    length: int
 
 

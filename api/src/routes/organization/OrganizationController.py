@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, select, update
+from sqlalchemy import and_, func, select, update
 from models.SurveyModel import Survey
 from schemas.SurveySchema import SurveyResponseWithLength, SurveyScopeEnum
 from models.UserModel import User
@@ -45,7 +45,12 @@ async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)], cu
         
         result = await db.execute(select(Organization))
         orgs = result.unique().scalars().all()
-        return { "orgs": orgs, "length": len(orgs) }
+
+        
+        organizations = [OrganizationResponse(id=o.id, name=o.name, users_count=len(o.users), surveys_count=len(o.surveys)) for o in orgs]
+
+
+        return { "organizations": organizations, "length": len(organizations) }
     
 
 
@@ -61,7 +66,7 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
         if not existing_org:
             raise HTTPException(status_code=404, detail="Organization not found") 
         
-        return existing_org
+        return OrganizationResponse(id=existing_org.id, name=existing_org.name, users_count=len(existing_org.users), surveys_count=len(existing_org.surveys))
 
 @org_router.get("/organizations/", status_code=200, response_model=OrganizationResponseWithLength)
 async def get_organizations_by_ids(ids:List[uuid.UUID], db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):

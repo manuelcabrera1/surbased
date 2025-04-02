@@ -4,17 +4,15 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_section.dart';
-import 'package:surbased/src/organization/application/organization_users.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
-import 'package:surbased/src/survey/application/pages/survey_create_page.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
+import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
-import 'package:surbased/src/survey/application/widgets/survey_list.dart';
 import 'package:surbased/src/survey/application/widgets/survey_section.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
-
+import '../../../organization/application/organization_list.dart';
 import '../../../survey/application/widgets/survey_explore.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -79,12 +77,15 @@ class _HomePageState extends State<HomePage> {
               Provider.of<OrganizationProvider>(context, listen: false);
           final categoryProvider =
               Provider.of<CategoryProvider>(context, listen: false);
+          final tagProvider =
+              Provider.of<TagsProvider>(context, listen: false);
 
           if (authProvider.isAuthenticated) {
-            await authProvider.getSurveysAssignedToUser(
+            tagProvider.getTags(authProvider.token ?? '');await authProvider.getSurveysAssignedToUser(
               authProvider.userId!,
               authProvider.token!,
             );
+
             await surveyProvider.getPublicSurveys(
               authProvider.token!,
             );
@@ -118,6 +119,7 @@ class _HomePageState extends State<HomePage> {
 
             if (authProvider.user!.role == 'admin') {
               await authProvider.getUsers(authProvider.token!, null, null);
+              await organizationProvider.getOrganizations(authProvider.token ?? '');
             }
           }
     } catch (e) {
@@ -162,8 +164,9 @@ class _HomePageState extends State<HomePage> {
     // Páginas para administradores
     final adminPages = [
       const SurveySection(),
-      const SurveyCreatePage(),
-      const UserProfile(),
+      const SurveyEventsCalendar(),
+      const SizedBox(),
+      const OrganizationList(),
       const UserProfile()
     ];
 
@@ -180,7 +183,7 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: pages,
       ),
-      floatingActionButton: role == 'researcher'
+      floatingActionButton: role == 'researcher' || role == 'admin'
           ? FloatingActionButton(
               heroTag: 'create',
               shape: const CircleBorder(),

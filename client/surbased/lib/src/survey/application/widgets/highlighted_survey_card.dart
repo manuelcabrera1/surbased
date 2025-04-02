@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HighlightedSurveyCard extends StatelessWidget {
   final Survey survey;
@@ -114,7 +115,7 @@ class HighlightedSurveyCard extends StatelessWidget {
                 if (survey.tags != null && survey.tags!.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
-                  'Tags:', 
+                  '${AppLocalizations.of(context)!.tags}:', 
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.tertiary,
                     fontWeight: FontWeight.bold,
@@ -154,10 +155,10 @@ class HighlightedSurveyCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           responseCount > 1
-                              ? '$responseCount respuestas'
+                              ? AppLocalizations.of(context)!.public_survey_responses(responseCount.toString())
                               : responseCount == 1
-                                  ? '1 respuesta'
-                                  : 'No hay respuestas',
+                                  ? AppLocalizations.of(context)!.public_survey_response
+                                  : AppLocalizations.of(context)!.public_survey_no_responses,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),

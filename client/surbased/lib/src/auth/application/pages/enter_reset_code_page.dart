@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/custom_otp_field.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class EnterResetCodePage extends StatefulWidget {
   final String email;
   const EnterResetCodePage({super.key, required this.email});
@@ -53,7 +53,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Reset Code',
+                      AppLocalizations.of(context)!.reset_code_page_title,
                       style: theme.textTheme.displayMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -63,7 +63,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
               ),
               const SizedBox(height: 40),
               Text(
-                        'Please enter the 6-digit code that we sent to your email address.',
+                        AppLocalizations.of(context)!.reset_code_enter_code,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -97,11 +97,11 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                   }
                   else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Invalid reset code')),
+                      SnackBar(content: Text(AppLocalizations.of(context)!.reset_code_invalid)),
                     );
                   }
                 },
-                child: const Text('Submit'),
+                child: Text(AppLocalizations.of(context)!.submit),
               ),
               const SizedBox(height: 30),
               Row(
@@ -117,7 +117,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                     onPressed: () {
                       Navigator.pushNamed(context, AppRoutes.login);
                     },
-                    child: const Text('Back to login'),
+                    child: Text(AppLocalizations.of(context)!.back_to_login),
                   ),
                 ],
               ),

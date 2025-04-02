@@ -1,36 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
-import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/widgets/survey_add_participants_dialog.dart';
 import 'package:surbased/src/survey/application/widgets/survey_answers.dart';
 import 'package:surbased/src/survey/application/widgets/survey_participants.dart';
 
-import '../../../user/domain/user_model.dart';
 import '../../domain/survey_model.dart';
 import '../provider/survey_provider.dart';
 import '../widgets/survey_info.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class SurveyDetailPage extends StatefulWidget {
-  const SurveyDetailPage({super.key});
+class SurveyDetailsPage extends StatefulWidget {
+  const SurveyDetailsPage({super.key});
 
   @override
-  State<SurveyDetailPage> createState() => _SurveyDetailPageState();
+  State<SurveyDetailsPage> createState() => _SurveyDetailsPageState();
 }
 
-class _SurveyDetailPageState extends State<SurveyDetailPage>
-    with SingleTickerProviderStateMixin {
+class _SurveyDetailsPageState extends State<SurveyDetailsPage>
+    with TickerProviderStateMixin {
   Survey? survey;
   late TabController tabController;
   bool _participantsLoaded = false;
+  List<Tab> tabTitles = [];
+  List<Widget> tabViews = [];
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
-
+    tabController = TabController(length: 1, vsync: this);
     tabController.addListener(_handleTabSelection);
   }
 
@@ -40,24 +39,73 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
     }
   }
 
-  @override
-  void dispose() {
-    tabController.removeListener(_handleTabSelection);
-    tabController.dispose();
-    super.dispose();
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && !_participantsLoaded) {
-        _loadParticipants();
-        setState(() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      
+      if (mounted) {
+        _configureTabs();
+        if (!_participantsLoaded) {
+          _loadParticipants();
+          setState(() {
           _participantsLoaded = true;
         });
+        }
       }
     });
+  }
+
+  void _configureTabs() {
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+
+    if (surveyProvider.isLoading || surveyProvider.currentSurvey == null) {
+      return;
+    }
+    if (mounted) {
+      final theme = Theme.of(context);
+      if (surveyProvider.currentSurvey!.scope != 'public') {
+          tabTitles = [
+            Tab(
+                    text: AppLocalizations.of(context)!.survey_info,
+                    icon: Icon(Icons.info, color: theme.colorScheme.surface)),
+                Tab(
+                    text: AppLocalizations.of(context)!.survey_participants,
+                    icon: Icon(Icons.people, color: theme.colorScheme.surface)),
+                Tab(
+                    text: AppLocalizations.of(context)!.survey_stats,
+                    icon:
+                        Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
+          ];
+          tabViews = const [
+            SurveyInfo(),
+            SurveyParticipants(),
+            SurveyAnswers(),
+          ];
+        
+      } else {
+        tabTitles = [
+            Tab(
+              text: AppLocalizations.of(context)!.survey_info,
+              icon: Icon(Icons.info, color: theme.colorScheme.surface)),
+            Tab(
+                text: AppLocalizations.of(context)!.survey_stats,
+                icon:
+                    Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
+          ];
+          tabViews = const [
+            SurveyInfo(),
+            SurveyAnswers(),
+          ];
+      }
+    }
+
+    tabController.dispose(); // Primero liberar el controlador actual
+    tabController = TabController(length: tabTitles.length, vsync: this);
+    tabController.addListener(_handleTabSelection);
+    
+    setState(() {}); // Forzar rebuild
   }
 
   void _showAddParticipantsModal() {
@@ -142,6 +190,10 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
     survey = surveyProvider.currentSurvey;
     final authProvider = Provider.of<AuthProvider>(context);
 
+     if (tabTitles.isEmpty || tabViews.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     if (survey == null || surveyProvider.isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -171,18 +223,7 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
             indicatorColor: theme.colorScheme.surface,
             controller: tabController,
             tabAlignment: TabAlignment.fill,
-            tabs: [
-              Tab(
-                  text: AppLocalizations.of(context)!.survey_info,
-                  icon: Icon(Icons.info, color: theme.colorScheme.surface)),
-              Tab(
-                  text: AppLocalizations.of(context)!.survey_participants,
-                  icon: Icon(Icons.people, color: theme.colorScheme.surface)),
-              Tab(
-                  text: AppLocalizations.of(context)!.survey_stats,
-                  icon:
-                      Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
-            ],
+            tabs: tabTitles,
           ),
           actions: [
             PopupMenuButton(
@@ -218,13 +259,9 @@ class _SurveyDetailPageState extends State<SurveyDetailPage>
           ]),
       body: TabBarView(
         controller: tabController,
-        children: const [
-          SurveyInfo(),
-          SurveyParticipants(),
-          SurveyAnswers(),
-        ],
+        children: tabViews,
       ),
-      floatingActionButton: tabController.index == 1
+      floatingActionButton: tabController.index == 1 && surveyProvider.currentSurvey!.scope != 'public'
           ? FloatingActionButton(
               heroTag: 'participants',
               onPressed: () => _showAddParticipantsModal(),

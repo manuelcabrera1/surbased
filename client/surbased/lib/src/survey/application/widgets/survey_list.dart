@@ -27,20 +27,23 @@ class _SurveyListState extends State<SurveyList> {
   @override
   void dispose() {
     super.dispose();
+    _searchController.dispose();
+    _selectedCategory = null;
+    _surveysToShow = [];
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (mounted) {
-      final surveyProvider =
-          Provider.of<SurveyProvider>(context, listen: false);
-      if (widget.surveys.isNotEmpty) {
-        setState(() {
-          _surveysToShow = widget.surveys;
-        });
-      }
-    }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (mounted) {
+          if (widget.surveys.isNotEmpty) {
+            setState(() {
+              _surveysToShow = widget.surveys;
+            });
+          }
+        }
+    });
   }
 
   Future<void> _handleOnTap(Survey survey) async {
@@ -65,14 +68,13 @@ class _SurveyListState extends State<SurveyList> {
         surveyProvider.currentSurvey = survey;
 
         if (mounted) {
-          Navigator.pushNamed(context, AppRoutes.surveyDetail);
+          Navigator.pushNamed(context, AppRoutes.surveyDetails);
         }
       }
     }
   }
 
   void filterSurveys() {
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
     if (mounted) {
@@ -81,7 +83,8 @@ class _SurveyListState extends State<SurveyList> {
             .where((survey) {
                 String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
                 bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-                categoryName.toLowerCase().contains(_searchController.text.toLowerCase());
+                categoryName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                (survey.tags?.any((tag) => tag.name.toLowerCase().contains(_searchController.text.toLowerCase())) ?? false);
                 bool category = _selectedCategory == null || _selectedCategory == survey.categoryId;
                 return search && category;
             })
@@ -184,7 +187,7 @@ class _SurveyListState extends State<SurveyList> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
-                          label: const Text('Todas'),
+                          label: Text(AppLocalizations.of(context)!.categories_all),
                           selected: _selectedCategory == null,
                           onSelected: (selected) {
                             setState(() => _selectedCategory = null);

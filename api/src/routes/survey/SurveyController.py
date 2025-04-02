@@ -234,14 +234,15 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
 
         #check if tags exist, if not, create them
         if survey.tags:  # Solo procesar tags si hay alguno
-            result = await db.execute(select(Tag).where(Tag.name.in_(survey.tags)))
+            survey_tags_names = [tag.name for tag in survey.tags]
+            result = await db.execute(select(Tag).where(Tag.name.in_(survey_tags_names)))
             existing_tags = result.unique().scalars().all()
 
             new_tags = []
 
-            if len(existing_tags) != len(survey.tags):
+            if len(existing_tags) != len(survey_tags_names):
                 existing_tags_names = [t.name for t in existing_tags]
-                tags_to_add = list(set(survey.tags) - set(existing_tags_names))
+                tags_to_add = list(set(survey_tags_names) - set(existing_tags_names))
                 
                 new_tags = [Tag(name=tag) for tag in tags_to_add]
 
