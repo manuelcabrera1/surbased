@@ -88,7 +88,7 @@ class PublicSurveyCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      category!.name,
+                      Category.getCategoryName(context, category!.name),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontSize: 14,

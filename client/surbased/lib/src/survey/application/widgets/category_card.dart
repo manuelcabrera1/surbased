@@ -42,7 +42,7 @@ class CategoryCard extends StatelessWidget {
               const SizedBox(height: 12),
               // Nombre de la categoría
               Text(
-                category.name,
+                Category.getCategoryName(context, category.name),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

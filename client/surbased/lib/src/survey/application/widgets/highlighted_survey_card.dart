@@ -60,7 +60,7 @@ class HighlightedSurveyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    
+    final t = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return SizedBox(
@@ -103,7 +103,7 @@ class HighlightedSurveyCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        category!.name,
+                        Category.getCategoryName(context, category!.name),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontSize: 16,
                           color: theme.colorScheme.primary,
@@ -115,7 +115,7 @@ class HighlightedSurveyCard extends StatelessWidget {
                 if (survey.tags != null && survey.tags!.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
-                  '${AppLocalizations.of(context)!.tags}:', 
+                  '${t.tags}:', 
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.tertiary,
                     fontWeight: FontWeight.bold,
@@ -155,10 +155,10 @@ class HighlightedSurveyCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           responseCount > 1
-                              ? AppLocalizations.of(context)!.public_survey_responses(responseCount.toString())
+                              ? t.public_survey_responses(responseCount.toString())
                               : responseCount == 1
-                                  ? AppLocalizations.of(context)!.public_survey_response
-                                  : AppLocalizations.of(context)!.public_survey_no_responses,
+                                  ? t.public_survey_response
+                                  : t.public_survey_no_responses,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
