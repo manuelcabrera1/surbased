@@ -174,6 +174,8 @@ class _SurveyAddEditQuestionDialogState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Dialog.fullscreen(
       child: SingleChildScrollView(
         child: Padding(
@@ -184,7 +186,7 @@ class _SurveyAddEditQuestionDialogState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.isEdit ? AppLocalizations.of(context)!.question_edit : AppLocalizations.of(context)!.question_new,
+                  widget.isEdit ? t.question_edit : t.question_new,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -196,7 +198,7 @@ class _SurveyAddEditQuestionDialogState
                   minLines: 1,
                   maxLines: 4,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.question_text,
+                    labelText: t.question_text,
                     border: const OutlineInputBorder(),
                   ),
                   validator: _fieldValidator,
@@ -205,31 +207,31 @@ class _SurveyAddEditQuestionDialogState
                 DropdownButtonFormField<String>(
                   value: widget.isEdit ? widget.question!.type : null,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.question_type,
+                    labelText: t.question_type,
                     border: const OutlineInputBorder(),
                   ),
                   items: [
                     DropdownMenuItem(
                       value: "single_choice",
-                      child: Text(AppLocalizations.of(context)!.single_choice),
+                      child: Text(t.single_choice),
                     ),
                     DropdownMenuItem(
                       value: "multiple_choice",
-                      child: Text(AppLocalizations.of(context)!.multiple_choice),
+                      child: Text(t.multiple_choice),
                     ),
                     DropdownMenuItem(
                       value: "likert_scale",
-                      child: Text(AppLocalizations.of(context)!.likert_scale),
+                      child: Text(t.likert_scale),
                     ),
                     DropdownMenuItem(
                       value: "open",
-                      child: Text(AppLocalizations.of(context)!.open),
+                      child: Text(t.open),
                     ),
 
                   ],
                   validator: (value) {
                     if (value == null) {
-                      return AppLocalizations.of(context)!.input_error_required;
+                      return t.input_error_required;
                     }
                     return null;
                   },
@@ -258,7 +260,7 @@ class _SurveyAddEditQuestionDialogState
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
-                  title: Text(AppLocalizations.of(context)!.required),
+                  title: Text(t.required),
                   value: _isRequired,
                   onChanged: (value) {
                     setState(() {
@@ -273,7 +275,7 @@ class _SurveyAddEditQuestionDialogState
                     children: [
                       const SizedBox(height: 8),
                       Text(
-                        AppLocalizations.of(context)!.likert_scale_configuration,
+                        t.likert_scale_configuration,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -281,7 +283,7 @@ class _SurveyAddEditQuestionDialogState
                       ),
                       Row(
                         children: [
-                          Text(AppLocalizations.of(context)!.likert_scale_levels_number),
+                          Text(t.likert_scale_levels_number),
                           const SizedBox(width: 16),
                           DropdownButton<int>(
                             value: _likertScale,
@@ -313,9 +315,9 @@ class _SurveyAddEditQuestionDialogState
                       children: [
                         Text(
                           _questionType == "likert_scale"
-                              ? AppLocalizations.of(context)!.likert_scale_levels
+                              ? t.likert_scale_levels
                               : _questionType == "single_choice" || _questionType == "multiple_choice"
-                                ? AppLocalizations.of(context)!.options
+                                ? t.options
                                 : "",
                           style: const TextStyle(
                             fontSize: 16,
@@ -326,7 +328,7 @@ class _SurveyAddEditQuestionDialogState
                           TextButton.icon(
                             onPressed: _addOption,
                             icon: const Icon(Icons.add),
-                            label: Text(AppLocalizations.of(context)!.add_option),
+                            label: Text(t.add_option),
                           ),
                       ],
                     ),
@@ -343,8 +345,8 @@ class _SurveyAddEditQuestionDialogState
                                 initialValue: _options[index].description,
                                 decoration: InputDecoration(
                                   labelText: _questionType == "likert_scale"
-                                      ? AppLocalizations.of(context)!.likert_scale_level(index + 1)
-                                      : AppLocalizations.of(context)!.option(index + 1),
+                                      ? t.likert_scale_level(index + 1)
+                                      : t.option(index + 1),
                                   border: const OutlineInputBorder(),
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.always,
@@ -363,7 +365,7 @@ class _SurveyAddEditQuestionDialogState
                                 child: TextFormField(
                                   initialValue: "${index + 1}",
                                   decoration: InputDecoration(
-                                    labelText: AppLocalizations.of(context)!.likert_scale_option_value,
+                                    labelText: t.likert_scale_option_value,
                                     border: const OutlineInputBorder(),
                                   ),
                                   keyboardType: TextInputType.number,
@@ -375,8 +377,8 @@ class _SurveyAddEditQuestionDialogState
                             
                             if (_questionType == "single_choice" || _questionType == "multiple_choice") // Solo mostrar botón eliminar si no es escala Likert
                               IconButton(
-                                icon: const Icon(Icons.remove_circle,
-                                    color: Colors.red),
+                                icon: Icon(Icons.remove_circle,
+                                    color: theme.colorScheme.error),
                                 onPressed: () => _removeOption(index),
                               ),
                           ],
@@ -390,8 +392,8 @@ class _SurveyAddEditQuestionDialogState
                   onPressed: widget.isEdit ? _updateQuestion : _addQuestion,
                   label: Text(
                       widget.isEdit
-                          ? AppLocalizations.of(context)!.question_update
-                          : AppLocalizations.of(context)!.question_add),
+                          ? t.question_update
+                          : t.question_add),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                   ),

@@ -19,24 +19,25 @@ class CustomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final role = authProvider.userRole;
+    final t = AppLocalizations.of(context)!;
 
     // Items de navegación para participantes
     final participantItems = [
       NavigationDestination(
         icon: const Icon(Icons.home, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.surveys_page_title,
+        label: t.surveys_page_title,
       ),
       NavigationDestination(
         icon: const Icon(Icons.explore, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.explore_page_title,
+        label: t.explore_page_title,
       ),
       NavigationDestination(
         icon: const Icon(Icons.calendar_month, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.calendar_page_title,
+        label: t.calendar_page_title,
       ),
       NavigationDestination(
         icon: const Icon(Icons.person, size: ICON_SIZE),
-        label: AppLocalizations.of(context)!.profile_page_title,
+        label: t.profile_page_title,
       ),
     ];
 
@@ -44,20 +45,20 @@ class CustomNavigationBar extends StatelessWidget {
     final researcherItems = [
       NavigationDestination(
           icon: const Icon(Icons.home, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.dashboard_page_title,
+          label: t.dashboard_page_title,
       ),
       NavigationDestination(
           icon: const Icon(Icons.calendar_month, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.calendar_page_title, 
+          label: t.calendar_page_title, 
       ),
       const SizedBox(),
       NavigationDestination(
           icon: const Icon(Icons.business, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.organizations_page_title,
+          label: t.organizations_page_title,
       ),
          NavigationDestination(
           icon: const Icon(Icons.person, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.profile_page_title,
+          label: t.profile_page_title,
         ),
 
     ];
@@ -65,21 +66,21 @@ class CustomNavigationBar extends StatelessWidget {
     // Items de navegación para administradores
     final adminItems = [
       NavigationDestination(
-          icon: const Icon(Icons.quiz_sharp, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.surveys_page_title,
+          icon: const Icon(Icons.assignment_outlined, size: ICON_SIZE),
+          label: t.surveys_page_title,
       ),
       NavigationDestination(
           icon: const Icon(Icons.calendar_month, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.calendar_page_title, 
+          label: t.calendar_page_title, 
       ),
       const SizedBox(),
       NavigationDestination(
           icon: const Icon(Icons.business, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.organizations_page_title,
+          label: t.organizations_page_title,
       ),
          NavigationDestination(
           icon: const Icon(Icons.person, size: ICON_SIZE),
-          label: AppLocalizations.of(context)!.profile_page_title,
+          label: t.profile_page_title,
         ),
 
     ];

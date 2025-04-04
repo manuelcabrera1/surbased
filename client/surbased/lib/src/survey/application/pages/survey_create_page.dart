@@ -21,6 +21,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
           child: SingleChildScrollView(
@@ -37,7 +38,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          'Create a New Survey',
+                          t.survey_create_page_title,
                           style: theme.textTheme.displayMedium?.copyWith(
                             fontSize: 30,
                           ),

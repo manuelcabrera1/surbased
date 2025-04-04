@@ -5,6 +5,7 @@ import 'package:surbased/src/category/application/provider/category_provider.dar
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/organization_section.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/shared/application/widgets/create_resource_dialog.dart';
 import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+  
 
   Future<void> _onDestinationSelected(int index) async {
     await Future.delayed(const Duration(milliseconds: 100));
@@ -187,8 +189,16 @@ class _HomePageState extends State<HomePage> {
           ? FloatingActionButton(
               heroTag: 'create',
               shape: const CircleBorder(),
-              onPressed: () =>
-                  Navigator.pushNamed(context, AppRoutes.surveyCreate),
+              onPressed: () {
+                if (role == 'researcher') {
+                  Navigator.pushNamed(context, AppRoutes.surveyCreate);
+                } else if (role == 'admin') {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const CreateResourceDialog(),
+                  );
+                }
+              },
               child: const Icon(Icons.add),
             )
           : null,

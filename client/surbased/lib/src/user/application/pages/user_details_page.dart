@@ -66,26 +66,28 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
   }
 
   String _getGenderTranslation(String? gender) {
+    final t = AppLocalizations.of(context)!;
     if (gender == null) return '-';
     
     switch (gender.toLowerCase()) {
       case 'male':
-        return AppLocalizations.of(context)!.gender_male;
+        return t.gender_male;
       case 'female':
-        return AppLocalizations.of(context)!.gender_female;
+        return t.gender_female;
       case 'other':
-        return AppLocalizations.of(context)!.gender_other;
+        return t.gender_other;
       default:
         return gender;
     }
   }
 
   String _getRoleTranslation(String role) {
+    final t = AppLocalizations.of(context)!;
     switch (role.toLowerCase()) {
       case 'researcher':
-        return AppLocalizations.of(context)!.researcher;
+        return t.researcher;
       case 'participant':
-        return AppLocalizations.of(context)!.participant;
+        return t.participant;
       default:
         return role;
     }
@@ -116,11 +118,12 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     final userProvider = Provider.of<UserProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (userProvider.isLoading || organizationProvider.isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.profile_page_title),
+          title: Text(t.profile_page_title),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -133,7 +136,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
       appBar: AppBar(
         title: Text(_user?.name != null 
             ? '${_user!.name} ${_user!.lastname ?? ''}'
-            : AppLocalizations.of(context)!.profile_page_title),
+            : t.profile_page_title),
       ),
       body: SafeArea(
         child: _user == null

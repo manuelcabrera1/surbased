@@ -71,6 +71,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (authProvider.isLoading || organizationProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -123,7 +124,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
 
                           filterUsers();
                         },
-                        hintText: AppLocalizations.of(context)!.users_searchbar_placeholder,
+                        hintText: t.users_searchbar_placeholder,
                       ),
                     ),
                   ),
@@ -140,7 +141,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
               Expanded(
                 child: Center(
                   child: Text(
-                    AppLocalizations.of(context)!.users_error_no_users,
+                    t.users_error_no_users,
                   ),
                 ),
               )
@@ -172,8 +173,8 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                           ),
                           child: Text(
                             _usersToShow[index].role == 'researcher'
-                                ? AppLocalizations.of(context)!.researcher
-                                : AppLocalizations.of(context)!.participant,
+                                ? t.researcher
+                                : t.participant,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onPrimaryContainer,
                             ),

@@ -50,6 +50,7 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
 
     if (authProvider.userRole == null || surveyProvider.isLoading || organizationProvider.isLoading
     || organizationProvider.organization == null || organizationProvider.organization!.surveys == null) {
@@ -59,9 +60,9 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
     switch(authProvider.userRole) {
       case 'admin':
         tabTitles = [
-          Tab(text: AppLocalizations.of(context)!.scope_private),
-          Tab(text: AppLocalizations.of(context)!.scope_organization),
-          Tab(text: AppLocalizations.of(context)!.scope_public),
+          Tab(text: t.scope_private),
+          Tab(text: t.scope_organization),
+          Tab(text: t.scope_public),
         ];
         tabViews = [
           SurveyList(surveys: surveyProvider.surveysOwned),
@@ -70,8 +71,8 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
         ];
       case 'researcher':
         tabTitles = [
-          Tab(text: AppLocalizations.of(context)!.surveys_owned),
-          Tab(text: AppLocalizations.of(context)!.surveys_assigned),
+          Tab(text: t.surveys_owned),
+          Tab(text: t.surveys_assigned),
         ];
         tabViews = [
           SurveyList(surveys: surveyProvider.surveysOwned),
@@ -79,8 +80,8 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
         ];
       case 'participant':
         tabTitles = [
-          Tab(text: AppLocalizations.of(context)!.surveys_assigned),
-          Tab(text: AppLocalizations.of(context)!.organization),
+          Tab(text: t.surveys_assigned),
+          Tab(text: t.organization),
         ];
         tabViews = [
           SurveyList(surveys: authProvider.surveysAssigned),
@@ -104,7 +105,7 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
-
+    final t = AppLocalizations.of(context)!;
 
     if (tabTitles.isEmpty || tabViews.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -129,7 +130,7 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: Text(
-                  AppLocalizations.of(context)!.surveys_page_title,
+                  t.surveys_page_title,
                   style: theme.textTheme.displayMedium,
                 ),
               ),

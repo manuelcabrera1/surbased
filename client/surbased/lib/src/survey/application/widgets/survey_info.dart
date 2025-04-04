@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
+import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -15,11 +16,11 @@ class SurveyInfo extends StatelessWidget {
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final survey = surveyProvider.currentSurvey;
     final dateFormat = DateFormat('dd/MM/yyyy');
-
+    final t = AppLocalizations.of(context)!;
     if (survey == null) {
       return Center(
           child: Text(
-        AppLocalizations.of(context)!.survey_not_selected_error,
+        t.survey_not_selected_error,
         style: theme.textTheme.titleLarge,
       ));
     }
@@ -52,34 +53,33 @@ class SurveyInfo extends StatelessWidget {
                     children: [
                       _buildInfoRow(
                         context,
-                        AppLocalizations.of(context)!.name,
+                        t.name,
                         survey.name,
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         context,
-                        AppLocalizations.of(context)!.category,
-                        category.name,
+                        t.category,
+                        Category.getCategoryName(context, category.name),
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         context,
-                        AppLocalizations.of(context)!.start_date,
+                        t.start_date,
                         dateFormat.format(survey.startDate),
                       ),
-                      if (survey.endDate != null) ...[
                         const SizedBox(height: 12),
                         _buildInfoRow(
                           context,
-                          AppLocalizations.of(context)!.end_date,
-                          dateFormat.format(survey.endDate!),
+                          t.end_date,
+                          dateFormat.format(survey.endDate),
                         ),
-                      ],
+
                       if (survey.description != null &&
                           survey.description!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
-                          AppLocalizations.of(context)!.description,
+                          t.description,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

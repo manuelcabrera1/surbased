@@ -174,6 +174,7 @@ class SurveyFormState extends State<SurveyForm> {
     final categories = categoryProvider.categories;
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final tagsProvider = Provider.of<TagsProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (tagsProvider.isLoading || categoryProvider.isLoading || surveyProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -190,7 +191,7 @@ class SurveyFormState extends State<SurveyForm> {
               keyboardType: TextInputType.text,
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.survey_name,
+                labelText: t.survey_name,
                 border: const OutlineInputBorder(),
               ),
               validator: _fieldValidator,
@@ -198,7 +199,7 @@ class SurveyFormState extends State<SurveyForm> {
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.category,
+                labelText: t.category,
                 border: const OutlineInputBorder(),
               ),
               value: _categoryId,
@@ -263,8 +264,8 @@ class SurveyFormState extends State<SurveyForm> {
                           controller: controller,
                           focusNode: focusNode,
                           decoration: InputDecoration(
-                            labelText: AppLocalizations.of(context)!.tags,
-                            hintText: AppLocalizations.of(context)!.tags_write,
+                            labelText: t.tags,
+                            hintText: t.tags_write,
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.add),
@@ -307,14 +308,14 @@ class SurveyFormState extends State<SurveyForm> {
               maxLines: 4,
               controller: _descriptionController,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.description,
+                labelText: t.description,
                 border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
             DateFormField(
               context: context,
-              labelText: AppLocalizations.of(context)!.start_date,
+              labelText: t.start_date,
               initialDate: _startDate,
               onChanged: (date) => setState(() => _startDate = date),
               required: false,
@@ -323,7 +324,7 @@ class SurveyFormState extends State<SurveyForm> {
             const SizedBox(height: 20),
             DateFormField(
               context: context,
-              labelText: AppLocalizations.of(context)!.end_date,
+              labelText: t.end_date,
               initialDate: _endDate,
               onChanged: (date) => setState(() => _endDate = date),
               required: false,
@@ -338,7 +339,7 @@ class SurveyFormState extends State<SurveyForm> {
                       strokeWidth: 2,
                       color: Colors.white,
                     )
-                  : Text(AppLocalizations.of(context)!.go_forward),
+                  : Text(t.go_forward),
             ),
           ],
         ),

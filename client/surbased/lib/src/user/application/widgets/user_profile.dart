@@ -44,29 +44,30 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
     final organizationProvider = Provider.of<OrganizationProvider>(context);
 
     final accountSettings = {
-      AppLocalizations.of(context)!.edit_profile_page_title: () {
+      t.edit_profile_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userEditInfo);
       },
-      AppLocalizations.of(context)!.edit_password_page_title: () {
+      t.edit_password_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userEditPassword);
       },
-      AppLocalizations.of(context)!.notifications_page_title: () {
+      t.notifications_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userNotifications);
       },
-      AppLocalizations.of(context)!.security_page_title: () {
+      t.security_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userSecurity);
       },
     };
     final appearanceSettings = {
-      AppLocalizations.of(context)!.theme_page_title: () {
+      t.theme_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userTheme);
       },
-      AppLocalizations.of(context)!.accessibility_page_title: () {
+      t.accessibility_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userAccessibility);
       },
     };
@@ -82,7 +83,7 @@ class _UserProfileState extends State<UserProfile> {
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 25),
-                    child: Text(AppLocalizations.of(context)!.profile_page_title, 
+                    child: Text(t.profile_page_title, 
                                 style: theme.textTheme.displayMedium),
                   ),
                 ),
@@ -132,17 +133,17 @@ class _UserProfileState extends State<UserProfile> {
                 ),
                 const SizedBox(height: 30),
                 UserSettingsSection(
-                    title: AppLocalizations.of(context)!.account_settings, items: accountSettings),
+                    title: t.account_settings, items: accountSettings),
                 const SizedBox(height: 20),
                 UserSettingsSection(
-                    title: AppLocalizations.of(context)!.appearance, items: appearanceSettings),
+                    title: t.appearance, items: appearanceSettings),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: TextButton(
                         onPressed: _logout,
-                        child: Text(AppLocalizations.of(context)!.logout,
+                        child: Text(t.logout,
                             style: theme.textTheme.titleMedium?.copyWith(
                                 color: theme.colorScheme.error,
                                 fontWeight: FontWeight.bold))),

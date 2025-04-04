@@ -76,6 +76,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -93,7 +94,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                     Expanded(
                       child: Text(
-                        'Change Password',
+                        t.password_change,
                         style: theme.textTheme.displayMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -103,7 +104,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
                 const SizedBox(height: 40),
                 Text(
-                    'Please enter your new password. It might be different from your previous password.',
+                    t.password_reset_instructions,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -118,7 +119,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.password,
+                          labelText: t.password,
                           prefixIcon: const Icon(Icons.lock),
                         ),
                         validator: _fieldValidator,
@@ -128,7 +129,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         controller: _confirmPasswordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.password_confirm,
+                          labelText: t.password_confirm,
                           prefixIcon: const Icon(Icons.lock),
                         ),
                         validator: _confirmPasswordValidator,
@@ -139,7 +140,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed:  _handleChangePassword,
-                  child: Text(AppLocalizations.of(context)!.submit),
+                  child: Text(t.submit),
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -155,7 +156,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       onPressed: () {
                         Navigator.pushNamed(context, AppRoutes.login);
                       },
-                      child: Text(AppLocalizations.of(context)!.back_to_login),
+                      child: Text(t.back_to_login),
                     ),
                   ],
                 ),

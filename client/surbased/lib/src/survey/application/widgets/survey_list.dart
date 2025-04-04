@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
+import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
@@ -106,6 +107,7 @@ class _SurveyListState extends State<SurveyList> {
     final authProvider = Provider.of<AuthProvider>(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (authProvider.userRole == null) {
       return const Center(child: CircularProgressIndicator());
@@ -162,8 +164,7 @@ class _SurveyListState extends State<SurveyList> {
                       onSubmitted: (value) {
                         filterSurveys();
                       },
-                      hintText: AppLocalizations.of(context)!
-                          .surveys_searchbar_placeholder,
+                      hintText: t.surveys_searchbar_placeholder,
                     ),
                   ),
                 ),
@@ -187,7 +188,7 @@ class _SurveyListState extends State<SurveyList> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
-                          label: Text(AppLocalizations.of(context)!.categories_all),
+                          label: Text(t.categories_all),
                           selected: _selectedCategory == null,
                           onSelected: (selected) {
                             setState(() => _selectedCategory = null);
@@ -200,7 +201,7 @@ class _SurveyListState extends State<SurveyList> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(category.name),
+                        label: Text(Category.getCategoryName(context, category.name)),
                         selected: _selectedCategory == category.id,
                         onSelected: (selected) {
                           setState(() => _selectedCategory = category.id);
@@ -231,7 +232,7 @@ class _SurveyListState extends State<SurveyList> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        AppLocalizations.of(context)!.surveys_error_no_surveys,
+                        t.surveys_error_no_surveys,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],

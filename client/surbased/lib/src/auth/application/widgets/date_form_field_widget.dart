@@ -20,6 +20,7 @@ class DateFormField extends FormField<DateTime> {
                   value == null && required ? AppLocalizations.of(context)!.input_error_required : null,
           builder: (FormFieldState<DateTime> state) {
             final theme = Theme.of(state.context);
+            final t = AppLocalizations.of(state.context)!;
             return InkWell(
               onTap: enabled
                   ? () async {
@@ -48,7 +49,7 @@ class DateFormField extends FormField<DateTime> {
                   errorText: state.errorText,
                 ),
                 child: state.value == null
-                    ? Text(AppLocalizations.of(context)!.select_date,
+                    ? Text(t.select_date,
                         style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant))
                     : Text(DateFormat('dd/MM/yyyy').format(state.value!),

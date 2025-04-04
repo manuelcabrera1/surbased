@@ -41,6 +41,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
 
   Future<void> _handleSendForgotPasswordMail() async {
     if (_formKey.currentState!.validate()) {
+      final t = AppLocalizations.of(context)!;
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
@@ -50,7 +51,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
           _navigateToEnterResetCodePage();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.email_sent)),
+              SnackBar(content: Text(t.email_sent)),
             );
           }
 
@@ -72,8 +73,9 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
   }
 
   String? _fieldValidator(String? value) {
+    final t = AppLocalizations.of(context)!;
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return t.input_error_required;
     }
     return null;
   }
@@ -84,6 +86,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -100,7 +103,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                       ),
                       Expanded(
                         child: Text(
-                          AppLocalizations.of(context)!.password_reset,
+                          t.password_reset,
                           style: theme.textTheme.displayMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -117,7 +120,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [   
-                                Text(AppLocalizations.of(context)!.forgot_password_instructions,
+                                Text(t.forgot_password_instructions,
                                       style: theme.textTheme.bodyLarge?.copyWith(
                                         color: theme.colorScheme.onSurfaceVariant,
                                       )),
@@ -126,7 +129,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
-                                    labelText: AppLocalizations.of(context)!.email,
+                                    labelText: t.email,
                                     prefixIcon: const Icon(Icons.email),
                                   ),
                                   validator: _fieldValidator,
@@ -140,7 +143,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                                             strokeWidth: 2,
                                             color: Colors.white,
                                           )
-                                        : Text(AppLocalizations.of(context)!.send_email)),
+                                        : Text(t.send_email)),
                                 const SizedBox(height: 30),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +158,7 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                                       onPressed: () {
                                         Navigator.pushNamed(context, AppRoutes.login);
                                       },
-                                      child: Text(AppLocalizations.of(context)!.back_to_login),
+                                      child: Text(t.back_to_login),
                                     ),
                                   ],
                                 ),

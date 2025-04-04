@@ -85,6 +85,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -94,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  Text(AppLocalizations.of(context)!.create_account,
+                  Text(t.create_account,
                       style: theme.textTheme.displayMedium),
                   const SizedBox(height: 30),
                   Form(
@@ -109,7 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 keyboardType: TextInputType.name,
                                 decoration: InputDecoration(
                                   labelText:
-                                      AppLocalizations.of(context)!.first_name,
+                                      t.first_name,
                                   prefixIcon: const Icon(Icons.person),
                                 ),
                                 validator: _fieldValidator,
@@ -121,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 controller: _lastNameController,
                                 decoration: InputDecoration(
                                   labelText:
-                                      AppLocalizations.of(context)!.last_name,
+                                      t.last_name,
                                   prefixIcon: const Icon(Icons.person_outline),
                                 ),
                                 validator: _fieldValidator,
@@ -134,7 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: _organizationController,
                           decoration: InputDecoration(
                             labelText:
-                                AppLocalizations.of(context)!.organization,
+                                t.organization,
                             prefixIcon: const Icon(Icons.business),
                           ),
                           validator: _fieldValidator,
@@ -144,7 +146,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: AppLocalizations.of(context)!.email,
+                            labelText: t.email,
                             prefixIcon: const Icon(Icons.email),
                           ),
                           validator: _fieldValidator,
@@ -154,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
-                            labelText: AppLocalizations.of(context)!.password,
+                            labelText: t.password,
                             prefixIcon: const Icon(Icons.lock),
                           ),
                           validator: _fieldValidator,
@@ -162,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         DateFormField(
                           context: context,
-                          labelText: AppLocalizations.of(context)!.birthdate,
+                          labelText: t.birthdate,
                           initialDate: _birthdate,
                           onChanged: (date) =>
                               setState(() => _birthdate = date),
@@ -170,7 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         GenderFormField(
                           context: context,
-                          labelText: AppLocalizations.of(context)!.gender,
+                          labelText: t.gender,
                           initialGender: _gender,
                           onChanged: (gender) =>
                               setState(() => _gender = gender),
@@ -184,13 +186,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                     strokeWidth: 2,
                                     color: Colors.white,
                                   )
-                                : Text(AppLocalizations.of(context)!.register)),
+                                : Text(t.register)),
                         const SizedBox(height: 20),
                         TextButton(
                           onPressed:
                               authProvider.isLoading ? null : _navigateToLogin,
                           child: Text(
-                              AppLocalizations.of(context)!.already_have_account),
+                              t.already_have_account),
                         )
                       ],
                     ),

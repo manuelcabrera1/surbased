@@ -11,9 +11,10 @@ class UserSecurityPage extends StatefulWidget {
 class _UserSecurityPageState extends State<UserSecurityPage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.security_page_title),
+          title: Text(t.security_page_title),
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),

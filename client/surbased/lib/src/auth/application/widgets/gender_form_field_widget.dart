@@ -13,10 +13,11 @@ class GenderFormField extends FormField<String> {
           validator: (value) => value == null ? AppLocalizations.of(context)!.gender_select : null,
           builder: (FormFieldState<String> state) {
             final theme = Theme.of(state.context);
+            final t = AppLocalizations.of(state.context)!;
             final genderOptions = [
-              AppLocalizations.of(state.context)!.gender_male,
-              AppLocalizations.of(state.context)!.gender_female,
-              AppLocalizations.of(state.context)!.gender_other
+              t.gender_male,
+              t.gender_female,
+              t.gender_other
             ];
 
             return Align(

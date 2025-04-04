@@ -25,6 +25,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
     final question = widget.question;
     final theme = Theme.of(context);
     final answerProvider = Provider.of<AnswerProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     return Card(
       elevation: 4,
@@ -86,7 +87,7 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
                               },
                             ),
                       Text(
-                        option.description ?? AppLocalizations.of(context)!.none,
+                        option.description ?? t.none,
                         style: theme.textTheme.bodyLarge,
                       ),
                     ],

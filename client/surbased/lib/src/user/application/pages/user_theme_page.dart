@@ -13,12 +13,13 @@ class UserThemePage extends StatefulWidget {
 class _UserThemePageState extends State<UserThemePage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.theme_page_title),
+        title: Text(t.theme_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -30,7 +31,7 @@ class _UserThemePageState extends State<UserThemePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.theme_configuration,
+              t.theme_configuration,
               style: theme.textTheme.headlineMedium,
             ),
             const SizedBox(height: 24),
@@ -54,8 +55,8 @@ class _UserThemePageState extends State<UserThemePage> {
                         const SizedBox(width: 16),
                         Text(
                           themeProvider.isDarkMode
-                              ? AppLocalizations.of(context)!.theme_dark
-                              : AppLocalizations.of(context)!.theme_light,
+                              ? t.theme_dark
+                              : t.theme_light,
                           style: theme.textTheme.titleLarge,
                         ),
                       ],
@@ -76,7 +77,7 @@ class _UserThemePageState extends State<UserThemePage> {
 
             // Explicación del tema
             Text(
-              AppLocalizations.of(context)!.theme_helper,
+              t.theme_helper,
               style: theme.textTheme.bodyMedium,
             ),
 

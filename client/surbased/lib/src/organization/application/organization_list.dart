@@ -62,9 +62,8 @@ class _OrganizationListState extends State<OrganizationList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final surveyProvider = Provider.of<SurveyProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
-    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Padding(
@@ -78,7 +77,7 @@ class _OrganizationListState extends State<OrganizationList> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: Text(
-                  AppLocalizations.of(context)!.explore_page_title,
+                  t.organizations_page_title,
                   style: theme.textTheme.displayMedium
                 ),
               ),
@@ -131,7 +130,7 @@ class _OrganizationListState extends State<OrganizationList> {
                             onSubmitted: (value) {
                               filterOrganizations();
                             },
-                            hintText: AppLocalizations.of(context)!.surveys_searchbar_placeholder,
+                            hintText: t.organization_searchbar_placeholder,
                           ),
                         ),
                       ),

@@ -76,12 +76,13 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
   @override
   Widget build(BuildContext context) {
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     //final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.survey_add_questions_page_title),
+        title: Text(t.survey_add_questions_page_title),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -111,7 +112,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.survey_added_questions,
+                        t.survey_added_questions,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -119,7 +120,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        AppLocalizations.of(context)!.drag_to_reorder,
+                        t.drag_to_reorder,
                         style: const TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
@@ -163,6 +164,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final question = surveyProvider.currentSurvey!.questions[index];
+    final t = AppLocalizations.of(context)!;
 
     return Card(
       key: ValueKey(index),
@@ -202,7 +204,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                           children: [
                             const Icon(Icons.edit),
                             const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.edit),
+                            Text(t.edit),
                           ],
                         ),
                       ),
@@ -213,7 +215,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                           children: [
                             const Icon(Icons.content_copy),
                             const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.duplicate),
+                            Text(t.duplicate),
                           ],
                         ),
                       ),
@@ -224,7 +226,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                           children: [
                             const Icon(Icons.delete),
                             const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.remove),
+                            Text(t.remove),
                           ],
                         ),
                       ),
@@ -238,7 +240,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.options,
+                      t.options,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
@@ -285,7 +287,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                   question.required!
                       ? Chip(
                           label: Text(
-                            AppLocalizations.of(context)!.required,
+                            t.required,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white,

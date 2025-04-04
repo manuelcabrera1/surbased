@@ -19,6 +19,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
 
 
   Future<void> _handleSave() async {
+    final t = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -32,14 +33,14 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
           setState(() => _isEditing = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.password_updated)),
+              SnackBar(content: Text(t.password_updated)),
             );
           }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content: Text(authProvider.error ?? AppLocalizations.of(context)!.password_update_error)),
+                  content: Text(authProvider.error ?? t.password_update_error)),
             );
           }
         }
@@ -70,9 +71,10 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.edit_password_page_title),
+        title: Text(t.edit_password_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -99,7 +101,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.password,
+                    labelText: t.password,
                     prefixIcon: const Icon(Icons.lock),
                   ),
                   validator: _fieldValidator,
@@ -110,7 +112,7 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
                   controller: _confirmPasswordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.password_confirm,
+                    labelText: t.password_confirm,
                     prefixIcon: const Icon(Icons.lock),
                   ),
                   validator: _confirmPasswordValidator,

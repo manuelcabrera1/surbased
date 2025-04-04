@@ -18,9 +18,10 @@ class SurveyEditPage extends StatefulWidget {
 class SurveyEditPageState extends State<SurveyEditPage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.survey_edit),
+        title: Text(t.survey_edit),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {

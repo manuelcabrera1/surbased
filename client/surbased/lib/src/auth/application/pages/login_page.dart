@@ -70,6 +70,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -84,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Logo o Título
                 Text(
-                  AppLocalizations.of(context)!.app_title,
+                  t.app_title,
                   style: theme.textTheme.displayLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -96,10 +97,10 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.email,
+                    labelText: t.email,
                   ),
                   validator: (value) => value == null || value.isEmpty
-                      ? AppLocalizations.of(context)!.input_error_email
+                      ? t.input_error_email
                       : null,
                 ),
 
@@ -109,11 +110,11 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.password,
+                    labelText: t.password,
                   ),
                   obscureText: true,
                   validator: (value) => value == null || value.isEmpty
-                      ? AppLocalizations.of(context)!.input_error_password
+                      ? t.input_error_password
                       : null,
                 ),
 
@@ -127,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                           strokeWidth: 2,
                           color: Colors.white,
                         )
-                      : Text(AppLocalizations.of(context)!.log_in),
+                      : Text(t.log_in),
                 ),
 
                 const SizedBox(height: 16),
@@ -137,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.forgotPassword);
                   },
-                  child: Text(AppLocalizations.of(context)!.forgot_password),
+                  child: Text(t.forgot_password),
                 ),
 
                 const SizedBox(height: 24),
@@ -146,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed:
                       authProvider.isLoading ? null : _navigateToRegister,
-                  child: Text(AppLocalizations.of(context)!.dont_have_account),
+                  child: Text(t.dont_have_account),
                 ),
               ],
             ),

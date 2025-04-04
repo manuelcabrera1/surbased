@@ -56,6 +56,7 @@ class _SurveyAddParticipantsDialogState
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
+    final t = AppLocalizations.of(context)!;
     if (surveyProvider.isLoading || organizationProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -76,7 +77,7 @@ class _SurveyAddParticipantsDialogState
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.survey_add_participants,
+                          t.survey_add_participants,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class _SurveyAddParticipantsDialogState
                         TextButton.icon(
                           onPressed: _addParticipant,
                           icon: const Icon(Icons.add),
-                          label: Text(AppLocalizations.of(context)!.survey_add_new),
+                          label: Text(t.survey_add_new),
                         ),
                       ],
                     ),
@@ -157,7 +158,7 @@ class _SurveyAddParticipantsDialogState
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  label: Text(AppLocalizations.of(context)!.survey_add_participants),
+                  label: Text(t.survey_add_participants),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                   ),

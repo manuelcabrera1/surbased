@@ -17,13 +17,14 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (surveyProvider.currentSurvey == null || 
     surveyProvider.currentSurvey!.assignedUsers == null || 
     surveyProvider.currentSurvey!.assignedUsers!.isEmpty) {
       return Center(
         child: Text(
-          AppLocalizations.of(context)!.survey_no_participants_assigned,
+          t.survey_no_participants_assigned,
           style: theme.textTheme.titleLarge,
         ),
       );
@@ -54,7 +55,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
                             color: theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(AppLocalizations.of(context)!.external_user,
+                          child: Text(t.external_user,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onPrimaryContainer,
                             ),

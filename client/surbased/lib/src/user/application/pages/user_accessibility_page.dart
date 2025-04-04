@@ -9,9 +9,10 @@ class UserAccessibilityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final langProvider = Provider.of<LangProvider>(context);
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.accessibility_page_title),
+          title: Text(t.accessibility_page_title),
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),
@@ -23,7 +24,7 @@ class UserAccessibilityPage extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.language),
-                title: Text(AppLocalizations.of(context)!.language),
+                title: Text(t.language),
                 trailing: DropdownButtonHideUnderline(
                   child: DropdownButton<Locale>(
                     value: langProvider.locale,

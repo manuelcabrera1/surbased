@@ -10,9 +10,10 @@ class UserNotificationsPage extends StatefulWidget {
 class _UserNotificationsPageState extends State<UserNotificationsPage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.notifications_page_title),
+          title: Text(t.notifications_page_title),
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),

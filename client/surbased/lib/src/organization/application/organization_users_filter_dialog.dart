@@ -6,6 +6,7 @@ class OrganizationUsersFilterDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     return Dialog(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -13,10 +14,10 @@ class OrganizationUsersFilterDialog extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.filter, style: theme.textTheme.displaySmall),
+            child: Text(t.filter, style: theme.textTheme.displaySmall),
           ),
           const SizedBox(height: 16),
-          Text(AppLocalizations.of(context)!.sort_by,
+          Text(t.sort_by,
               style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: theme.colorScheme.primary)),

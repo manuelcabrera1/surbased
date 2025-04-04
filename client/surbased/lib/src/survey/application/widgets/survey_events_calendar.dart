@@ -131,7 +131,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
-
+    final t = AppLocalizations.of(context)!;
 
     if (surveyProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -145,7 +145,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.only(left: 25),
-                child: Text(AppLocalizations.of(context)!.calendar_page_title,
+                child: Text(t.calendar_page_title,
                     style: theme.textTheme.displayMedium),
               ),
             ),
@@ -232,7 +232,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                       children: [
                         const SizedBox(height: 20),
                         Text(
-                          AppLocalizations.of(context)!.calendar_surveys_for(
+                          t.calendar_surveys_for(
                             _selectedDay!.day,
                             _selectedDay!.month,
                             _selectedDay!.year,
@@ -316,10 +316,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                       children: [
                                         Text(
                                           _isExpanded
-                                              ? AppLocalizations.of(context)!
-                                                  .show_less
-                                              : AppLocalizations.of(context)!
-                                                  .show_all(eventCount - 2),
+                                              ? t.show_less
+                                              : t.show_all(eventCount - 2),
                                           style: theme.textTheme.bodyMedium
                                               ?.copyWith(
                                             color: theme.colorScheme.primary,
@@ -346,8 +344,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                             height: 150,
                             child: Center(
                               child: Text(
-                                AppLocalizations.of(context)!
-                                    .calendar_no_surveys_for_day,
+                                t.calendar_no_surveys_for_day,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w500,

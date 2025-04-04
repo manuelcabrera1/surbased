@@ -5,6 +5,7 @@ class SurveyWithoutQuestionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -17,7 +18,7 @@ class SurveyWithoutQuestionsCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              AppLocalizations.of(context)!.survey_no_questions_added,
+              t.survey_no_questions_added,
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 16,
@@ -25,7 +26,7 @@ class SurveyWithoutQuestionsCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(context)!.survey_add_question,
+              t.survey_add_question,
               style: const TextStyle(
                 color: Colors.grey,
               ),

@@ -62,6 +62,7 @@ class SurveyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
 
     final isSurveyAvailable = survey.startDate.isBefore(
                                 DateTime.now().add(const Duration(days: 1))) &&
@@ -125,9 +126,9 @@ class SurveyCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     isSurveyAvailable
-                        ? AppLocalizations.of(context)!.survey_end_date(
+                        ? t.survey_end_date(
                             _formatDate(survey.endDate))
-                        : AppLocalizations.of(context)!.survey_start_date(
+                        : t.survey_start_date(
                             _formatDate(survey.startDate)),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,

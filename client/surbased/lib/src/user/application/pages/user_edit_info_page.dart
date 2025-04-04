@@ -48,6 +48,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
   }
 
   Future<void> _handleSave() async {
+    final t = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -63,14 +64,14 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
           setState(() => _isEditing = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.profile_updated)),
+              SnackBar(content: Text(t!.profile_updated)),
             );
           }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content: Text(authProvider.error ?? AppLocalizations.of(context)!.profile_update_error)),
+                  content: Text(authProvider.error ?? t!.profile_update_error)),
             );
           }
         }
@@ -86,9 +87,10 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.edit_profile_page_title),
+        title: Text(t.edit_profile_page_title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -118,7 +120,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                         controller: _nameController,
                         keyboardType: TextInputType.name,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.first_name,
+                          labelText: t.first_name,
                           prefixIcon: const Icon(Icons.person),
                         ),
                         validator: _fieldValidator,
@@ -130,7 +132,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                         enabled: _isEditing,
                         controller: _lastNameController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.last_name,
+                          labelText: t.last_name,
                           prefixIcon: const Icon(Icons.person_outline),
                         ),
                         validator: _fieldValidator,
@@ -144,7 +146,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.email,
+                    labelText: t.email,
                     prefixIcon: const Icon(Icons.email),
                   ),
                   validator: _fieldValidator,
@@ -153,7 +155,7 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
                 DateFormField(
                   context: context,
                   enabled: _isEditing,
-                  labelText: AppLocalizations.of(context)!.birthdate,
+                  labelText: t.birthdate,
                   initialDate: _birthdate,
                   onChanged: (date) => setState(() => _birthdate = date),
                 ),

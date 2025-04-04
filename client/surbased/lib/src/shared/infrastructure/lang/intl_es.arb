@@ -161,5 +161,17 @@
     "likert_scale_levels": "Niveles de la escala",
     "likert_scale_levels_number": "Número de niveles",
     "likert_scale_level": "Nivel {level}",
-    "likert_scale_option_value": "Valor"
+    "likert_scale_option_value": "Valor",
+    "organization_searchbar_placeholder": "Buscar organizaciones",
+    "category_education": "Educación",
+    "category_social": "Social",
+    "category_health": "Salud",
+    "category_science": "Ciencia",
+    "category_business": "Negocios",
+    "category_politics": "Política",
+    "category_technology": "Tecnología",
+    "category_sport": "Deporte",
+    "category_environment": "Medio ambiente",
+    "category_entertainment": "Entretenimiento",
+    "category_economics": "Economía y finanzas"
 }

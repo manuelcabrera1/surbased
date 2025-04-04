@@ -22,11 +22,12 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
     try {
       if (surveyProvider.currentSurvey!.questions.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.please_add_question)),
+            SnackBar(content: Text(t.please_add_question)),
           );
         }
         return;
@@ -35,7 +36,7 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
       if (_selectedScope == '') {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.please_select_scope)),
+            SnackBar(content: Text(t.please_select_scope)),
           );
         }
         return;
@@ -55,7 +56,7 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(AppLocalizations.of(context)!.survey_saved)),
+             SnackBar(content: Text(t.survey_saved)),
           );
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
@@ -77,13 +78,14 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
   
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final Map<String, String> scopeOptions = {
-    AppLocalizations.of(context)!.scope_private: AppLocalizations.of(context)!.scope_private_explanation,
-    AppLocalizations.of(context)!.scope_organization: AppLocalizations.of(context)!.scope_organization_explanation,
-    AppLocalizations.of(context)!.scope_public: AppLocalizations.of(context)!.scope_public_explanation,
+    t.scope_private: t.scope_private_explanation,
+    t.scope_organization: t.scope_organization_explanation,
+    t.scope_public: t.scope_public_explanation,
   };
     return AlertDialog(
-        title: Text(AppLocalizations.of(context)!.survey_save_publish),
+        title: Text(t.survey_save_publish),
         content: Padding(
           padding: const EdgeInsets.all(0),
           child: Column(
@@ -91,7 +93,7 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(AppLocalizations.of(context)!.survey_publish_explanation),
+              Text(t.survey_publish_explanation),
                const SizedBox(height: 10),
                ...scopeOptions.entries.map((entry) => RadioListTile(
                 visualDensity: VisualDensity.compact,
@@ -108,11 +110,11 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(t.cancel),
           ),
           TextButton(
             onPressed: () => _createSurvey(),
-            child: Text(AppLocalizations.of(context)!.save),
+            child: Text(t.save),
           ),
         ],
       );

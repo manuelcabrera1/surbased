@@ -31,18 +31,6 @@ class _SurveyExploreState extends State<SurveyExplore> {
     });
   }
 
-  void _loadInitialData() {
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
-    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-    final tagProvider = Provider.of<TagsProvider>(context, listen: false);
-    
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (authProvider.isAuthenticated && authProvider.token != null) {
-      categoryProvider.getCategories(null, authProvider.token ?? '');
-      surveyProvider.getPublicSurveys(authProvider.token ?? '');
-      tagProvider.getTags(authProvider.token ?? '');
-    }
-  }
 
   void filterSurveys() {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
@@ -93,6 +81,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Padding(
@@ -106,7 +95,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: Text(
-                  AppLocalizations.of(context)!.explore_page_title,
+                  t.explore_page_title,
                   style: theme.textTheme.displayMedium
                 ),
               ),
@@ -159,7 +148,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             onSubmitted: (value) {
                               filterSurveys();
                             },
-                            hintText: AppLocalizations.of(context)!.surveys_searchbar_placeholder,
+                            hintText: t.surveys_searchbar_placeholder,
                           ),
                         ),
                       ),

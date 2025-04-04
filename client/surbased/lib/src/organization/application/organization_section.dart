@@ -43,6 +43,7 @@ class OrganizationSection extends StatefulWidget {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (authProvider.isLoading || organizationProvider.isLoading || organizationProvider.organization == null) {
       return const Center(child: CircularProgressIndicator());
@@ -57,7 +58,7 @@ class OrganizationSection extends StatefulWidget {
             Padding(
               padding: const EdgeInsets.only(left: 25),
               child: Text(
-                AppLocalizations.of(context)!.organization,
+                t.organization,
                 style: theme.textTheme.displayMedium,
               ),
             ),
@@ -66,8 +67,8 @@ class OrganizationSection extends StatefulWidget {
                 dividerHeight: 0,
                 controller: tabController,
                 tabs: [
-                  Tab(text: AppLocalizations.of(context)!.surveys_page_title),
-                  Tab(text: AppLocalizations.of(context)!.users_page_title),
+                  Tab(text: t.surveys_page_title),
+                  Tab(text: t.users_page_title),
                 ],
               ),
               const SizedBox(height: 20),

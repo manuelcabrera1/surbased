@@ -59,6 +59,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
 
   void _configureTabs() {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
 
     if (surveyProvider.isLoading || surveyProvider.currentSurvey == null) {
       return;
@@ -68,13 +69,13 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
       if (surveyProvider.currentSurvey!.scope != 'public') {
           tabTitles = [
             Tab(
-                    text: AppLocalizations.of(context)!.survey_info,
+                    text: t.survey_info,
                     icon: Icon(Icons.info, color: theme.colorScheme.surface)),
                 Tab(
-                    text: AppLocalizations.of(context)!.survey_participants,
+                    text: t.survey_participants,
                     icon: Icon(Icons.people, color: theme.colorScheme.surface)),
                 Tab(
-                    text: AppLocalizations.of(context)!.survey_stats,
+                    text: t.survey_stats,
                     icon:
                         Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
           ];
@@ -87,10 +88,10 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
       } else {
         tabTitles = [
             Tab(
-              text: AppLocalizations.of(context)!.survey_info,
+              text: t.survey_info,
               icon: Icon(Icons.info, color: theme.colorScheme.surface)),
             Tab(
-                text: AppLocalizations.of(context)!.survey_stats,
+                text: t.survey_stats,
                 icon:
                     Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
           ];
@@ -141,19 +142,20 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
   }
 
   void _showRemoveSurveyDialog() {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.survey_remove),
-        content: Text(AppLocalizations.of(context)!.survey_remove_confirmation),
+        title: Text(t.survey_remove),
+        content: Text(t.survey_remove_confirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(t.cancel),
           ),
           TextButton(
             onPressed: () => _removeSurvey(),
-            child: Text(AppLocalizations.of(context)!.save),
+            child: Text(t.save),
           ),
         ],
       ),
@@ -189,6 +191,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     final surveyProvider = Provider.of<SurveyProvider>(context);
     survey = surveyProvider.currentSurvey;
     final authProvider = Provider.of<AuthProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
      if (tabTitles.isEmpty || tabViews.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -238,7 +241,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
                           children: [
                             Icon(Icons.edit, color: theme.colorScheme.primary),
                             const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.edit),
+                            Text(t.edit),
                           ],
                         ),
                       ),
@@ -251,7 +254,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
                             Icon(Icons.delete,
                                 color: theme.colorScheme.primary),
                             const SizedBox(width: 12),
-                            Text(AppLocalizations.of(context)!.remove),
+                            Text(t.remove),
                           ],
                         ),
                       ),
@@ -265,7 +268,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
           ? FloatingActionButton(
               heroTag: 'participants',
               onPressed: () => _showAddParticipantsModal(),
-              tooltip: AppLocalizations.of(context)!.survey_add_participants,
+              tooltip: t.survey_add_participants,
               child: const Icon(Icons.person_add),
             )
           : null,

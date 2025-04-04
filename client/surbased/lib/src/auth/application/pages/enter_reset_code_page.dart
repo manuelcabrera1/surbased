@@ -37,6 +37,8 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
+      final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -53,7 +55,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                   ),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.reset_code_page_title,
+                      t.reset_code_page_title,
                       style: theme.textTheme.displayMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -63,7 +65,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
               ),
               const SizedBox(height: 40),
               Text(
-                        AppLocalizations.of(context)!.reset_code_enter_code,
+                        t.reset_code_enter_code,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -97,11 +99,11 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                   }
                   else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocalizations.of(context)!.reset_code_invalid)),
+                      SnackBar(content: Text(t.reset_code_invalid)),
                     );
                   }
                 },
-                child: Text(AppLocalizations.of(context)!.submit),
+                child: Text(t.submit),
               ),
               const SizedBox(height: 30),
               Row(
@@ -117,7 +119,7 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                     onPressed: () {
                       Navigator.pushNamed(context, AppRoutes.login);
                     },
-                    child: Text(AppLocalizations.of(context)!.back_to_login),
+                    child: Text(t.back_to_login),
                   ),
                 ],
               ),

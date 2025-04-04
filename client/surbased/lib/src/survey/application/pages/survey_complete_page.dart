@@ -40,6 +40,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
     if (authProvider.token != null) {
       bool success = await answerProvider.registerSurveyAnswers(
           surveyProvider.currentSurvey!.id!, authProvider.token!);
@@ -47,7 +48,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.survey_submitted),
+              content: Text(t.survey_submitted),
             ),
           );
           Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -63,20 +64,21 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
   }
 
   void _showSubmitSurveyConfirmationDialog() {
+    final t = AppLocalizations.of(context)!;
     if (allRequiredQuestionsAreAnswered()) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.survey_submit),
-          content: Text(AppLocalizations.of(context)!.survey_submit_confirmation),
+          title: Text(t.survey_submit),
+          content: Text(t.survey_submit_confirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(t.cancel),
             ),
             TextButton(
               onPressed: () => _submitSurvey(),
-              child: Text(AppLocalizations.of(context)!.submit),
+              child: Text(t.submit),
             ),
           ],
         ),
@@ -85,7 +87,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.survey_answer_required_questions),
+            content: Text(t.survey_answer_required_questions),
           ),
         );
       }
@@ -94,26 +96,27 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
 
   void _showGoBackConfirmationDialog() {
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+    final t = AppLocalizations.of(context)!;
 
     if (answerProvider.currentSurveyBeingAnswered!.questions
         .any((q) => q.options!.isNotEmpty)) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.go_back),
+          title: Text(t.go_back),
           content: Text(
-              AppLocalizations.of(context)!.survey_return_confirmation),
+              t.survey_return_confirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(t.cancel),
             ),
             TextButton(
               onPressed: () {
                 answerProvider.clearAllCurrentInfo();
                 Navigator.pop(context);
               },
-              child: Text(AppLocalizations.of(context)!.go_back),
+              child: Text(t.go_back),
             ),
           ],
         ),
@@ -128,6 +131,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
   Widget build(BuildContext context) {
     final answerProvider = Provider.of<AnswerProvider>(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (answerProvider.isLoading || surveyProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -135,7 +139,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.survey_complete),
+        title: Text(t.survey_complete),
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: answerProvider.isLoading
@@ -167,7 +171,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                     : _showSubmitSurveyConfirmationDialog,
                 child: answerProvider.isLoading
                     ? const CircularProgressIndicator(strokeWidth: 2)
-                    : Text(AppLocalizations.of(context)!.submit),
+                    : Text(t.submit),
               ),
             ],
           ),
