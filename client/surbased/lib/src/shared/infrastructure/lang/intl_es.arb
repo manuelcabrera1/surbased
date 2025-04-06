@@ -103,6 +103,16 @@
     "survey_add_question": "Haga clic en '+' para agregar una pregunta",
     "accessibility_page_title": "Accesibilidad",
     "language": "Idioma",
+    "text_size": "Tamaño del texto",
+    "text_size_small": "Pequeño",
+    "text_size_medium": "Mediano",
+    "text_size_large": "Grande",
+    "high_contrast": "Alto contraste",
+    "high_contrast_description": "Mejora la legibilidad del texto",
+    "screen_reader": "Lector de pantalla",
+    "screen_reader_description": "Activa el soporte para lectores de pantalla",
+    "reduce_motion": "Reducir animaciones",
+    "reduce_motion_description": "Minimiza las animaciones y transiciones",
     "profile_updated": "Perfil actualizado correctamente",
     "profile_update_error": "Error al actualizar el perfil",
     "edit_profile_page_title": "Editar perfil",
@@ -126,6 +136,7 @@
     "logout": "Cerrar sesión",
     "researcher": "Investigador",
     "participant": "Participante",
+    "admin": "Admin",
     "explore_page_title": "Explorar",
     "users_error_no_users": "No se encontraron usuarios",
     "survey_removed": "Cuestionario eliminado correctamente",
@@ -173,5 +184,7 @@
     "category_sport": "Deporte",
     "category_environment": "Medio ambiente",
     "category_entertainment": "Entretenimiento",
-    "category_economics": "Economía y finanzas"
+    "category_economics": "Economía y finanzas",
+    "password_reset_instructions": "Por favor, introduce tu nueva contraseña. Debe ser diferente de tu contraseña anterior.",
+    "survey_create_page_title": "Crear un Nuevo Cuestionario"
 }
