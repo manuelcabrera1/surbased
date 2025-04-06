@@ -22,20 +22,22 @@ from models.SurveyTagModel import survey_tag
 
 survey_router = APIRouter(tags=["Survey"])
 
-@survey_router.get("/surveys/public", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/{scope}", status_code=200, response_model=SurveyResponseWithLength)
 @required_roles(["admin", "researcher", "participant"])
-async def get_public_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
-                        category_id: Optional[uuid.UUID] = None):
+async def get_surveys_by_scope(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
+                        scope: SurveyScopeEnum):
     
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
-        if category_id:
-            result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.public, 
-                                                                Survey.category_id == category_id)))
-        else:
+        if scope == SurveyScopeEnum.public:
             result = await db.execute(select(Survey).where(Survey.scope == SurveyScopeEnum.public))
+        else: 
+            if current_user.role != "admin":
+                raise HTTPException(status_code=403, detail="Forbidden")
+            result = await db.execute(select(Survey).where(Survey.scope == scope))
     
+
         surveys = result.unique().scalars().all()
 
         return { "surveys": surveys, "length": len(surveys) }

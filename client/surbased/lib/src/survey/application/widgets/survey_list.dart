@@ -4,12 +4,14 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'survey_list_filter_dialog.dart';
 
 class SurveyList extends StatefulWidget {
@@ -77,7 +79,8 @@ class _SurveyListState extends State<SurveyList> {
 
   void filterSurveys() {
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     if (mounted) {
       setState(() {
         _surveysToShow = widget.surveys
@@ -85,7 +88,9 @@ class _SurveyListState extends State<SurveyList> {
                 String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
                 bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
                 categoryName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-                (survey.tags?.any((tag) => tag.name.toLowerCase().contains(_searchController.text.toLowerCase())) ?? false);
+                (survey.tags != null && survey.tags!.any((tag) => tag.name.toLowerCase().contains(_searchController.text.toLowerCase())))
+                || survey.organizationId != null && organizationProvider.getOrganizationName(survey.organizationId!).toLowerCase().contains(_searchController.text.toLowerCase())
+                || userProvider.getUserEmail(survey.ownerId!).toLowerCase().contains(_searchController.text.toLowerCase());
                 bool category = _selectedCategory == null || _selectedCategory == survey.categoryId;
                 return search && category;
             })

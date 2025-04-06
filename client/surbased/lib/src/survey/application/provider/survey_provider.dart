@@ -14,6 +14,8 @@ class SurveyProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   Survey? _currentSurvey;
+  List<Survey> _privateSurveys = [];
+  List<Survey> _organizationSurveys = [];
 
   List<Survey> get publicSurveys => _publicSurveys;
   List<Survey> get highlightedPublicSurveys => _highlightedPublicSurveys;
@@ -21,6 +23,9 @@ class SurveyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   Survey? get currentSurvey => _currentSurvey;
+  List<Survey> get privateSurveys => _privateSurveys;
+  List<Survey> get organizationSurveys => _organizationSurveys;
+
 
   set currentSurvey(Survey? value) {
     _currentSurvey = value;
@@ -130,29 +135,38 @@ class SurveyProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> getPublicSurveys(String token, {String? category}) async {
+  Future<void> getSurveysByScope(String scope, String token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      _error = null;
-      _isLoading = true;
-      notifyListeners();
-
-      final response = await _surveyService.getPublicSurveys(token, category: category);
-
+      final response = await _surveyService.getSurveysByScope(scope, token);
       if (response['success']) {
-        _publicSurveys = 
-          (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+        switch (scope) {
+          case 'private':
+            _privateSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+
+            break;
+          case 'organization':
+            _organizationSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+
+            break;
+          case 'public':
+            _publicSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+
+            break;
+        }
+        _error = null;
+        _isLoading = false;
         notifyListeners();
-        return true;
       } else {
         _error = response['data'];
+        _isLoading = false;
         notifyListeners();
-        return false;
       }
     } catch (e) {
       _error = e.toString();
-      notifyListeners();
-      return false;
-    } finally {
       _isLoading = false;
       notifyListeners();
     }

@@ -34,11 +34,10 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getPublicSurveys(String token, {String? category}) async {
+  Future<Map<String, dynamic>> getSurveysByScope(String scope, String token) async {
     try {
-      final existingCategory = category != null ? '?category=$category' : '';
       final response = await http
-          .get(Uri.parse('$_baseUrl/surveys/public$existingCategory'), headers: {
+          .get(Uri.parse('$_baseUrl/surveys/$scope'), headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });

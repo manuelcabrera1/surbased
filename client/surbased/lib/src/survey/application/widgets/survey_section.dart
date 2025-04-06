@@ -52,8 +52,7 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
     final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
     final t = AppLocalizations.of(context)!;
 
-    if (authProvider.userRole == null || surveyProvider.isLoading || organizationProvider.isLoading
-    || organizationProvider.organization == null || organizationProvider.organization!.surveys == null) {
+    if (authProvider.userRole == null || surveyProvider.isLoading || organizationProvider.isLoading) {
       return;
     }
 
@@ -65,10 +64,11 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           Tab(text: t.scope_public),
         ];
         tabViews = [
-          SurveyList(surveys: surveyProvider.surveysOwned),
-          SurveyList(surveys: organizationProvider.organization!.surveys!),
+          SurveyList(surveys: surveyProvider.privateSurveys),
+          SurveyList(surveys: surveyProvider.organizationSurveys),
           SurveyList(surveys: surveyProvider.publicSurveys),
         ];
+        break;
       case 'researcher':
         tabTitles = [
           Tab(text: t.surveys_owned),
@@ -78,6 +78,7 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           SurveyList(surveys: surveyProvider.surveysOwned),
           SurveyList(surveys: authProvider.surveysAssigned),
         ];
+        break;
       case 'participant':
         tabTitles = [
           Tab(text: t.surveys_assigned),
@@ -85,8 +86,9 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
         ];
         tabViews = [
           SurveyList(surveys: authProvider.surveysAssigned),
-          SurveyList(surveys: organizationProvider.organization!.surveys!),
+          SurveyList(surveys: organizationProvider.organization?.surveys ?? []),
         ];
+        break;
     }
 
     tabController.dispose(); // Primero liberar el controlador actual
