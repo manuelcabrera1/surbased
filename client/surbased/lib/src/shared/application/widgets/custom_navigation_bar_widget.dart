@@ -70,8 +70,8 @@ class CustomNavigationBar extends StatelessWidget {
           label: t.surveys_page_title,
       ),
       NavigationDestination(
-          icon: const Icon(Icons.calendar_month, size: ICON_SIZE),
-          label: t.calendar_page_title, 
+          icon: const Icon(Icons.people, size: ICON_SIZE),
+          label: t.users_page_title, 
       ),
       const SizedBox(),
       NavigationDestination(
