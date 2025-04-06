@@ -20,7 +20,6 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final surveyProvider = Provider.of<SurveyProvider>(context);
     final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
