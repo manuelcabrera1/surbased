@@ -11,6 +11,8 @@ import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
 import 'package:surbased/src/survey/application/widgets/survey_section.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
+import 'package:surbased/src/user/application/widgets/user_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
 import '../../../organization/application/organization_list.dart';
@@ -69,7 +71,93 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _refreshData() async {
+  void _refreshParticipantData() async {
+    try {
+      final authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
+      final surveyProvider =
+          Provider.of<SurveyProvider>(context, listen: false);
+      final organizationProvider =
+          Provider.of<OrganizationProvider>(context, listen: false);
+
+      if (authProvider.isAuthenticated) {
+        await authProvider.getSurveysAssignedToUser(
+                  authProvider.userId!,
+                  authProvider.token!,
+                );
+        await surveyProvider.getSurveysByScope(
+                'public',
+                authProvider.token!,
+              );
+        await surveyProvider.getHighlightedPublicSurveys(
+                authProvider.token!,
+              );
+        if (authProvider.user!.organizationId != null) {
+          await organizationProvider.getCurrentOrganization(
+            authProvider.user!.organizationId!,
+            authProvider.token!,
+          );
+
+          await organizationProvider.getSurveysInOrganization(
+          authProvider.token!,
+        );      
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _refreshResearcherData() async {
+    try {
+      final authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
+      final surveyProvider =
+          Provider.of<SurveyProvider>(context, listen: false);
+      final organizationProvider =
+          Provider.of<OrganizationProvider>(context, listen: false);
+
+      if (authProvider.isAuthenticated) {
+        await authProvider.getSurveysAssignedToUser(
+                  authProvider.userId!,
+                  authProvider.token!,
+                );
+
+        if (authProvider.user!.organizationId != null) {
+          await organizationProvider.getCurrentOrganization(
+            authProvider.user!.organizationId!,
+            authProvider.token!,
+          );
+
+          await organizationProvider.getSurveysInOrganization(
+            authProvider.token!,
+          );
+
+          await organizationProvider.getUsersInOrganization(
+            authProvider.token!,
+          );
+          await surveyProvider.getSurveysByOwner(
+            authProvider.user!.id,
+            authProvider.token!,
+          );
+
+        }
+
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _refreshAdminData() async {
     try {
       final authProvider =
               Provider.of<AuthProvider>(context, listen: false);
@@ -77,53 +165,60 @@ class _HomePageState extends State<HomePage> {
               Provider.of<SurveyProvider>(context, listen: false);
           final organizationProvider =
               Provider.of<OrganizationProvider>(context, listen: false);
-          final categoryProvider =
+          final userProvider =
+              Provider.of<UserProvider>(context, listen: false);
+    
+    if (authProvider.isAuthenticated) {
+      await surveyProvider.getSurveysByScope(
+        'private',
+        authProvider.token!,
+      );
+      await surveyProvider.getSurveysByScope(
+        'organization',
+        authProvider.token!,
+      );
+      
+      await surveyProvider.getSurveysByScope(
+              'public',
+              authProvider.token!,
+            );
+      await userProvider.getUsers(authProvider.token!, null, null);
+      await organizationProvider.getOrganizations(authProvider.token ?? '');
+      
+    }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _refreshData() async {
+    try {
+      final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
+      final categoryProvider =
               Provider.of<CategoryProvider>(context, listen: false);
-          final tagProvider =
+      final tagProvider =
               Provider.of<TagsProvider>(context, listen: false);
 
-          if (authProvider.isAuthenticated) {
-            tagProvider.getTags(authProvider.token ?? '');await authProvider.getSurveysAssignedToUser(
-              authProvider.userId!,
-              authProvider.token!,
-            );
-
-            await surveyProvider.getPublicSurveys(
-              authProvider.token!,
-            );
-
-            await surveyProvider.getHighlightedPublicSurveys(
-              authProvider.token!,
-            );
-
-            await categoryProvider.getCategories(null, authProvider.token!);
-
-            if (authProvider.user!.organizationId != null) {
-              await organizationProvider.getCurrentOrganization(
-                authProvider.user!.organizationId!,
-                authProvider.token!,
-              );
-
-              await organizationProvider.getSurveysInOrganization(
-              authProvider.token!,
-            );
-
-              if (authProvider.user!.role == 'researcher') {
-                await organizationProvider.getUsersInOrganization(
-                  authProvider.token!,
-                );
-                await surveyProvider.getSurveysByOwner(
-                  authProvider.user!.id,
-                  authProvider.token!,
-                );
-              }
-            }
-
-            if (authProvider.user!.role == 'admin') {
-              await authProvider.getUsers(authProvider.token!, null, null);
-              await organizationProvider.getOrganizations(authProvider.token ?? '');
-            }
-          }
+      if (authProvider.isAuthenticated) {
+        await categoryProvider.getCategories(null, authProvider.token!);
+        await tagProvider.getTags(authProvider.token ?? '');
+        switch (authProvider.userRole) {
+          case 'participant':
+            _refreshParticipantData();
+          break;
+        case 'researcher':
+          _refreshResearcherData();
+          break;
+        case 'admin':
+          _refreshAdminData();
+          break;
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -136,6 +231,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final role = authProvider.userRole;
 
     if (!authProvider.isAuthenticated || role == null || authProvider.isLoading) {
@@ -166,7 +262,7 @@ class _HomePageState extends State<HomePage> {
     // Páginas para administradores
     final adminPages = [
       const SurveySection(),
-      const SurveyEventsCalendar(),
+      const UserList(),
       const SizedBox(),
       const OrganizationList(),
       const UserProfile()
