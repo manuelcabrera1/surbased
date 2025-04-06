@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/config/app_routes.dart';
 
 class CreateResourceDialog extends StatelessWidget {
   const CreateResourceDialog({super.key});
@@ -19,11 +20,11 @@ class CreateResourceDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Crear recurso',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+                  'Crear recurso',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
             const SizedBox(height: 24),
             _buildOption(
               context,
@@ -48,13 +49,16 @@ class CreateResourceDialog extends StatelessWidget {
               icon: Icons.person_add_outlined,
               title: 'Crear usuario',
               onTap: () {
-                Navigator.pop(context, 'user');
+                Navigator.pushNamed(context, AppRoutes.userCreate);
               },
             ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
+            const SizedBox(height: 25),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
             ),
           ],
         ),
