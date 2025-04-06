@@ -6,12 +6,13 @@ import '../../domain/user_model.dart';
 class UserProvider with ChangeNotifier {
 
   final UserService _userService = UserService();
+  List<User> _users = [];
   bool _isLoading = false;
   String? _error;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
+  List<User> get users => _users;
   
 
 
@@ -42,6 +43,36 @@ class UserProvider with ChangeNotifier {
       return null;
     }
 
+  }
+
+  String getUserEmail(String userId) {
+    return _users.firstWhere((user) => user.id == userId).email;
+  }
+
+  Future<void> getUsers(String token, String? org, String? role) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      Map<String, dynamic> getUsersResponse = await _userService.getUsers(token, org, role);
+    
+      if (getUsersResponse['success']) {
+        _users = (getUsersResponse['data']['users'] as List<dynamic>)
+            .map((user) => User.fromJson(user))
+            .toList();
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+      } else {
+        _isLoading = false;
+        _error = getUsersResponse['data'];
+        notifyListeners();
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 }
 

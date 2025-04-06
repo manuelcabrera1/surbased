@@ -23,4 +23,30 @@ class UserService {
       return {'success': false, 'data': e.toString()};
     }
   }
+  
+  Future<Map<String, dynamic>> getUsers(
+      String token, String? org, String? role) async {
+    try {
+      final existingOrg = org != null ? '?organization=$org' : '';
+      final existingRole = role != null ? '?role=$role' : '';
+      final response = await http.get(
+        Uri.parse('$_baseUrl$existingOrg$existingRole'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
 }
