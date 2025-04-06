@@ -2,6 +2,7 @@ from typing import Annotated
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, or_, select, update, and_
+from schemas.UserSchema import UserRoleEnum
 from schemas.SurveySchema import SurveyScopeEnum
 from models.AnswerModel import Answer
 from models.OptionModel import Option
@@ -209,7 +210,7 @@ async def get_survey_answers(
 
     elif survey.scope == SurveyScopeEnum.organization:
         # Verificar si el usuario pertenece a la misma organización
-        if current_user.organization_id != survey.organization_id:
+        if current_user.organization_id != survey.organization_id and current_user.role != UserRoleEnum.admin:
             raise HTTPException(status_code=403, detail="Access denied: User not in the same organization")
 
     # Obtener todas las respuestas de la encuesta
