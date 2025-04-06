@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
 
 class SurveyCard extends StatelessWidget {
   final Survey survey;
@@ -62,11 +65,15 @@ class SurveyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final t = AppLocalizations.of(context)!;
 
     final isSurveyAvailable = survey.startDate.isBefore(
                                 DateTime.now().add(const Duration(days: 1))) &&
                             survey.endDate.isAfter(DateTime.now());
+
+    final isSurveyNotStarted = survey.startDate.isAfter(DateTime.now());
 
     return Card(
       elevation: 4,
@@ -96,6 +103,32 @@ class SurveyCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
+                    survey.organizationId != null 
+                        ? Icons.business_outlined 
+                        : Icons.person_outline,
+                    size: 18,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      survey.organizationId != null 
+                          ? organizationProvider.getOrganizationName(survey.organizationId!)
+                          : userProvider.getUserEmail(survey.ownerId),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
                     Icons.question_answer_outlined,
                     size: 18,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -119,7 +152,9 @@ class SurveyCard extends StatelessWidget {
                   Icon(
                     isSurveyAvailable
                         ? Icons.calendar_month_outlined
-                        : Icons.lock_outline,
+                        : isSurveyNotStarted
+                            ? Icons.lock_outline
+                            : Icons.check_circle_outline,
                     size: 18,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -128,8 +163,11 @@ class SurveyCard extends StatelessWidget {
                     isSurveyAvailable
                         ? t.survey_end_date(
                             _formatDate(survey.endDate))
-                        : t.survey_start_date(
-                            _formatDate(survey.startDate)),
+                        : isSurveyNotStarted
+                            ? t.survey_start_date(
+                            _formatDate(survey.startDate))
+                            : t.survey_end_date(
+                            _formatDate(survey.endDate)),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
