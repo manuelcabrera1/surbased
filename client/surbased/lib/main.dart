@@ -11,19 +11,31 @@ import 'package:surbased/src/organization/application/provider/organization_prov
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_answers_provider.dart';
+import 'package:surbased/src/shared/application/provider/accessibility_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => AuthProvider()),
+  
+  final authProvider = AuthProvider();
+  final themeProvider = ThemeProvider();
+  final langProvider = LangProvider();  
+  final accessibilityProvider = AccessibilityProvider();
+  
+  final isAuthenticated = await authProvider.checkToken();
+
+  
+  runApp(
+    MultiProvider(providers: [
+    ChangeNotifierProvider.value(value: authProvider),
+    ChangeNotifierProvider.value(value: themeProvider),
+    ChangeNotifierProvider.value(value: langProvider),
+    ChangeNotifierProvider.value(value: accessibilityProvider),
     ChangeNotifierProvider(create: (_) => SurveyProvider()),
     ChangeNotifierProvider(create: (_) => OrganizationProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider()),
     ChangeNotifierProvider(create: (_) => CategoryProvider()),
     ChangeNotifierProvider(create: (_) => AnswerProvider()),
-    ChangeNotifierProvider(create: (_) => LangProvider()),
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => SurveyAnswersProvider()),
     ChangeNotifierProvider(create: (_) => TagsProvider()),
-  ], child: const App()));
+  ], child: App(isAuthenticated: isAuthenticated)));
 }

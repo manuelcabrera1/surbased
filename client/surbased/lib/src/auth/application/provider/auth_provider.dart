@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surbased/src/shared/infrastructure/mail_service.dart';
 import '../../../survey/domain/survey_model.dart';
@@ -249,31 +248,47 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getUsers(String token, String? org, String? role) async {
-    _error = null;
+  Future<bool> checkToken() async {
     _isLoading = true;
     notifyListeners();
+    
+    final prefs = await _prefs;
+    final token = prefs.getString('token');
+    
+    if (token == null) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
     try {
-      late Map<String, dynamic> getUsersResponse;
-      if (_user!.role == 'admin') {
-        getUsersResponse = await _authService.getUsers(token, org, role);
-      }
-      if (getUsersResponse['success']) {
-        _users = (getUsersResponse['data']['users'] as List<dynamic>)
-            .map((user) => User.fromJson(user))
-            .toList();
-        _isLoading = false;
+      _token = token;
+      final userDataResult = await _authService.getCurrentUser(token);
+
+      if (userDataResult['success']) {
+        _user = User.fromJson(userDataResult['data']);
+        _isAuthenticated = true;
         _error = null;
-        notifyListeners();
-      } else {
         _isLoading = false;
-        _error = getUsersResponse['data'];
         notifyListeners();
+        return true;
+      } else {
+        _token = null;
+        _isAuthenticated = false;
+        _isLoading = false;
+        await prefs.remove('token');
+        await prefs.remove('email');
+        notifyListeners();
+        return false;
       }
     } catch (e) {
+      _token = null;
+      _isAuthenticated = false;
       _isLoading = false;
-      _error = e.toString();
+      await prefs.remove('token');
+      await prefs.remove('email');
       notifyListeners();
+      return false;
     }
   }
 
