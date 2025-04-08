@@ -9,7 +9,7 @@ from .SurveyUserModel import survey_user
 
 
 if TYPE_CHECKING:
-   
+    from .UserFcmTokenModel import UserFcmToken
     from .SurveyModel import Survey
     from .OrganizationModel import Organization
     from .AnswerModel import Answer
@@ -39,6 +39,7 @@ class User(Base):
     surveys_assigned: Mapped[Optional[List["Survey"]]]=relationship(secondary=survey_user, back_populates="assigned_users", lazy="selectin")
     surveys_owned: Mapped[Optional[List["Survey"]]] = relationship(back_populates="owner", cascade="all, delete", lazy="selectin")
     answers: Mapped[Optional[List["Answer"]]] = relationship(back_populates="participant", cascade="all, delete", lazy="selectin")
+    fcm_tokens: Mapped[Optional[List["UserFcmToken"]]] = relationship(back_populates="user", cascade="all, delete", lazy="selectin")
 
     __table_args__ = (
         CheckConstraint("role IN ('researcher', 'participant', 'admin')", name="role_check"),

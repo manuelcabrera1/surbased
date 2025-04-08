@@ -15,7 +15,8 @@ from auth.Auth import create_access_token, check_current_user, get_current_user,
 
 org_router = APIRouter(tags=["Organization"])
 
-@org_router.post("/organizations/create", status_code=201, response_model=OrganizationResponse)
+@org_router.post("/organizations", status_code=201, response_model=OrganizationResponse)
+@required_roles(["admin"])
 async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
     if not current_user:

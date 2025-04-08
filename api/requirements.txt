@@ -11,3 +11,4 @@ typing
 asyncpg
 fastapi-mail
 jinja2
+firebase-admin

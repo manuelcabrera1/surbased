@@ -26,17 +26,19 @@ async def create_user(user: UserCreateRequest, db: Annotated[AsyncSession, Depen
             raise HTTPException(status_code=400, detail="This email is already in use")  
         
         #check if org already exists
-        result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
-        existing_org = result.unique().scalars().first()
+        existing_org = None
+        if user.role != "admin":
+            result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
+            existing_org = result.unique().scalars().first()
+            if not existing_org:
+                raise HTTPException(status_code=404, detail= "Organization not found")
 
-        if not existing_org:
-            raise HTTPException(status_code=404, detail= "Organization not found")
-
+    
         #hash password
         hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         #insert user to db
-        new_user = User(name=user.name, lastname=user.lastname, email=user.email, password=hashed_password, role=user.role, birthdate= user.birthdate, gender= user.gender, organization_id= existing_org.id)
+        new_user = User(name=user.name, lastname=user.lastname, email=user.email, password=hashed_password, role=user.role, birthdate= user.birthdate, gender= user.gender, organization_id= existing_org.id if existing_org else None)
     
         db.add(new_user) 
         await db.commit()
@@ -111,7 +113,6 @@ async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_us
 
 
 @user_router.get("/users/{id}", status_code=200, response_model=UserResponse)
-@required_roles(["admin", "researcher"])
 async def get_user_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
         
         if not current_user:
@@ -120,8 +121,6 @@ async def get_user_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get
         result = await db.execute(select(User).where(User.id == id))
         existing_user = result.unique().scalars().first()
 
-        if current_user.role == "researcher" and existing_user.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=403, detail="You are not allowed to access this user")
 
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found") 

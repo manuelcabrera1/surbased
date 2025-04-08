@@ -20,17 +20,24 @@ class UserRoleRequestEnum(str, Enum):
     researcher="researcher"
     participant="participant"
 
+class AssignmentStatusEnum(str, Enum):
+    pending="pending"
+    accepted="accepted"
+    rejected="rejected"
+
 
 class UserBase(BaseModel):
     email: EmailStr
 
 
-class AssignParticipantToSurvey(UserBase): ...
+class AssignParticipantToSurvey(UserBase): 
+    notification_title: str
+    notification_body: str
 
 class RemoveParticipantFromSurvey(UserBase): ...
 
 class UserCreateRequest(UserBase):  
-    role: UserRoleRequestEnum
+    role: UserRoleEnum
     name: str
     lastname: str
     organization: str
@@ -73,6 +80,10 @@ class UserByRoleRequest(BaseModel):
 class UserResponseWithLength(BaseModel):
     users: List[UserResponse]
     length: int
+
+class UserResponseWithPendingAssignments(BaseModel):
+    users: List[UserResponse]
+    pending_assignments: List[str]
     
 
 class UserUpdatePasswordRequest(BaseModel):

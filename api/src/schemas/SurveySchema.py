@@ -45,6 +45,8 @@ class SurveyResponse(SurveyBase):
     description: str
     start_date: date
     end_date: date
+    assignment_status: Optional[str] = Field(default=None)
+    invitations_rejected: Optional[int] = Field(default=None)
     questions: List[QuestionResponse]
     response_count: Optional[int] = Field(default=None)
     tags: Optional[List[TagResponse]] = Field(default=None)
