@@ -98,7 +98,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
     final t = AppLocalizations.of(context)!;
 
-    if (answerProvider.currentSurveyBeingAnswered!.questions
+    if ( answerProvider.currentSurveyBeingAnswered != null && answerProvider.currentSurveyBeingAnswered!.questions
         .any((q) => q.options!.isNotEmpty)) {
       showDialog(
         context: context,

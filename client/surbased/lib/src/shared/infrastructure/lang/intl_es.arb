@@ -79,7 +79,7 @@
     "option": "Opción {number}",
     "question_add_error": "Error al agregar pregunta",
     "question_update_error": "Error al actualizar pregunta",
-    "survey_add_participants": "Agregar participantes",
+    "survey_add_participant": "Agregar participante",
     "survey_add_new": "Agregar nuevo",
     "category_name": "Categoría {name}",
     "category": "Categoría",
@@ -186,5 +186,17 @@
     "category_entertainment": "Entretenimiento",
     "category_economics": "Economía y finanzas",
     "password_reset_instructions": "Por favor, introduce tu nueva contraseña. Debe ser diferente de tu contraseña anterior.",
-    "survey_create_page_title": "Crear un Nuevo Cuestionario"
+    "survey_create_page_title": "Crear un Nuevo Cuestionario",
+    "survey_invitation_title": "Invitación a cuestionario",
+    "survey_invitation_message": "{inviterName} te ha invitado a participar en el cuestionario \"{surveyName}\"",
+    "survey_invitation_question": "¿Deseas participar en este cuestionario?",
+    "survey_invitation_accept": "Aceptar",
+    "survey_invitation_reject": "Rechazar",
+    "survey_invitation_not_now": "Ahora no",
+    "survey_invitation_accepted": "Has aceptado la invitación al cuestionario",
+    "survey_invitation_rejected": "Has rechazado la invitación a la encuesta",
+    "survey_status_pending": "PENDIENTE",
+    "survey_invitation_pending": "Invitación pendiente",
+    "survey_invitation_waiting_response": "{email} tiene una invitación pendiente para responder a este cuestionario. Espera la respuesta del usuario.",
+    "ok": "Aceptar"
 }

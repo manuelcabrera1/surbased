@@ -10,6 +10,8 @@ String surveyToJson(Survey data) => json.encode(data.toJson());
 
 class Survey {
   String name;
+  String? assignmentStatus;
+  int? invitationsRejected;
   String categoryId;
   String ownerId;
   final String? id;
@@ -25,6 +27,8 @@ class Survey {
 
   Survey({
     required this.name,
+    this.assignmentStatus,
+    this.invitationsRejected,
     required this.categoryId,
     required this.ownerId,
     this.id,
@@ -41,6 +45,8 @@ class Survey {
 
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
         name: json["name"],
+        assignmentStatus: json["assignment_status"],
+        invitationsRejected: json["invitations_rejected"],
         categoryId: json["category_id"],
         ownerId: json["owner_id"],
         id: json["id"],
@@ -58,6 +64,8 @@ class Survey {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = {};
     json["name"] = name;
+    if (assignmentStatus != null) json["assignment_status"] = assignmentStatus;
+    if (invitationsRejected != null) json["invitations_rejected"] = invitationsRejected;
     json["category_id"] = categoryId;
     json["owner_id"] = ownerId;
     if (id != null) json["id"] = id;

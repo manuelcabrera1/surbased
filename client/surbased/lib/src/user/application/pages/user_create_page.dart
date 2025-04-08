@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/user/application/widgets/user_form.dart';
+import '../../../category/application/provider/category_provider.dart';
 
 
 class UserCreatePage extends StatefulWidget {
@@ -38,7 +39,11 @@ class UserCreatePageState extends State<UserCreatePage> {
                         ),
                       ],
                     ),
-                  const UserForm(),
+                    const SizedBox(height: 20),
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: UserForm(isCreate: true),
+                  ),
                 ],
               ),
           ),

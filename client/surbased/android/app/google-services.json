@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "816712233769",
+    "project_id": "surbased-9d626",
+    "storage_bucket": "surbased-9d626.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816712233769:android:090a1978dcb9260a7efd38",
+        "android_client_info": {
+          "package_name": "com.example.surbased"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEYqlV6dx7XbxaGX1tnH5z1aJWsjsMZO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,6 +19,9 @@ class AppTheme {
       Color(0xFF000000); // Negro para textos principales
   static const Color lightGreyText =
       Color.fromARGB(255, 185, 185, 185); // Gris para campos deshabilitados
+  
+  static const Color orangeText =
+      Color.fromARGB(255, 223, 173, 49); // Naranja para warnings
 
   static ThemeData theme() {
     return ThemeData(
@@ -47,6 +50,7 @@ class AppTheme {
         outline: primaryBlue.withOpacity(0.7),
         shadow: Colors.black.withOpacity(0.5),
         surfaceTint: lightGreyText,
+        inversePrimary: orangeText,
       ),
 
       scaffoldBackgroundColor: offWhite,
@@ -236,6 +240,7 @@ class AppTheme {
     const Color darkAccentBlue = Color(0xFF90CAF9);
     const Color darkText = Color(0xFFE0E0E0);
     const Color darkGreyText = Color(0xFFAAAAAA);
+    
 
     return ThemeData(
       useMaterial3: true,
@@ -263,6 +268,7 @@ class AppTheme {
         onSurfaceVariant: darkGreyText,
         outline: darkGreyText.withOpacity(0.5),
         shadow: Colors.black,
+        inversePrimary: const Color.fromARGB(255, 223, 173, 49),
       ),
 
       scaffoldBackgroundColor: darkBackground,
@@ -425,5 +431,9 @@ class AppTheme {
         ),
       ),
     );
+  }
+
+  static ThemeData getTheme(bool isDarkMode) {
+    return isDarkMode ? darkTheme() : theme();
   }
 }

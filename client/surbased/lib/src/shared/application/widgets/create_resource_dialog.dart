@@ -31,7 +31,7 @@ class CreateResourceDialog extends StatelessWidget {
               icon: Icons.business_outlined,
               title: 'Crear organización',
               onTap: () {
-                Navigator.pop(context, 'organization');
+                Navigator.pushNamed(context, AppRoutes.organizationCreate);
               },
             ),
             const SizedBox(height: 12),
@@ -40,7 +40,7 @@ class CreateResourceDialog extends StatelessWidget {
               icon: Icons.assignment_outlined,
               title: 'Crear encuesta',
               onTap: () {
-                Navigator.pop(context, 'survey');
+                Navigator.pushNamed(context, AppRoutes.surveyCreate);
               },
             ),
             const SizedBox(height: 12),

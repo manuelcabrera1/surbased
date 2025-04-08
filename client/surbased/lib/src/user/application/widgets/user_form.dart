@@ -10,7 +10,8 @@ import 'package:surbased/src/config/app_routes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserForm extends StatefulWidget {
-  const UserForm({super.key});
+  final bool isCreate;
+  const UserForm({super.key, this.isCreate = false});
 
   @override
   State<UserForm> createState() => _UserFormState();
@@ -26,6 +27,7 @@ class _UserFormState extends State<UserForm> {
   final _passwordController = TextEditingController();
   DateTime? _birthdate;
   String? _gender;
+  String? _selectedRole;
 
   @override
   void dispose() {
@@ -41,7 +43,7 @@ class _UserFormState extends State<UserForm> {
     Navigator.pushReplacementNamed(context, AppRoutes.login);
   }
 
-  Future<void> _handleRegister() async {
+  Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -49,6 +51,7 @@ class _UserFormState extends State<UserForm> {
         final isRegistered = await authProvider.register(
             _nameController.text,
             _lastNameController.text,
+            _selectedRole!,
             _organizationController.text,
             _emailController.text,
             _passwordController.text,
@@ -56,7 +59,9 @@ class _UserFormState extends State<UserForm> {
             _gender!.toLowerCase());
 
         if (isRegistered) {
-          _navigateToLogin();
+          if (mounted) {
+            widget.isCreate ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
+          }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +81,7 @@ class _UserFormState extends State<UserForm> {
 
   String? _fieldValidator(String? value) {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
-      return 'This field is required';
+      return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
   }
@@ -119,16 +124,56 @@ class _UserFormState extends State<UserForm> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _organizationController,
+                if (widget.isCreate) ...[
+                  DropdownButtonFormField<String>(
+                  value: _selectedRole,
                   decoration: InputDecoration(
-                    labelText:
-                        t.organization,
-                    prefixIcon: const Icon(Icons.business),
+                    labelText: t.role,
+                    border: const OutlineInputBorder(),
                   ),
-                  validator: _fieldValidator,
+                  items: [
+                    DropdownMenuItem(
+                      value: "admin",
+                      child: Text(t.admin),
+                    ),
+                    DropdownMenuItem(
+                      value: "researcher",
+                      child: Text(t.researcher),
+                    ),
+                    DropdownMenuItem(
+                      value: "participant",
+                      child: Text(t.participant),
+                    ),
+
+                  ],
+                  validator: (value) {
+                    if (value == null) {
+                      return t.input_error_required;
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedRole = value;
+                      });
+                    }
+                  },
                 ),
+                ],
                 const SizedBox(height: 20),
+                if (_selectedRole != "admin") ...[
+                  TextFormField(
+                    controller: _organizationController,
+                    decoration: InputDecoration(
+                      labelText:
+                          t.organization,
+                      prefixIcon: const Icon(Icons.business),
+                    ),
+                    validator: _fieldValidator,
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -167,20 +212,13 @@ class _UserFormState extends State<UserForm> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                     onPressed:
-                        authProvider.isLoading ? null : _handleRegister,
+                        authProvider.isLoading ? null : _handleSubmit,
                     child: authProvider.isLoading
                         ? const CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
                           )
-                        : Text(t.register)),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed:
-                      authProvider.isLoading ? null : _navigateToLogin,
-                  child: Text(
-                      t.already_have_account),
-                )
+                        : Text(widget.isCreate ? t.user_create : t.register)),
               ],
       ),
     );

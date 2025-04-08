@@ -72,7 +72,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       }
 
       if (authProvider.surveysAssigned.isNotEmpty) {
-        allSurveys.addAll(authProvider.surveysAssigned);
+        allSurveys.addAll(authProvider.surveysAssigned.where((survey) => survey.assignmentStatus == 'accepted').toList());
       }
 
 

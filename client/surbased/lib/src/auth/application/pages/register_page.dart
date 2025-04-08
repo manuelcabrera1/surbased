@@ -24,9 +24,14 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  void _navigateToLogin() {
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
 
@@ -43,6 +48,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: theme.textTheme.displayMedium),
                   const SizedBox(height: 30),
                   const UserForm(),
+                  const SizedBox(height: 20),
+                TextButton(
+                  onPressed:
+                      authProvider.isLoading ? null : _navigateToLogin,
+                  child: Text(
+                      t.already_have_account),
+                )
                 ]),
           ),
         ),

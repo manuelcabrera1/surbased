@@ -8,6 +8,8 @@ import 'package:surbased/src/shared/application/provider/accessibility_provider.
 import 'package:surbased/src/shared/application/provider/lang_provider.dart';
 import 'package:surbased/src/shared/application/provider/theme_provider.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class App extends StatelessWidget {
   final bool isAuthenticated;
   const App({super.key, required this.isAuthenticated});
@@ -33,6 +35,7 @@ class App extends StatelessWidget {
     }
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Surbased',
       initialRoute: isAuthenticated ? AppRoutes.home : AppRoutes.login,

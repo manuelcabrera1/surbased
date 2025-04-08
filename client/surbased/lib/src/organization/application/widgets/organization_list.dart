@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
-import 'package:surbased/src/organization/application/organization_card.dart';
+import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/organization/application/widgets/organization_card.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/organization/domain/organization_model.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
@@ -54,8 +55,10 @@ class _OrganizationListState extends State<OrganizationList> {
 
   Future<void> _handleOnTap(Organization organization) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
     if (mounted && authProvider.userRole != null) {
-      //Navigator.pushNamed(context, AppRoutes.organizationDetail, arguments: organization);
+      organizationProvider.organization = organization;
+      Navigator.pushNamed(context, AppRoutes.organizationDetails);
     }
   }
 
@@ -147,7 +150,7 @@ class _OrganizationListState extends State<OrganizationList> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                childAspectRatio: 1.1,
+                childAspectRatio: 1,
                 mainAxisSpacing: 2,
               ),
               itemCount: _searchController.text.isEmpty 

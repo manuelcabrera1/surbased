@@ -31,20 +31,35 @@ class OrganizationCard extends StatelessWidget {
             children: [
               // Icono de la categoría
               const SizedBox(height: 5),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 30,
-                    color: theme.colorScheme.onPrimaryContainer,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.business_outlined,
+                        size: 23,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        organization.name.split(' ')[0],
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: organization.name.length > 10 ? 18 : 25,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    organization.name,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  if (organization.name.split(' ').length > 1)
+                    Text(
+                      organization.name.split(' ').sublist(1).join(' '),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: organization.name.length > 10 ? 18 : 25,
+                      ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 4),
@@ -71,7 +86,7 @@ class OrganizationCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.quiz,
+                    Icons.assignment_outlined,
                     size: 20,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

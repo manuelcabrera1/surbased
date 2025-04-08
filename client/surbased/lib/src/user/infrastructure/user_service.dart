@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  final String _baseUrl = 'http://10.0.2.2:8000/users';
+  final String _baseUrl = 'http://192.168.1.69:8000/users';
 
   Future<Map<String, dynamic>> getUserById(String userId, String token) async {
     try {
@@ -31,7 +31,10 @@ class UserService {
       final existingRole = role != null ? '?role=$role' : '';
       final response = await http.get(
         Uri.parse('$_baseUrl$existingOrg$existingRole'),
-        headers: {'Authorization': 'Bearer $token'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {

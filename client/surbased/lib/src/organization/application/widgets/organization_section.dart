@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
-import 'package:surbased/src/organization/application/organization_users.dart';
+import 'package:surbased/src/organization/application/widgets/organization_users.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/organization/application/organization_users_filter_dialog.dart';
+import 'package:surbased/src/organization/application/widgets/organization_users_filter_dialog.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
-import '../../survey/application/widgets/survey_list.dart';
+import '../../../survey/application/widgets/survey_list.dart';
 
 class OrganizationSection extends StatefulWidget {
   const OrganizationSection({super.key});

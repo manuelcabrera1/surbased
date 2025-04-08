@@ -17,11 +17,44 @@ class OrganizationProvider with ChangeNotifier {
   Organization? get organization => _organization;
   List<Organization> get organizations => _organizations;
 
+  set organization(Organization? organization) {
+    _organization = organization;
+    notifyListeners();
+  }
+
   void clearState() {
     _organization = null;
     _error = null;
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<bool> createOrganization(String name, String token) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final createOrganizationResponse = await _organizationService.createOrganization(name, token);
+
+      if (createOrganizationResponse['success']) {
+        _organizations.add(Organization.fromJson(createOrganizationResponse['data']));
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = createOrganizationResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> getOrganizations(String token) async {
@@ -37,8 +70,6 @@ class OrganizationProvider with ChangeNotifier {
         .map((organization) => Organization.fromJson(organization))
         .toList();
 
-        print(_organizations.map((org) => org.usersCount));
-        print(_organizations.map((org) => org.surveysCount));
         _error = null;
         _isLoading = false;
         notifyListeners();
@@ -56,6 +87,16 @@ class OrganizationProvider with ChangeNotifier {
       return false;
     }
 
+  }
+
+  String getOrganizationName(String id) {
+    if (_organizations.isEmpty && _organization == null) {
+      return '';
+    }
+    if (_organizations.isNotEmpty) {
+      return _organizations.firstWhere((organization) => organization.id == id, orElse: () => Organization(id: '', name: '')).name;
+    }
+    return _organization!.name;
   }
 
   Future<Organization?> getOrganizationById(String id, String token) async {

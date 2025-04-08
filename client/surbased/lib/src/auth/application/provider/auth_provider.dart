@@ -81,16 +81,15 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> register(String name, String lastname, String organization,
+  Future<bool> register(String name, String lastname, String role, String organization,
       String email, String password, String birthdate, String gender) async {
     _error = null;
     _isLoading = true;
-    String defaultRole = 'participant';
     notifyListeners();
 
     try {
       final registerResponse = await _authService.register(name, lastname,
-          organization, email, password, defaultRole, birthdate, gender);
+          role, organization, email, password, birthdate, gender);
 
       if (registerResponse['success']) {
         _error = null;
@@ -308,6 +307,78 @@ class AuthProvider with ChangeNotifier {
         _surveysAssigned = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> acceptSurveyAssignment(String surveyId, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      if (user == null) {
+        _error = 'Not authenticated';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final getSurveysResponse = await _authService.acceptSurveyAssignment(
+        user!.id,
+        surveyId,
+        token,
+      );
+        
+      if (getSurveysResponse['success']) {
+        _surveysAssigned.add(Survey.fromJson(getSurveysResponse['data']));
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> rejectSurveyAssignment(String surveyId, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      if (user == null) {
+        _error = 'Not authenticated';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final getSurveysResponse = await _authService.rejectSurveyAssignment(
+        user!.id,
+        surveyId,
+        token,
+      );
+        
+      if (getSurveysResponse['success']) {
+        _surveysAssigned.removeWhere((survey) => survey.id == surveyId);
         _error = null;
         _isLoading = false;
         notifyListeners();

@@ -31,6 +31,31 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     super.initState();
     tabController = TabController(length: 1, vsync: this);
     tabController.addListener(_handleTabSelection);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _loadInitialData();
+    });
+  }
+
+  Future<void> _loadInitialData() async {
+    if (!mounted) return;
+    
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    if (surveyProvider.currentSurvey?.id != null && authProvider.token != null) {
+      await surveyProvider.getUsersAssignedToSurvey(
+        surveyProvider.currentSurvey!.id!,
+        authProvider.token!
+      );
+    }
+
+    if (!mounted) return;
+    
+    setState(() {
+      _participantsLoaded = true;
+    });
+    
+    _configureTabs();
   }
 
   void _handleTabSelection() {
@@ -39,22 +64,12 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     }
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      
-      if (mounted) {
-        _configureTabs();
-        if (!_participantsLoaded) {
-          _loadParticipants();
-          setState(() {
-          _participantsLoaded = true;
-        });
-        }
-      }
-    });
+    if (!_participantsLoaded) {
+      _configureTabs();
+    }
   }
 
   void _configureTabs() {
@@ -162,29 +177,6 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     );
   }
 
-  Future<void> _loadParticipants() async {
-    try {
-      final surveyProvider =
-          Provider.of<SurveyProvider>(context, listen: false);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      survey = surveyProvider.currentSurvey;
-
-      if (survey != null && authProvider.token != null) {
-        await surveyProvider.getUsersAssignedToSurvey(
-            survey!.id!, authProvider.token!);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -268,7 +260,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
           ? FloatingActionButton(
               heroTag: 'participants',
               onPressed: () => _showAddParticipantsModal(),
-              tooltip: t.survey_add_participants,
+              tooltip: t.survey_add_participant,
               child: const Icon(Icons.person_add),
             )
           : null,

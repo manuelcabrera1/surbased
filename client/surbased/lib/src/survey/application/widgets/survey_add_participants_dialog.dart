@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../provider/survey_provider.dart';
@@ -16,18 +17,57 @@ class SurveyAddParticipantsDialog extends StatefulWidget {
 class _SurveyAddParticipantsDialogState
     extends State<SurveyAddParticipantsDialog> {
   final _formKey = GlobalKey<FormState>();
-  List<String> _participantsInSurvey = [];
-  List<String> _participantsToAdd = [];
+  final _participantController = TextEditingController();
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (mounted) {
-      final surveyProvider =
-          Provider.of<SurveyProvider>(context, listen: false);
-      if (surveyProvider.currentSurvey!.assignedUsers!.isNotEmpty) {
-        _participantsInSurvey =
-            surveyProvider.currentSurvey!.assignedUsers!.map((p) => p.email).toList();
+
+  void _addParticipant() async {
+    if (_formKey.currentState!.validate()) {  
+      final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final t = AppLocalizations.of(context)!;
+      try {
+        if (authProvider.token != null) {
+          if (surveyProvider.currentSurvey!.assignedUsers != null && 
+              surveyProvider.currentSurvey!.assignedUsers!.any((p) => p.email == _participantController.text)) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(t.user_already_assigned),
+                ),
+              );
+            }
+            return;
+          }
+          
+          final success = await surveyProvider.addUserToSurvey(
+            surveyProvider.currentSurvey!.id!,
+            _participantController.text,
+            authProvider.token!,
+          );
+          
+          if (success) {
+            if (mounted) {
+              _participantController.clear();
+              Navigator.pop(context);
+            }
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(surveyProvider.error!),
+                ),
+              );
+            }
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            ),
+          );
+        }
       }
     }
   }
@@ -35,25 +75,11 @@ class _SurveyAddParticipantsDialogState
   @override
   void dispose() {
     super.dispose();
-    _participantsInSurvey.clear();
-    _participantsToAdd.clear();
-  }
-
-  void _addParticipant() {
-    setState(() {
-      _participantsToAdd.add('');
-    });
-  }
-
-  void _removeParticipant(String email) {
-    setState(() {
-      _participantsToAdd.remove(email);
-    });
+    _participantController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
     final t = AppLocalizations.of(context)!;
@@ -67,102 +93,48 @@ class _SurveyAddParticipantsDialogState
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.survey_add_participants,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                            t.survey_add_participant,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        TextButton.icon(
-                          onPressed: _addParticipant,
-                          icon: const Icon(Icons.add),
-                          label: Text(t.survey_add_new),
-                        ),
-                      ],
                     ),
-                    const SizedBox(height: 20),
-                    ...List.generate(
-                      _participantsToAdd.length,
-                      (index) => Padding(
+                    const SizedBox(height: 30),
+                    Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Autocomplete<String>(optionsViewBuilder:
-                                  (context, onSelected, options) {
-                                return Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Material(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    elevation: 4,
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                                0.8,
-                                      ),
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: options.length,
-                                        itemBuilder: (context, index) =>
-                                            ListTile(
-                                          title: Text(
-                                            options.elementAt(index),
-                                            style: theme.textTheme.bodyLarge,
-                                          ),
-                                          onTap: () {
-                                            onSelected(
-                                                options.elementAt(index));
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }, optionsBuilder:
-                                  (TextEditingValue currentValue) {
-                                return organizationProvider.organization?.users
-                                        ?.where((user) =>
-                                            !_participantsInSurvey
-                                                .contains(user.email) &&
-                                            user.role == 'participant')
-                                        .map((user) => user.email)
-                                        .toList() ??
-                                    [];
-                              }),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.remove_circle,
-                                  color: Colors.red),
-                              onPressed: () =>
-                                  _removeParticipant(_participantsToAdd[index]),
-                            ),
-                          ],
+                        child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _participantController,
+                          decoration: InputDecoration(
+                            hintText: t.user_assign_hint_text,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return t.input_error_required;
+                            }
+                            return null;
+                          },
                         ),
-                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  label: Text(t.survey_add_participants),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                ),
+                const SizedBox(height: 25),
+                ElevatedButton(
+                      onPressed:  _addParticipant,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: Text(t.survey_add_participant),
+                    ),
+
               ],
             ),
           ),

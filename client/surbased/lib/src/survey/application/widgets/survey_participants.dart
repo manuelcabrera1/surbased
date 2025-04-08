@@ -19,9 +19,15 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
     final authProvider = Provider.of<AuthProvider>(context);
     final t = AppLocalizations.of(context)!;
 
+    if (surveyProvider.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     if (surveyProvider.currentSurvey == null || 
-    surveyProvider.currentSurvey!.assignedUsers == null || 
-    surveyProvider.currentSurvey!.assignedUsers!.isEmpty) {
+        surveyProvider.currentSurvey!.assignedUsers == null || 
+        surveyProvider.currentSurvey!.assignedUsers!.isEmpty) {
       return Center(
         child: Text(
           t.survey_no_participants_assigned,
@@ -36,48 +42,91 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
       shrinkWrap: true,
       itemCount: surveyProvider.currentSurvey!.assignedUsers!.length,
       itemBuilder: (context, index) {
+        final user = surveyProvider.currentSurvey!.assignedUsers![index];
+        final isPending = surveyProvider.pendingAssignmentsInCurrentSurvey.contains(user.id.toString());
+
         return ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          trailing: 
-          Row(
+          trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (surveyProvider.currentSurvey!.assignedUsers![index].organizationId != null
-              && surveyProvider.currentSurvey!.assignedUsers![index].organizationId != authProvider.user!.organizationId)
+              if (user.organizationId != null && user.organizationId != authProvider.user!.organizationId)
                 Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(t.external_user,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 30),
-                        
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    t.external_user,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              if (user.organizationId != null && user.organizationId != authProvider.user!.organizationId)
+                const SizedBox(width: 30),
               const Icon(Icons.arrow_forward_ios),
             ],
           ),
           leading: CircleAvatar(
             backgroundColor: theme.colorScheme.primary,
             child: Text(
-              surveyProvider.currentSurvey!.assignedUsers![index].name![0],
+              user.name![0],
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          title: Text(surveyProvider.currentSurvey!.assignedUsers![index].name ?? ''),
-          subtitle: Text(surveyProvider.currentSurvey!.assignedUsers![index].email),
+          title: Row(
+            children: [
+              Text(user.name ?? ''),
+              if (isPending) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Row(
+                          children: [
+                            Icon(
+                              Icons.schedule,
+                              color: theme.colorScheme.inversePrimary,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(t.survey_invitation_pending),
+                          ],
+                        ),
+                        content: Text(
+                          t.survey_invitation_waiting_response(user.email),
+                        ),
+                        actions: [
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(t.ok),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.schedule,
+                    size: 18,
+                    color: theme.colorScheme.inversePrimary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          subtitle: Text(user.email),
         );
       },
     );

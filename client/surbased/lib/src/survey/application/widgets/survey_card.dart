@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
@@ -62,6 +63,37 @@ class SurveyCard extends StatelessWidget {
     );
   }
 
+  Widget _buildStatusLabel(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade100,
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(12),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        t.survey_status_pending,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: Colors.blue.shade700,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.8,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -77,136 +109,148 @@ class SurveyCard extends StatelessWidget {
 
     return Card(
       elevation: 4,
-      child: InkWell(
-        onTap: userRole == 'participant'
-            ? survey.startDate.isBefore(DateTime.now())
-                ? onTap
-                : null
-            : onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                survey.name,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-              Row(
+      child: Stack(
+        children: [
+          InkWell(
+            onTap: userRole == 'participant'
+                ? survey.startDate.isBefore(DateTime.now())
+                    ? onTap
+                    : null
+                : onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    survey.organizationId != null 
-                        ? Icons.business_outlined 
-                        : Icons.person_outline,
-                    size: 18,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      survey.organizationId != null 
-                          ? organizationProvider.getOrganizationName(survey.organizationId!)
-                          : userProvider.getUserEmail(survey.ownerId),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.question_answer_outlined,
-                    size: 18,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 4),
                   Text(
-                    survey.questions.length > 1
-                        ? '${survey.questions.length} preguntas'
-                        : '1 pregunta',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                    survey.name,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    isSurveyAvailable
-                        ? Icons.calendar_month_outlined
-                        : isSurveyNotStarted
-                            ? Icons.lock_outline
-                            : Icons.check_circle_outline,
-                    size: 18,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    isSurveyAvailable
-                        ? t.survey_end_date(
-                            _formatDate(survey.endDate))
-                        : isSurveyNotStarted
-                            ? t.survey_start_date(
-                            _formatDate(survey.startDate))
-                            : t.survey_end_date(
-                            _formatDate(survey.endDate)),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                  if (userRole == 'admin') ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          survey.organizationId != null 
+                              ? Icons.business_outlined 
+                              : Icons.person_outline,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            survey.organizationId != null 
+                                ? organizationProvider.getOrganizationName(survey.organizationId!)
+                                : userProvider.getUserEmail(survey.ownerId),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-              if (survey.tags != null && survey.tags!.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Text(
-                  'Tags:', 
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: [
-                    ...survey.tags!.take(_maxVisibleTags).map((tag) {
-                      final index = survey.tags!.indexOf(tag);
-                      final color = _tagColors[index % _tagColors.length];
-                      return _buildTagChip(context, tag.name, color);
-                    }),
-                    if (survey.tags!.length > _maxVisibleTags)
-                      _buildTagChip(
-                        context,
-                        '+${survey.tags!.length - _maxVisibleTags}',
-                        theme.colorScheme.tertiaryContainer,
-                      ),
                   ],
-                ),
-              ],
-            ],
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.question_answer_outlined,
+                        size: 18,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        survey.questions.length > 1
+                            ? '${survey.questions.length} preguntas'
+                            : '1 pregunta',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        isSurveyAvailable
+                            ? Icons.calendar_month_outlined
+                            : isSurveyNotStarted
+                                ? Icons.lock_outline
+                                : Icons.check_circle_outline,
+                        size: 18,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isSurveyAvailable
+                            ? t.survey_end_date(
+                                _formatDate(survey.endDate))
+                            : isSurveyNotStarted
+                                ? t.survey_start_date(
+                                _formatDate(survey.startDate))
+                                : t.survey_end_date(
+                                _formatDate(survey.endDate)),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                  if (survey.tags != null && survey.tags!.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      'Tags:', 
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.tertiary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: [
+                        ...survey.tags!.take(_maxVisibleTags).map((tag) {
+                          final index = survey.tags!.indexOf(tag);
+                          final color = _tagColors[index % _tagColors.length];
+                          return _buildTagChip(context, tag.name, color);
+                        }),
+                        if (survey.tags!.length > _maxVisibleTags)
+                          _buildTagChip(
+                            context,
+                            '+${survey.tags!.length - _maxVisibleTags}',
+                            theme.colorScheme.tertiaryContainer,
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
-        ),
+          if (survey.assignmentStatus == 'pending')
+            Positioned(
+              top: 0,
+              right: 0,
+              child: _buildStatusLabel(context),
+            ),
+        ],
       ),
     );
   }

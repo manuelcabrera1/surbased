@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  final _baseUrl = 'http://10.0.2.2:8000/users';
+  final _baseUrl = 'http://192.168.1.69:8000/users';
 
   Future<Map<String, dynamic>> register(
       String name,
       String lastname,
+      String role,
       String organization,
       String email,
       String password,
-      String role,
       String birthdate,
       String gender) async {
     try {
@@ -227,6 +227,40 @@ class AuthService {
           'success': false,
           'data': json.decode(utf8.decode(response.bodyBytes))['detail']
         };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> acceptSurveyAssignment(String userId, String surveyId, String token) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/$userId/surveys/$surveyId/accept'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      } else {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> rejectSurveyAssignment(String userId, String surveyId, String token) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/$userId/surveys/$surveyId/reject'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      } else {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};

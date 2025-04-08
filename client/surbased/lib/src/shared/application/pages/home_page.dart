@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/organization/application/organization_section.dart';
+import 'package:surbased/src/organization/application/widgets/organization_section.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/shared/application/widgets/create_resource_dialog.dart';
 import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
@@ -15,8 +15,11 @@ import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/user/application/widgets/user_list.dart';
 import 'package:surbased/src/user/application/widgets/user_profile.dart';
 import 'dart:async';
-import '../../../organization/application/organization_list.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../../organization/application/widgets/organization_list.dart';
 import '../../../survey/application/widgets/survey_explore.dart';
+import '../../../survey/application/pages/survey_invitation_dialog.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -33,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _refreshData();
+      _checkForInvitation();
     });
   }
 
@@ -45,7 +49,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    //_startPeriodicRefresh();
+    //_startPeriodicRefresh
+    _checkForInvitation();
   }
 
   void _startPeriodicRefresh() {
@@ -68,6 +73,22 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _currentIndex = index;
       });
+    }
+  }
+
+  void _checkForInvitation() {
+    final message = ModalRoute.of(context)?.settings.arguments;
+    if (message != null && message is RemoteMessage) {
+      if (message.data['type'] == 'survey_invitation') {
+        showDialog(
+          context: context,
+          builder: (context) => SurveyInvitationDialog(
+            surveyId: message.notification?.body ?? '',
+            surveyName: message.notification?.title ?? '',
+            inviterName: message.notification?.title ?? '',
+          ),
+        );
+      }
     }
   }
 
@@ -128,6 +149,11 @@ class _HomePageState extends State<HomePage> {
                 );
 
         if (authProvider.user!.organizationId != null) {
+          await surveyProvider.getSurveysByOwner(
+            authProvider.user!.id,
+            authProvider.token!,
+          );
+          
           await organizationProvider.getCurrentOrganization(
             authProvider.user!.organizationId!,
             authProvider.token!,
@@ -140,10 +166,7 @@ class _HomePageState extends State<HomePage> {
           await organizationProvider.getUsersInOrganization(
             authProvider.token!,
           );
-          await surveyProvider.getSurveysByOwner(
-            authProvider.user!.id,
-            authProvider.token!,
-          );
+          
 
         }
 

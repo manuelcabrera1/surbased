@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
-import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/shared/application/provider/firebase_provider.dart';
+import 'package:surbased/src/shared/infrastructure/firebase_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final firebaseProvider = Provider.of<FirebaseProvider>(context, listen: false);
         final isLogged = await authProvider.login(
           _emailController.text,
           _passwordController.text,
@@ -49,6 +49,9 @@ class _LoginPageState extends State<LoginPage> {
 
         if (isLogged && mounted) {
           _navigateToHome();
+          if (authProvider.token != null && authProvider.user != null) {
+            await firebaseProvider.sendFcmToken(authProvider.token!, authProvider.user!.id);
+          }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

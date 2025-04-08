@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:surbased/src/survey/domain/answer_model.dart';
 
 class SurveyService {
-  final String _baseUrl = 'http://10.0.2.2:8000';
+  final String _baseUrl = 'http://192.168.1.69:8000';
 
   Future<Map<String, dynamic>> createSurvey(
       Map<String, dynamic> survey, String token) async {
@@ -195,6 +195,33 @@ class SurveyService {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addUserToSurvey(String surveyId, String email, String token, String notificationTitle, String notificationBody) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/surveys/$surveyId/users/add'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'email': email, 'notification_title': notificationTitle, 'notification_body': notificationBody}),
       );
 
       if (response.statusCode == 200) {

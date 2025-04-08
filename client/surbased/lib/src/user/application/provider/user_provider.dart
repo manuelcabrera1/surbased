@@ -46,6 +46,9 @@ class UserProvider with ChangeNotifier {
   }
 
   String getUserEmail(String userId) {
+    if (_users.isEmpty) {
+      return '';
+    }
     return _users.firstWhere((user) => user.id == userId).email;
   }
 

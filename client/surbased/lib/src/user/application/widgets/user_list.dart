@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/organization/application/organization_users_filter_dialog.dart';
+import 'package:surbased/src/organization/application/widgets/organization_users_filter_dialog.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
