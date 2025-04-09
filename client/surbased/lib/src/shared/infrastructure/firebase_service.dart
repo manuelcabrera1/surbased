@@ -80,4 +80,28 @@ class FirebaseService {
       return {'success': false, 'message': 'Failed to send token: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> deleteFcmToken(String jwtToken, String userId, String fcmToken) async {
+    try {
+        final response = await http.delete(
+          Uri.parse(_baseUrl),
+          headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: json.encode({
+          'fcm_token': fcmToken,
+          'user_id': userId,
+        }),
+      );
+
+      if (response.statusCode == 204) {
+        return {'success': true, 'message': 'Token deleted successfully'};
+      } else {
+        return {'success': false, 'message': 'Failed to delete token'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to delete token: $e'};
+    }
+  }
 }

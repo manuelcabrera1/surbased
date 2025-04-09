@@ -74,7 +74,6 @@ async def send_forgot_password(forgot_password: MailForgotPassword,
     user = result.unique().scalars().first()
 
     if not user:
-        print("iyooo aqui estoy llegando con la calo")
         raise HTTPException(status_code=404, detail="User not found")
     
     try:

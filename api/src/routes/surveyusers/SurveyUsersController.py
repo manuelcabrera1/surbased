@@ -96,7 +96,7 @@ async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User,
         """
        
         #buscamos los cuestionarios asignados al usuario
-        result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(and_(survey_user.c.user_id == id)))
+        result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(and_(survey_user.c.user_id == id, Survey.end_date >= datetime.now())))
         surveys_assigned = result.all()
 
         surveys = []
@@ -154,13 +154,16 @@ async def assign_users_to_survey(id: uuid.UUID, user: AssignParticipantToSurvey,
                 raise HTTPException(status_code=400, detail=f"User with email {user.email} already assigned to this survey")
              
         assignment_query = await db.execute(
-            select(survey_user)
+            select(survey_user.c.user_id, 
+                   survey_user.c.survey_id, 
+                   survey_user.c.status, 
+                   survey_user.c.invitations_rejected)
             .where(and_(
             survey_user.c.user_id == existing_user.id,
             survey_user.c.survey_id == existing_survey.id
             ))
         )
-        existing_assignment = assignment_query.unique().scalars().first()
+        existing_assignment = assignment_query.first()
 
          
     
@@ -194,7 +197,8 @@ async def assign_users_to_survey(id: uuid.UUID, user: AssignParticipantToSurvey,
                 if existing_assignment.invitations_rejected >= 3:
                     raise HTTPException(status_code=400, detail=f"User with email {user.email} already rejected this survey 3 times. They can't be invited again.")
                 else:
-                    existing_assignment.status = AssignmentStatusEnum.pending
+                    update_assignment = survey_user.update().values(status=AssignmentStatusEnum.pending).where(and_(survey_user.c.user_id == existing_user.id, survey_user.c.survey_id == existing_survey.id))
+                    await db.execute(update_assignment)
                     await db.commit()
         
         else: 

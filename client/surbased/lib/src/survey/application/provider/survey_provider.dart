@@ -294,7 +294,7 @@ class SurveyProvider extends ChangeNotifier {
       );
 
       if (addUserToSurveyResponse['success']) {
-        //_currentSurvey!.assignedUsers!.add(User.fromJson(addUserToSurveyResponse['data']));
+        _currentSurvey!.assignedUsers!.add(User.fromJson(addUserToSurveyResponse['data']));
         _error = null;
         _isLoading = false;
         notifyListeners();

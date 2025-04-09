@@ -34,4 +34,25 @@ async def register_user_fcm_token(user_fcm_token: UserFcmTokenCreate, db: Annota
     else:
         return {"message": "Token already registered"}
 
+
+@user_fcm_token_router.delete("", status_code=204)
+async def delete_user_fcm_token(user_fcm_token: UserFcmTokenCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
+
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    
+    
+
+    
+    result = await db.execute(select(UserFcmToken).where(and_(UserFcmToken.user_id == user_fcm_token.user_id, UserFcmToken.fcm_token == user_fcm_token.fcm_token)))
+    existing_token = result.unique().scalars().first()
+
+    if not existing_token:
+        raise HTTPException(status_code=404, detail="Token not found")
+
+    await db.delete(existing_token)
+    await db.commit()
+
+    return {"message": "Token deleted successfully"}
+
     

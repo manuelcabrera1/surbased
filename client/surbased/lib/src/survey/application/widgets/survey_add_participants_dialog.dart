@@ -21,6 +21,7 @@ class _SurveyAddParticipantsDialogState
 
 
   void _addParticipant() async {
+    print('mano que yo aqui llegue');
     if (_formKey.currentState!.validate()) {  
       final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);

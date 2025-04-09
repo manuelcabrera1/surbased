@@ -44,5 +44,35 @@ class FirebaseProvider with ChangeNotifier {
     
   }
 
+
+  Future<bool> deleteFcmToken(String jwtToken, String userId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+
+      final response = await _firebaseService.deleteFcmToken(jwtToken, userId, _token!);
+      if (response['success']) {
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return true;
+      } else {
+        _error = response['message'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    
+    
+  }
+
 }
 

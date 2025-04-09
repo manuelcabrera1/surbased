@@ -134,7 +134,7 @@ class _SurveyListState extends State<SurveyList> {
   }
 
   void _showFilterDialog() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
       builder: (context) => const SurveyListFilterDialog(),
     );

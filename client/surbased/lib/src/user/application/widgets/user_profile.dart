@@ -4,6 +4,7 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/shared/application/provider/firebase_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/user/application/widgets/user_settings_section.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -29,11 +30,17 @@ class _UserProfileState extends State<UserProfile> {
           Provider.of<SurveyProvider>(context, listen: false);
       final categoryProvider =
           Provider.of<CategoryProvider>(context, listen: false);
+      final firebaseProvider =
+          Provider.of<FirebaseProvider>(context, listen: false);
+      if (authProvider.token != null && authProvider.user != null) {
+        await firebaseProvider.deleteFcmToken(authProvider.token!, authProvider.user!.id);
+      }
 
       //clean all providers
       organizationProvider.clearState();
       surveyProvider.clearState();
       categoryProvider.clearState();
+     
       await authProvider.logout();
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
