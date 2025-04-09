@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/app.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
@@ -21,6 +22,8 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await FlutterDownloader.initialize();
 
   final firebaseProvider = FirebaseProvider();
   await firebaseProvider.initNotifications();

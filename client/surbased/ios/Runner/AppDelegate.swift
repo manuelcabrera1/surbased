@@ -11,6 +11,7 @@ import flutter_local_notifications
     FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { registry in
       GeneratedPluginRegistrant.register(with: registry)
     }
+    FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
     GeneratedPluginRegistrant.register(with: self)
 
     if #available(iOS 10.0, *) {
@@ -18,4 +19,10 @@ import flutter_local_notifications
     }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+  
+  private func registerPlugins(registry: FlutterPluginRegistry) {
+    if (!registry.hasPlugin("FlutterDownloaderPlugin")) {
+       FlutterDownloaderPlugin.register(with: registry.registrar(forPlugin: "FlutterDownloaderPlugin")!)
+    }
+}
 }

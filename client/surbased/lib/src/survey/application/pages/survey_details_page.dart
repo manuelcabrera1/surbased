@@ -4,6 +4,7 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/widgets/survey_add_participants_dialog.dart';
 import 'package:surbased/src/survey/application/widgets/survey_answers.dart';
+import 'package:surbased/src/survey/application/widgets/survey_answers_download_dialog.dart';
 import 'package:surbased/src/survey/application/widgets/survey_participants.dart';
 
 import '../../domain/survey_model.dart';
@@ -177,6 +178,13 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     );
   }
 
+  void _showDownloadDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => SurveyAnswersDownloadDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -247,6 +255,18 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
                                 color: theme.colorScheme.primary),
                             const SizedBox(width: 12),
                             Text(t.remove),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => _showDownloadDialog(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.download,
+                                color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text(t.survey_download_answers),
                           ],
                         ),
                       ),

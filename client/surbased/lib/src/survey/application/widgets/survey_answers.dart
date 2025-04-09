@@ -6,6 +6,7 @@ import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
+import 'package:surbased/src/survey/application/widgets/survey_answers_download_dialog.dart';
 
 class SurveyAnswers extends StatefulWidget {
   const SurveyAnswers({super.key});
@@ -117,19 +118,29 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Resumen General',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: () => _showDownloadDialog(),
+                icon: const Icon(Icons.download),
+                label: const Text('Descargar'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Resumen General',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -199,6 +210,13 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showDownloadDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const SurveyAnswersDownloadDialog(),
     );
   }
 }

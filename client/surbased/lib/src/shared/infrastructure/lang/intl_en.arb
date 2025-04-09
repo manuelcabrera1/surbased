@@ -15,6 +15,7 @@
     "go_forward": "Continue",
     "go_back": "Return",
     "submit": "Submit",
+    "export": "Export",
     "required": "Required",
     "email": "Email",
     "password": "Password",
@@ -205,5 +206,8 @@
     "survey_status_pending": "PENDING",
     "survey_invitation_pending": "Pending invitation",
     "survey_invitation_waiting_response": "{email} has a pending invitation to answer this survey. Wait for the user response.",
-    "ok": "OK"
+    "ok": "OK",
+    "survey_download_answers": "Export answers",
+    "survey_download_answers_filename": "File Name",
+    "survey_download_answers_format": "Format"
 }
