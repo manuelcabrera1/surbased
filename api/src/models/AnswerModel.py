@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class Answer(Base):
     __tablename__ = "answers"
 
-    participant_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), primary_key=True)
     option_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("options.id"))
     question_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("questions.id"), primary_key=True)
     text: Mapped[str] = mapped_column(String(250), nullable=True)

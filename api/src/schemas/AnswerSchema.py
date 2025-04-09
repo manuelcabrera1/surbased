@@ -7,6 +7,10 @@ from schemas.QuestionSchema import *
 
 class AnswerBase(BaseModel):...
 
+class AvailableFormatsEnum(str, Enum):
+    csv = "csv"
+    excel = "excel"
+
 class AnswerCreate(AnswerBase):
     questions: List[QuestionAnswer]
 

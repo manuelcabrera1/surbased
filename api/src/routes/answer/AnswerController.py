@@ -1,6 +1,8 @@
+import io
 from typing import Annotated
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy import delete, or_, select, update, and_
 from schemas.UserSchema import UserRoleEnum
 from schemas.SurveySchema import SurveyScopeEnum
@@ -16,6 +18,7 @@ from auth.Auth import get_current_user, required_roles
 from models.UserModel import User
 from models.SurveyUserModel import survey_user
 from datetime import datetime
+import pandas as pd
 
 
 
@@ -60,10 +63,10 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
             raise HTTPException(status_code=400, detail="Question not found in this survey")
         
         #check if there are previous answers registered for this question
-        result = await db.execute(select(Answer).where(Answer.question_id == q.id, Answer.participant_id == current_user.id))
+        result = await db.execute(select(Answer).where(Answer.question_id == q.id, Answer.user_id == current_user.id))
         answers = result.unique().scalars().all()
         if answers:
-            await db.execute(delete(Answer).where(Answer.question_id == q.id, Answer.participant_id == current_user.id))
+            await db.execute(delete(Answer).where(Answer.question_id == q.id, Answer.user_id == current_user.id))
         
         option_count = 0
         if question.type == QuestionTypeEnum.open:
@@ -98,7 +101,7 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
 
             if question.type == QuestionTypeEnum.open:
                 new_answer = Answer(
-                    participant_id=current_user.id,
+                    user_id=current_user.id,
                     text=question.text,
                     question_id=question.id,
                 )
@@ -106,7 +109,7 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
             else:
                 for option in question.options:
                     new_answer = Answer(
-                        participant_id=current_user.id,
+                        user_id=current_user.id,
                         option_id=option.id,
                         question_id=question.id,
                     )
@@ -141,7 +144,7 @@ async def get_all_user_answers(current_user: Annotated[User, Depends(get_current
         .join(Option, Answer.option_id == Option.id)
         .join(Question, Answer.question_id == Question.id)
         .join(Survey, Question.survey_id == Survey.id)
-        .where(Answer.participant_id == current_user.id)
+        .where(Answer.user_id == current_user.id)
     )
     answers = result.all()
 
@@ -217,8 +220,8 @@ async def get_survey_answers(
     result = await db.execute(
         select(Answer, Option, Question, User)
         .join(Question, Answer.question_id == Question.id)
-        .join(User, Answer.participant_id == User.id)
-        .outerjoin(Option, Answer.option_id == Option.id)  # Usamos outerjoin para incluir respuestas sin opciones (texto)
+        .join(User, Answer.user_id == User.id)
+        .outerjoin(Option, Answer.option_id == Option.id)
         .where(Question.survey_id == survey_id)
     )
     answers = result.all()
@@ -281,6 +284,102 @@ async def get_survey_answers(
         "answers": answers_list,
         "length": len(answers_list)
     }
+
+@answer_router.get("/surveys/{survey_id}/answers/export/{format}", status_code=200)
+async def export_survey_answers(
+    survey_id: uuid.UUID,
+    format: AvailableFormatsEnum,
+    filename: str,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    
+    # Verificar que el usuario tiene acceso a la encuesta
+    result = await db.execute(select(Survey).where(Survey.id == survey_id))
+    survey = result.unique().scalars().first()
+    
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Verificar permisos según el scope de la encuesta
+    if survey.scope == SurveyScopeEnum.private:
+        # Verificar si el usuario está asignado a la encuesta
+        result = await db.execute(
+            select(survey_user).where(
+                and_(
+                    survey_user.c.user_id == current_user.id,
+                    survey_user.c.survey_id == survey_id
+                )
+            )
+        )
+        assignment = result.unique().scalars().first()
+
+        if not assignment and survey.owner_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied: User not assigned to this survey")
+
+    elif survey.scope == SurveyScopeEnum.organization:
+        # Verificar si el usuario pertenece a la misma organización
+        if current_user.organization_id != survey.organization_id and current_user.role != UserRoleEnum.admin:
+            raise HTTPException(status_code=403, detail="Access denied: User not in the same organization")
+
+    # Obtener todas las respuestas de la encuesta
+    result = await db.execute(
+        select(Question.description.label("question"), User.email.label("user_email"), Option.description.label("option"), Answer.text.label("answer"))
+        .select_from(Survey)
+        .join(Question, Survey.id == Question.survey_id)
+        .join(Answer, Question.id == Answer.question_id)
+        .join(User, Answer.user_id == User.id)
+        .outerjoin(Option, Answer.option_id == Option.id)
+        .where(Survey.id == survey_id)
+    )
+    answers = result.all()
+
+    answers_list = []
+    questions_list = []
+
+    for question, user_email, option, answer in answers:
+        if question not in questions_list:
+            questions_list.append(question)
+        if option:
+            answers_list.append({
+                "question": question,
+                "user_email": user_email,
+                "answer": option,
+            })
+        else:
+            answers_list.append({
+                "question": question,
+                "user_email": user_email,
+                "answer": answer,
+            })
+        
+    # Convertir las respuestas a un DataFrame
+    df = pd.DataFrame(answers_list)
+    df = df.pivot(index='user_email', columns='question', values='answer')
+    df = df.reset_index().rename(columns={'user_email': 'user'})
+
+    if format == AvailableFormatsEnum.csv:
+
+        IO = io.StringIO()
+        df.to_csv(IO, index=False)
+
+        return StreamingResponse(
+            content=iter([IO.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}.csv"}
+        )
+    elif format == AvailableFormatsEnum.excel:
+
+        IO = io.BytesIO()
+        df.to_excel(IO, index=False)
+
+        return StreamingResponse(
+            content=iter([IO.getvalue()]),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}.xlsx"}
+        )
 
 
     
