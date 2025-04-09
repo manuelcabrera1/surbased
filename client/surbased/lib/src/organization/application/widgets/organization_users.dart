@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/organization/application/widgets/organization_users_filter_dialog.dart';
+import 'package:surbased/src/organization/application/widgets/user_filter_dialog.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
@@ -18,6 +18,9 @@ class OrganizationUsers extends StatefulWidget {
 class _OrganizationUsersState extends State<OrganizationUsers> {
   final SearchController _searchController = SearchController();
   List<User> _usersToShow = [];
+  String _sortField = 'name';
+  bool _isAscending = true;
+  String? _selectedRole;
 
   @override
   void didChangeDependencies() {
@@ -49,21 +52,83 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
       setState(() {
         _usersToShow = organizationProvider.organization!.users!
             .where((user) =>
-                user.name?.toLowerCase().contains(_searchController.text.toLowerCase()) ??
+                // Filtro por texto
+                (user.name?.toLowerCase().contains(_searchController.text.toLowerCase()) ??
                 false ||
                     user.email
                         .toLowerCase()
                         .contains(_searchController.text.toLowerCase()))
+                // Filtro por rol
+                && (_selectedRole == null || user.role == _selectedRole)
+            )
             .toList();
+            
+        // Aplicar ordenamiento
+        _applySorting();
       });
     }
+  }
+  
+  void _applySorting() {
+    _usersToShow.sort((a, b) {
+      int result;
+      
+      switch (_sortField) {
+        case 'name':
+          result = (a.name ?? '').compareTo(b.name ?? '');
+          break;
+        case 'email':
+          result = a.email.compareTo(b.email);
+          break;
+        case 'role':
+          result = a.role.compareTo(b.role);
+          break;
+        default:
+          result = (a.name ?? '').compareTo(b.name ?? '');
+      }
+      
+      return _isAscending ? result : -result;
+    });
   }
 
   void _showFilterDialog() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => const OrganizationUsersFilterDialog(),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      builder: (context) => UserFilterDialog(
+        currentSortField: _sortField,
+        isAscending: _isAscending,
+        selectedRole: _selectedRole,
+        onApplyFilter: (sortField, isAscending, role) {
+          setState(() {
+            _sortField = sortField;
+            _isAscending = isAscending;
+            _selectedRole = role;
+            filterUsers();
+          });
+        },
+        areFromSameOrganization: true,
+      ),
     );
+  }
+
+  String _getSortFieldName(String field) {
+    switch (field) {
+      case 'name':
+        return 'Nombre';
+      case 'email':
+        return 'Email';
+      case 'role':
+        return 'Rol';
+      default:
+        return 'Nombre';
+    }
   }
 
   @override
@@ -75,6 +140,11 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
 
     if (authProvider.isLoading || organizationProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    // Aplicar ordenamiento por defecto la primera vez
+    if (_usersToShow.isNotEmpty) {
+      _applySorting();
     }
 
     return Column(
@@ -136,7 +206,22 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 24),
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                child: Row(
+                  children: [
+                    Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                    Text(
+                      _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (_usersToShow.isEmpty)
               Expanded(
                 child: Center(

@@ -277,6 +277,9 @@ class SurveyProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  bool checkIfAllSurveysBelongToAnOrganization(List<Survey> surveys) {
+    return surveys.every((survey) => survey.organizationId != null);
+  }
 
   Future<bool> addUserToSurvey(String surveyId, String email, String token) async {
     try {

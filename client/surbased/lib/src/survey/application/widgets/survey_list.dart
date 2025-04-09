@@ -29,6 +29,10 @@ class _SurveyListState extends State<SurveyList> {
   final _searchController = SearchController();
   String? _selectedCategory;
   List<Survey> _surveysToShow = [];
+  String _sortField = 'endDate';
+  bool _isAscending = false;
+  DateTime? _startDateFilter;
+  DateTime? _endDateFilter;
 
   @override
   void dispose() {
@@ -120,25 +124,110 @@ class _SurveyListState extends State<SurveyList> {
         _surveysToShow = widget.surveys
             .where((survey) {
                 String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
+                
+                // Filtrado por texto de búsqueda y categoría
                 bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
                 categoryName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
                 (survey.tags != null && survey.tags!.any((tag) => tag.name.toLowerCase().contains(_searchController.text.toLowerCase())))
                 || survey.organizationId != null && organizationProvider.getOrganizationName(survey.organizationId!).toLowerCase().contains(_searchController.text.toLowerCase())
                 || userProvider.getUserEmail(survey.ownerId).toLowerCase().contains(_searchController.text.toLowerCase());
+                
                 bool category = _selectedCategory == null || _selectedCategory == survey.categoryId;
-                return search && category;
+                
+                // Filtrado por fecha de inicio
+                bool startDateMatch = _startDateFilter == null || 
+                    !survey.startDate.isBefore(_startDateFilter!);
+                
+                // Filtrado por fecha de fin
+                bool endDateMatch = _endDateFilter == null || 
+                    !survey.endDate.isAfter(_endDateFilter!);
+                
+                return search && category && startDateMatch && endDateMatch;
             })
             .toList();
+        
+        // Aplicar ordenamiento
+        _applySorting();
       });
     }
   }
 
+  void _applySorting() {
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+    _surveysToShow.sort((a, b) {
+      int result;
+      switch (_sortField) {
+        case 'name':
+          result = a.name.compareTo(b.name);
+          break;
+        case 'startDate':
+          result = a.startDate.compareTo(b.startDate);
+          break;
+        case 'endDate':
+          result = a.endDate.compareTo(b.endDate);
+          break;
+        case 'organization':
+          result = organizationProvider.getOrganizationName(a.organizationId!).compareTo(organizationProvider.getOrganizationName(b.organizationId!));
+          break;
+        case 'questions':
+          result = a.questions.length.compareTo(b.questions.length);
+          break;
+        default:
+          result = a.endDate.compareTo(b.endDate);
+      }
+      
+      return _isAscending ? result : -result;
+    });
+  }
+
   void _showFilterDialog() {
-    showDialog(
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+    final canFilterByOrganization = surveyProvider.checkIfAllSurveysBelongToAnOrganization(widget.surveys);
+    showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
-      builder: (context) => const SurveyListFilterDialog(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      builder: (context) => SurveyListFilterDialog(
+        currentSortField: _sortField,
+        isAscending: _isAscending,
+        startDateFilter: _startDateFilter,
+        endDateFilter: _endDateFilter,
+        onApplyFilter: (sortField, isAscending, startDate, endDate) {
+          setState(() {
+            _sortField = sortField;
+            _isAscending = isAscending;
+            _startDateFilter = startDate;
+            _endDateFilter = endDate;
+            filterSurveys();
+          });
+        },
+        canFilterByOrganization: canFilterByOrganization,
+      ),
     );
   }
+
+  String _getSortFieldName(String field) {
+    switch (field) {
+      case 'name':
+        return 'Nombre';
+      case 'startDate':
+        return 'Fecha de inicio';
+      case 'endDate':
+        return 'Fecha de fin';
+      case 'organization':
+        return 'Organización';
+      case 'questions':
+        return 'Número de preguntas';
+      default:
+        return 'Nombre';
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +245,11 @@ class _SurveyListState extends State<SurveyList> {
 
     if (surveyProvider.isLoading || categoryProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    // Aplicar ordenamiento por defecto la primera vez
+    if (_surveysToShow.isNotEmpty) {
+      _applySorting();
     }
 
     return Column(
@@ -255,6 +349,22 @@ class _SurveyListState extends State<SurveyList> {
             ],
           ),
         ),
+        const SizedBox(height: 24),
+        Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
+                  children: [
+                    Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                    Text(
+                      _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
         if (widget.surveys.isEmpty || _surveysToShow.isEmpty) ...[
           Expanded(
             child: Column(

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/organization/application/widgets/organization_users_filter_dialog.dart';
+import 'package:surbased/src/organization/application/widgets/user_filter_dialog.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
@@ -19,6 +19,9 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   final SearchController _searchController = SearchController();
   List<User> _usersToShow = [];
+  String _sortField = 'name';
+  bool _isAscending = true;
+  String? _selectedRole;
 
   @override
   void didChangeDependencies() {
@@ -55,7 +58,8 @@ class _UserListState extends State<UserList> {
       setState(() {
         _usersToShow = userProvider.users
             .where((user) =>
-                (user.name != null && user.name!.toLowerCase().contains(_searchController.text.toLowerCase())) ||
+                // Filtro de búsqueda por texto
+                ((user.name != null && user.name!.toLowerCase().contains(_searchController.text.toLowerCase())) ||
                     (user.email
                         .toLowerCase()
                         .contains(_searchController.text.toLowerCase()))
@@ -69,16 +73,88 @@ class _UserListState extends State<UserList> {
                         .toLowerCase()
                         .contains(_searchController.text.toLowerCase()))
                     )
-                      
+                // Filtro por rol seleccionado
+                && (_selectedRole == null || user.role == _selectedRole)
+            )
             .toList();
+            
+        // Aplicar ordenamiento
+        _applySorting();
       });
     }
+  }
+
+  String _getSortFieldName(String field) {
+    switch (field) {
+      case 'name':
+        return 'Nombre';
+      case 'email':
+        return 'Email';
+      case 'role':
+        return 'Rol';
+      case 'organization':
+        return 'Organización';
+      default:
+        return 'Nombre';
+    }
+  }
+
+  
+  void _applySorting() {
+    _usersToShow.sort((a, b) {
+      int result;
+      final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+      
+      switch (_sortField) {
+        case 'name':
+          result = (a.name ?? '').compareTo(b.name ?? '');
+          break;
+        case 'email':
+          result = a.email.compareTo(b.email);
+          break;
+        case 'role':
+          result = a.role.compareTo(b.role);
+          break;
+        case 'organization':
+          final orgNameA = a.organizationId != null 
+              ? organizationProvider.getOrganizationName(a.organizationId!)
+              : '';
+          final orgNameB = b.organizationId != null 
+              ? organizationProvider.getOrganizationName(b.organizationId!)
+              : '';
+          result = orgNameA.compareTo(orgNameB);
+          break;
+        default:
+          result = (a.name ?? '').compareTo(b.name ?? '');
+      }
+      
+      return _isAscending ? result : -result;
+    });
   }
 
   void _showFilterDialog() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => const OrganizationUsersFilterDialog(),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      builder: (context) => UserFilterDialog(
+        currentSortField: _sortField,
+        isAscending: _isAscending,
+        selectedRole: _selectedRole,
+        onApplyFilter: (sortField, isAscending, role) {
+          setState(() {
+            _sortField = sortField;
+            _isAscending = isAscending;
+            _selectedRole = role;
+            filterUsers();
+          });
+        },
+      ),
     );
   }
 
@@ -108,6 +184,11 @@ class _UserListState extends State<UserList> {
 
     if (authProvider.isLoading || organizationProvider.isLoading || userProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    // Aplicar ordenamiento por defecto la primera vez
+    if (_usersToShow.isNotEmpty) {
+      _applySorting();
     }
 
     return SafeArea(
@@ -179,7 +260,22 @@ class _UserListState extends State<UserList> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 24),
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                child: Row(
+                  children: [
+                    Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                    Text(
+                      _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
                       if (_usersToShow.isEmpty) ...[
                       Expanded(
                         child: Column(

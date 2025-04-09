@@ -120,12 +120,12 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Resumen General',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                children: [
+                  Text(
+                    'Resumen General',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               FilledButton.icon(
                 onPressed: () => _showDownloadDialog(),
@@ -133,8 +133,8 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
                 label: const Text('Descargar'),
               ),
             ],
-          ),
-          const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
