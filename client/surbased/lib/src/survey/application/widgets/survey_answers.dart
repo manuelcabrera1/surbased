@@ -292,21 +292,21 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        description,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Total respuestas: $totalResponses',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Total respuestas: $totalResponses',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
                       ),
                     ],
                   ),
@@ -455,31 +455,31 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
 
   Widget _buildDescriptiveStats(Map<String, double> stats, ThemeData theme) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStatBox('Media', stats['mean']?.toStringAsFixed(2) ?? '0.00', theme),
-                _buildStatBox('Mediana', stats['median']?.toStringAsFixed(2) ?? '0.00', theme),
-                _buildStatBox('Moda', stats['mode']?.toStringAsFixed(2) ?? '0.00', theme),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatBox('Media', stats['mean']?.toStringAsFixed(2) ?? '0.00', theme),
+                    _buildStatBox('Mediana', stats['median']?.toStringAsFixed(2) ?? '0.00', theme),
+                    _buildStatBox('Moda', stats['mode']?.toStringAsFixed(2) ?? '0.00', theme),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatBox('Desv. Est.', stats['stdDev']?.toStringAsFixed(2) ?? '0.00', theme),
+                    _buildStatBox('Mínimo', stats['min']?.toInt().toString() ?? '0', theme),
+                    _buildStatBox('Máximo', stats['max']?.toInt().toString() ?? '0', theme),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatBox('Desv. Est.', stats['stdDev']?.toStringAsFixed(2) ?? '0.00', theme),
-                _buildStatBox('Mínimo', stats['min']?.toInt().toString() ?? '0', theme),
-                _buildStatBox('Máximo', stats['max']?.toInt().toString() ?? '0', theme),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -700,91 +700,91 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
           Container(
             height: 240,
             padding: const EdgeInsets.only(left: 24, right: 16),
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: 100,
-                minY: 0,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    tooltipBgColor: theme.colorScheme.surface,
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              maxY: 100,
+              minY: 0,
+              barTouchData: BarTouchData(
+                enabled: true,
+                touchTooltipData: BarTouchTooltipData(
+                  tooltipBgColor: theme.colorScheme.surface,
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final option = sortedOptions[group.x.toInt()];
                       final percentage = double.parse(option.value['percentage']);
                       final count = option.value['count'] as int;
-                      return BarTooltipItem(
+                    return BarTooltipItem(
                         '${option.value['description']}\n$count respuestas (${percentage.toStringAsFixed(1)}%)',
                         TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
                           fontSize: 12,
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
+              ),
+              titlesData: FlTitlesData(
+                show: true,
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
                       reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        if (value < 0 || value >= sortedOptions.length) return const Text('');
+                    getTitlesWidget: (value, meta) {
+                      if (value < 0 || value >= sortedOptions.length) return const Text('');
                         
                         String description = sortedOptions[value.toInt()].value['description'];
                         
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
                             description,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
-                            textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                          ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 20,
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 20,
                       reservedSize: 24,
-                      getTitlesWidget: (value, meta) {
+                    getTitlesWidget: (value, meta) {
                         if (value % 20 != 0) return const Text('');
-                        return Padding(
+                      return Padding(
                           padding: const EdgeInsets.only(right: 2),
-                          child: Text(
+                        child: Text(
                             '${value.toInt()}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.w400,
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
-                gridData: FlGridData(
-                  show: true,
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              gridData: FlGridData(
+                show: true,
                   drawVerticalLine: false,
-                  horizontalInterval: 20,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
+                horizontalInterval: 20,
+                getDrawingHorizontalLine: (value) {
+                  return FlLine(
                       color: theme.colorScheme.outline.withOpacity(0.3),
                       strokeWidth: value % 40 == 0 ? 1.0 : 0.5,
-                    );
-                  },
-                ),
+                  );
+                },
+              ),
                 borderData: FlBorderData(
                   show: true,
                   border: Border(
@@ -792,7 +792,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                     left: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5), width: 1),
                   ),
                 ),
-                barGroups: sortedOptions.asMap().entries.map((entry) {
+              barGroups: sortedOptions.asMap().entries.map((entry) {
                   final index = entry.key;
                   final option = entry.value;
                   final percentage = double.parse(option.value['percentage']);
@@ -801,27 +801,27 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                   final barWidth = sortedOptions.length <= 2 ? 36.0 : 
                                    sortedOptions.length <= 3 ? 28.0 : 22.0;
                   
-                  return BarChartGroupData(
+                return BarChartGroupData(
                     x: index,
-                    barRods: [
-                      BarChartRodData(
+                  barRods: [
+                    BarChartRodData(
                         toY: percentage,
                         color: colors[index % colors.length],
                         width: barWidth,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),
                           topRight: Radius.circular(4),
-                        ),
                       ),
-                    ],
-                  );
-                }).toList(),
-              ),
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
           ),
-          
+        ),
+
           // Leyenda
-          Padding(
+        Padding(
             padding: const EdgeInsets.only(top: 16, bottom: 4),
             child: Center(
               child: Wrap(
@@ -841,34 +841,34 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                       color: colors[index % colors.length].withOpacity(0.1),
                       border: Border.all(color: colors[index % colors.length].withOpacity(0.3)),
                     ),
-                    child: Row(
+                  child: Row(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
                             color: colors[index % colors.length],
-                            shape: BoxShape.circle,
-                          ),
+                          shape: BoxShape.circle,
                         ),
+                      ),
                         const SizedBox(width: 6),
-                        Text(
+                      Text(
                           '${option.value['description']}: $count (${percentage.toStringAsFixed(1)}%)',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                             fontSize: 11,
-                          ),
                         ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
               ),
-            ),
           ),
-        ],
+        ),
+      ],
       ),
     );
   }
@@ -884,14 +884,14 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
           final percentage = double.parse(option.value['percentage']);
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
+      child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+        children: [
+          Text(
                   option.value['description'],
                   style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 4),
+          ),
+          const SizedBox(height: 4),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
@@ -902,14 +902,14 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+          Text(
                   '${percentage.toStringAsFixed(1)}%',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+              color: theme.colorScheme.onSurfaceVariant,
             ),
+          ),
+        ],
+      ),
           );
         }).toList(),
       ],
