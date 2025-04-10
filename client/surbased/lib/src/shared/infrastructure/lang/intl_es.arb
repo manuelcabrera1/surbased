@@ -198,5 +198,6 @@
     "survey_status_pending": "PENDIENTE",
     "survey_invitation_pending": "Invitación pendiente",
     "survey_invitation_waiting_response": "{email} tiene una invitación pendiente para responder a este cuestionario. Espera la respuesta del usuario.",
-    "ok": "Aceptar"
+    "ok": "Aceptar",
+    "survey_status_ended": "Finalizado"
 }

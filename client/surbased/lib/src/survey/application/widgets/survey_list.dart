@@ -31,6 +31,7 @@ class _SurveyListState extends State<SurveyList> {
   bool _isAscending = false;
   DateTime? _startDateFilter;
   DateTime? _endDateFilter;
+  bool _includeFinished = true;
 
   @override
   void dispose() {
@@ -140,7 +141,11 @@ class _SurveyListState extends State<SurveyList> {
                 bool endDateMatch = _endDateFilter == null || 
                     !survey.endDate.isAfter(_endDateFilter!);
                 
-                return search && category && startDateMatch && endDateMatch;
+                // Filtrado por cuestionarios finalizados
+                bool finishedMatch = _includeFinished || 
+                    survey.endDate.isAfter(DateTime.now());
+                
+                return search && category && startDateMatch && endDateMatch && finishedMatch;
             })
             .toList();
         
@@ -195,12 +200,14 @@ class _SurveyListState extends State<SurveyList> {
         isAscending: _isAscending,
         startDateFilter: _startDateFilter,
         endDateFilter: _endDateFilter,
-        onApplyFilter: (sortField, isAscending, startDate, endDate) {
+        includeFinished: _includeFinished,
+        onApplyFilter: (sortField, isAscending, startDate, endDate, includeFinished) {
           setState(() {
             _sortField = sortField;
             _isAscending = isAscending;
             _startDateFilter = startDate;
             _endDateFilter = endDate;
+            _includeFinished = includeFinished;
             filterSurveys();
           });
         },
@@ -402,11 +409,10 @@ class _SurveyListState extends State<SurveyList> {
             ),
           )
         ] else ...[
-          const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               itemCount: _surveysToShow.length,
               itemBuilder: (context, index) => SurveyCard(
                 userRole: userRole,

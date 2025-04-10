@@ -83,10 +83,11 @@ class SurveyService {
     }
   }
 
-  Future<Map<String, dynamic>> getSurveysByOwner(String ownerId, String token) async {
+  Future<Map<String, dynamic>> getSurveysByOwner(String ownerId, String token, {bool? includeFinished}) async {
     try {
+      final existsIncludeFinished = includeFinished != null ? '?includeFinished=$includeFinished' : '';
       final response = await http
-          .get(Uri.parse('$_baseUrl/surveys/owner/$ownerId'), headers: {
+          .get(Uri.parse('$_baseUrl/surveys/owner/$ownerId$existsIncludeFinished'), headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });

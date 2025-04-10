@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, select, update
 from models.SurveyModel import Survey
@@ -121,15 +122,15 @@ async def get_surveys_in_organization(current_user: Annotated[User, Depends(get_
         if current_user.role != "admin" and current_user.organization_id != org_id:
             raise HTTPException(status_code=403, detail="Forbidden")
         
-        if category_id:
-            result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.organization, 
-                                                                Survey.organization_id == org_id, 
-                                                                Survey.category_id == category_id)))
-        else:
-            result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.organization, 
+        
+        result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.organization, 
                                                                 Survey.organization_id == org_id)))
     
         surveys = result.unique().scalars().all()
+
+        
+        surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
+
 
         return { "surveys": surveys, "length": len(surveys) }
             

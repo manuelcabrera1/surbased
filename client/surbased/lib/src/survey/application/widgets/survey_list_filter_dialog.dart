@@ -8,7 +8,8 @@ class SurveyListFilterDialog extends StatefulWidget {
   final DateTime? startDateFilter;
   final DateTime? endDateFilter;
   final bool? canFilterByOrganization;
-  final Function(String sortField, bool ascending, DateTime? startDate, DateTime? endDate) onApplyFilter;
+  final bool? includeFinished;
+  final Function(String sortField, bool ascending, DateTime? startDate, DateTime? endDate, bool includeFinished) onApplyFilter;
 
   const SurveyListFilterDialog({
     super.key,
@@ -17,6 +18,7 @@ class SurveyListFilterDialog extends StatefulWidget {
     this.startDateFilter,
     this.endDateFilter,
     this.canFilterByOrganization = false,
+    this.includeFinished = true,
     required this.onApplyFilter,
   });
 
@@ -30,6 +32,7 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
   DateTime? _startDate;
   DateTime? _endDate;
   bool _showDateFilters = false;
+  bool _includeFinished = true;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
     _startDate = widget.startDateFilter;
     _endDate = widget.endDateFilter;
     _showDateFilters = _startDate != null || _endDate != null;
+    _includeFinished = widget.includeFinished ?? true;
   }
 
   @override
@@ -173,6 +177,37 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
               ),
             ),
             
+          // Filtro para incluir cuestionarios finalizados
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(thickness: 0.5),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Incluir cuestionarios finalizados',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Switch(
+                      value: _includeFinished,
+                      onChanged: (value) {
+                        setState(() {
+                          _includeFinished = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+            
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -185,7 +220,8 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
                     _selectedSortField, 
                     _isAscending, 
                     _showDateFilters ? _startDate : null, 
-                    _showDateFilters ? _endDate : null
+                    _showDateFilters ? _endDate : null,
+                    _includeFinished
                   );
                   Navigator.pop(context);
                 },

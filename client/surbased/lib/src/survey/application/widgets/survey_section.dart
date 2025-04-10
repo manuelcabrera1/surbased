@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';

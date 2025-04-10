@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, or_, select, update
@@ -70,7 +70,7 @@ async def get_all_survey_assigned_users(id: uuid.UUID, current_user: Annotated[U
     
 
 @survey_users_router.get("/users/{id}/surveys", status_code=200, response_model=SurveyResponseWithLength)
-async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], includeFinished: bool = False):
+async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
     
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -96,23 +96,23 @@ async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User,
         """
        
         #buscamos los cuestionarios asignados al usuario
-        if includeFinished:
-            result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(survey_user.c.user_id == id))
-        else:
-            result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(and_(survey_user.c.user_id == id, Survey.end_date >= datetime.now())))
+        result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(survey_user.c.user_id == id))
+        
             
         surveys_assigned = result.all()
 
         surveys = []
+
         for survey, status in surveys_assigned:
-            if status == AssignmentStatusEnum.pending or status == AssignmentStatusEnum.accepted:
-                survey.assignment_status = status
-                surveys.append(survey)          
-        
-        newest_surveys = sorted(surveys, key=lambda x: x.start_date, reverse=True)
+            if status == AssignmentStatusEnum.rejected:
+                continue
+            survey.assignment_status = status
+            surveys.append(survey)
+            
+        surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
 
 
-        return { "surveys": newest_surveys, "length": len(newest_surveys)}
+        return { "surveys": surveys, "length": len(surveys)}
     
 
 @survey_users_router.post("/surveys/{id}/users/add", status_code=200, response_model=UserResponse)

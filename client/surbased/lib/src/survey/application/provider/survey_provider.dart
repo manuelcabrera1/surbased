@@ -216,9 +216,10 @@ class SurveyProvider extends ChangeNotifier {
       );
         
       if (getSurveysResponse['success']) {
-        _surveysOwned = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+        final surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
+        _surveysOwned = surveys;
         _error = null;
         _isLoading = false;
         notifyListeners();
@@ -235,7 +236,7 @@ class SurveyProvider extends ChangeNotifier {
   }
 
 
-  Future<void> getUsersAssignedToSurvey(String surveyId, String token, {bool? includeFinished}) async {
+  Future<void> getUsersAssignedToSurvey(String surveyId, String token) async {
     if (_isLoading) return;
     
     try {

@@ -63,29 +63,31 @@ class SurveyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusLabel(BuildContext context) {
+  Widget _buildStatusLabel(BuildContext context, String status, {Color? backgroundColor, Color? textColor}) {
     final theme = Theme.of(context);
-    final t = AppLocalizations.of(context)!;
+    final statusColor = backgroundColor ?? Colors.blue.shade100;
+    final labelTextColor = textColor ?? Colors.blue.shade700;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.blue.shade100,
+        color: statusColor,
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(16),
           bottomLeft: Radius.circular(12),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
+            color: statusColor.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Text(
-        t.survey_status_pending,
+        status,
         style: theme.textTheme.labelSmall?.copyWith(
-          color: Colors.blue.shade700,
+          color: labelTextColor,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.8,
           fontSize: 12,
@@ -106,6 +108,8 @@ class SurveyCard extends StatelessWidget {
                             survey.endDate.isAfter(DateTime.now());
 
     final isSurveyNotStarted = survey.startDate.isAfter(DateTime.now());
+    final isSurveyFinished = survey.endDate.isBefore(DateTime.now());
+    final isSurveyPending = survey.assignmentStatus == 'pending' && survey.endDate.isAfter(DateTime.now());
 
     return Card(
       elevation: 4,
@@ -124,14 +128,17 @@ class SurveyCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    survey.name,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: EdgeInsets.only(right: isSurveyPending || isSurveyFinished ? 75 : 0),
+                    child: Text(
+                      survey.name,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   if (userRole == 'admin') ...[
                     const SizedBox(height: 6),
@@ -244,11 +251,27 @@ class SurveyCard extends StatelessWidget {
               ),
             ),
           ),
-          if (survey.assignmentStatus == 'pending')
+          if (isSurveyPending)
             Positioned(
               top: 0,
               right: 0,
-              child: _buildStatusLabel(context),
+              child: _buildStatusLabel(
+                context, 
+                t.survey_status_pending,
+                backgroundColor: Colors.blue.shade100,
+                textColor: Colors.blue.shade700,
+              ),
+            ),
+          if (isSurveyFinished)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: _buildStatusLabel(
+                context, 
+                t.survey_status_ended,
+                backgroundColor: Colors.grey.shade300,
+                textColor: Colors.grey.shade800,
+              ),
             ),
         ],
       ),

@@ -77,7 +77,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
           leading: CircleAvatar(
             backgroundColor: theme.colorScheme.primary,
             child: Text(
-              user.name![0],
+              user.name != null ? user.name!.substring(0, 1) : user.email.split('@')[0].substring(0, 1).toUpperCase(),
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -86,7 +86,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
           ),
           title: Row(
             children: [
-              Text(user.name ?? ''),
+              Text(user.name ?? user.email.split('@')[0]),
               if (isPending) ...[
                 const SizedBox(width: 8),
                 GestureDetector(

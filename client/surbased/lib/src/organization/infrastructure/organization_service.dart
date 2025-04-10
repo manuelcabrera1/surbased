@@ -119,7 +119,7 @@ class OrganizationService {
   Future<Map<String, dynamic>> getSurveysInOrganization(
       String orgId, String token, {String? category}) async {
     try {
-      final existingCategory = category != null ? '?category=$category' : '';
+      final existingCategory = category != null ? '&category=$category' : '';
       final response = await http
           .get(Uri.parse('$_baseUrl/$orgId/surveys$existingCategory'), headers: {
         'Authorization': 'Bearer $token',

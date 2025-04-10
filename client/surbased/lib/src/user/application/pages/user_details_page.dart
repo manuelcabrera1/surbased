@@ -75,7 +75,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     
     if (authProvider.isAuthenticated) {
       try {
-        final surveys = await authProvider.getSurveysAssignedToUser(widget.userId, authProvider.token!, includeFinished: true);
+        final surveys = await authProvider.getSurveysAssignedToUser(widget.userId, authProvider.token!);
         setState(() {
           _userCategoriesOfInterest = surveys.map((survey) => categoryProvider.getCategoryById(survey.categoryId)).toList();
           _userCategoriesOfInterest = _userCategoriesOfInterest.toSet().toList();
@@ -158,9 +158,6 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     // Verificar si el usuario actual coincide con el usuario de la página
     final bool isCurrentUser = _user != null && authProvider.userId == _user!.id;
 
-    print('userCategoriesOfInterest');
-
-    print(_userCategoriesOfInterest);
 
     return Scaffold(
       appBar: AppBar(

@@ -194,10 +194,13 @@ class OrganizationProvider with ChangeNotifier {
           .getSurveysInOrganization(_organization!.id, token, category: category);
 
       if (getSurveysResponse['success']) {
-        _organization!.surveys =
+        final surveys =
             (getSurveysResponse['data']['surveys'] as List<dynamic>)
                 .map((survey) => Survey.fromJson(survey))
                 .toList();
+
+        _organization!.surveys = surveys;
+
         _isLoading = false;
         _error = null;
         notifyListeners();

@@ -314,6 +314,10 @@ async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current
     
         surveys = result.unique().scalars().all()
 
+
+        surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
+       
+
         return { "surveys": surveys, "length": len(surveys) }
 
 @survey_router.get("/surveys/public/highlighted", status_code=200, response_model=SurveyResponseWithLength)
