@@ -29,21 +29,30 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
                       children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const Icon(Icons.arrow_back),
                         ),
-                        const SizedBox(width: 3),
-                        Text(
-                          t.survey_create_page_title,
-                          style: theme.textTheme.displayMedium?.copyWith(
-                            fontSize: 30,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              t.survey_create_page_title,
+                              style: theme.textTheme.displayMedium?.copyWith(
+                                fontSize: 30,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
+                  ),
                   const SurveyForm(),
                 ],
               ),
