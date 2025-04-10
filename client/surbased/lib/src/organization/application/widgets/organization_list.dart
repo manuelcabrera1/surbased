@@ -250,18 +250,23 @@ class _OrganizationListState extends State<OrganizationList> {
               ),
             ),
             // Mostrar información del ordenamiento activo
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+             Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Row(
                   children: [
-                    Text('Ordenado por: ', style: theme.textTheme.bodySmall),
-                    Text(
-                      _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
+                    InkWell(
+                      onTap: _showFilterDialog,
+                      child: Wrap(children: [
+                        Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                      Text(
+                        _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
-                    ),
+                      ],),
+                    )
                   ],
                 ),
               ),
