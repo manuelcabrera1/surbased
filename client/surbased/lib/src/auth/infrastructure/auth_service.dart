@@ -207,11 +207,12 @@ class AuthService {
   
 
   Future<Map<String, dynamic>> getSurveysAssignedToUser(
-      String userId, String token, {String? category}) async {
+      String userId, String token, {String? category, bool? includeFinished}) async {
     try {
       final existingCategory = category != null ? '?category=$category' : '';
+      final existingIncludeFinished = includeFinished != null ? '?includeFinished=$includeFinished' : '';
       final response = await http.get(
-          Uri.parse('$_baseUrl/$userId/surveys$existingCategory'),
+          Uri.parse('$_baseUrl/$userId/surveys$existingCategory$existingIncludeFinished'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',

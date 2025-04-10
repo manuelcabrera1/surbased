@@ -70,7 +70,7 @@ async def get_all_survey_assigned_users(id: uuid.UUID, current_user: Annotated[U
     
 
 @survey_users_router.get("/users/{id}/surveys", status_code=200, response_model=SurveyResponseWithLength)
-async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], category: Optional[uuid.UUID] = None):
+async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], includeFinished: bool = False):
     
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -82,7 +82,7 @@ async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User,
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        if (current_user.role == "participant" or current_user.role == "researcher") and current_user.id != existing_user.id:
+        if current_user.role == "participant" and current_user.id != existing_user.id:
             raise HTTPException(status_code=403, detail="Forbidden")
         
 
@@ -96,7 +96,11 @@ async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User,
         """
        
         #buscamos los cuestionarios asignados al usuario
-        result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(and_(survey_user.c.user_id == id, Survey.end_date >= datetime.now())))
+        if includeFinished:
+            result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(survey_user.c.user_id == id))
+        else:
+            result = await db.execute(select(Survey, survey_user.c.status.label("status")).join(survey_user, Survey.id == survey_user.c.survey_id).where(and_(survey_user.c.user_id == id, Survey.end_date >= datetime.now())))
+            
         surveys_assigned = result.all()
 
         surveys = []

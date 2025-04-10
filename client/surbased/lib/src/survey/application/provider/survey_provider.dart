@@ -235,9 +235,7 @@ class SurveyProvider extends ChangeNotifier {
   }
 
 
-
-
-  Future<void> getUsersAssignedToSurvey(String surveyId, String token) async {
+  Future<void> getUsersAssignedToSurvey(String surveyId, String token, {bool? includeFinished}) async {
     if (_isLoading) return;
     
     try {

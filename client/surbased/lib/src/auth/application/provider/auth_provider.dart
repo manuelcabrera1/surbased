@@ -291,7 +291,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getSurveysAssignedToUser(String userId, String token, {String? category}) async {
+   Future<List<Survey>> getSurveysAssignedToUser(String userId, String token, {String? category, bool? isCurrentUser= true, bool? includeFinished = false}) async {
     try {
       _error = null;
       _isLoading = true;
@@ -301,24 +301,36 @@ class AuthProvider with ChangeNotifier {
         userId,
         token,
         category: category,
+        includeFinished: includeFinished,
       );
         
       if (getSurveysResponse['success']) {
-        _surveysAssigned = (getSurveysResponse['data']['surveys'] as List<dynamic>)
-            .map((s) => Survey.fromJson(s))
-            .toList();
+        List<Survey> surveys = [];
+        if (isCurrentUser == true) {
+          surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+              .map((s) => Survey.fromJson(s))
+              .toList();
+              _surveysAssigned = surveys;
+        } else {
+              surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+              .map((s) => Survey.fromJson(s))
+              .toList();
+        }
         _error = null;
         _isLoading = false;
         notifyListeners();
+        return surveys;
       } else {
         _error = getSurveysResponse['error'];
         _isLoading = false;
         notifyListeners();
+        return [];
       }
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+      return [];
     }
   }
 

@@ -90,7 +90,6 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
             padding: const EdgeInsets.all(24.0),
               child: Column(
                   children: [
@@ -109,67 +108,61 @@ class _SendForgotPasswordMailPageState extends State<SendForgotPasswordMailPage>
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(width: 24), // Para compensar el espacio del icono y mantener el título centrado
+                        const SizedBox(width: 24), 
                       ],
                     ),
                     const SizedBox(height: 40),
                     Form(
-                          key: _formKey,
-                          child: Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [   
-                                  Text(t.forgot_password_instructions,
-                                        style: theme.textTheme.bodyLarge?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
-                                        )),
-                                  const SizedBox(height: 20),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    decoration: InputDecoration(
-                                      labelText: t.email,
-                                      prefixIcon: const Icon(Icons.email),
-                                    ),
-                                    validator: _fieldValidator,
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [   
+                              Text(t.forgot_password_instructions,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    )),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  labelText: t.email,
+                                  prefixIcon: const Icon(Icons.email),
+                                ),
+                                validator: _fieldValidator,
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                  onPressed:
+                                      authProvider.isLoading ? null : _handleSendForgotPasswordMail,
+                                  child: authProvider.isLoading
+                                      ? const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        )
+                                      : Text(t.send_email)),
+                              const SizedBox(height: 30),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(context, AppRoutes.login);
+                                    },
+                                    child: const Icon(Icons.arrow_back),
                                   ),
-                                  const SizedBox(height: 20),
-                                  ElevatedButton(
-                                      onPressed:
-                                          authProvider.isLoading ? null : _handleSendForgotPasswordMail,
-                                      child: authProvider.isLoading
-                                          ? const CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: Colors.white,
-                                            )
-                                          : Text(t.send_email)),
-                                  const SizedBox(height: 30),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(context, AppRoutes.login);
-                                        },
-                                        child: const Icon(Icons.arrow_back),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context, AppRoutes.login);
-                                        },
-                                        child: Text(t.back_to_login),
-                                      ),
-                                    ],
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, AppRoutes.login);
+                                    },
+                                    child: Text(t.back_to_login),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                  ]),
-          ),
+                    ),
+              ]),
         ),
       ),
     );
