@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/app.dart';
@@ -7,7 +6,6 @@ import 'package:surbased/src/category/application/provider/category_provider.dar
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_invitation_dialog.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
@@ -228,6 +226,11 @@ class _SurveyListState extends State<SurveyList> {
     }
   }
 
+  void sortCategories() {
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+    categoryProvider.categories.sort((a, b) => Category.getCategoryName(context, a.name).compareTo(Category.getCategoryName(context, b.name)));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -246,6 +249,8 @@ class _SurveyListState extends State<SurveyList> {
     if (surveyProvider.isLoading || categoryProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+
+    sortCategories();
 
     // Aplicar ordenamiento por defecto la primera vez
     if (_surveysToShow.isNotEmpty) {
@@ -331,6 +336,7 @@ class _SurveyListState extends State<SurveyList> {
                       );
                     }
                     final category = categoryProvider.categories[index - 1];
+                    
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
