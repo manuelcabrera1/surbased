@@ -18,7 +18,7 @@ class SurveyListFilterDialog extends StatefulWidget {
     this.startDateFilter,
     this.endDateFilter,
     this.canFilterByOrganization = false,
-    this.includeFinished = true,
+    this.includeFinished = false,
     required this.onApplyFilter,
   });
 
@@ -32,7 +32,7 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
   DateTime? _startDate;
   DateTime? _endDate;
   bool _showDateFilters = false;
-  bool _includeFinished = true;
+  bool _includeFinished = false;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _SurveyListFilterDialogState extends State<SurveyListFilterDialog> {
     _startDate = widget.startDateFilter;
     _endDate = widget.endDateFilter;
     _showDateFilters = _startDate != null || _endDate != null;
-    _includeFinished = widget.includeFinished ?? true;
+    _includeFinished = widget.includeFinished ?? false;
   }
 
   @override

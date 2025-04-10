@@ -31,7 +31,7 @@ class _SurveyListState extends State<SurveyList> {
   bool _isAscending = false;
   DateTime? _startDateFilter;
   DateTime? _endDateFilter;
-  bool _includeFinished = true;
+  bool _includeFinished = false;
 
   @override
   void dispose() {
@@ -48,7 +48,7 @@ class _SurveyListState extends State<SurveyList> {
         if (mounted) {
           if (widget.surveys.isNotEmpty) {
             setState(() {
-              _surveysToShow = widget.surveys;
+              _surveysToShow = widget.surveys.where((survey) => survey.endDate.isAfter(DateTime.now())).toList();
             });
           }
         }
