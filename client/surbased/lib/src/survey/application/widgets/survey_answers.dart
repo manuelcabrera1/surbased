@@ -127,11 +127,6 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              FilledButton.icon(
-                onPressed: () => _showDownloadDialog(),
-                icon: const Icon(Icons.download),
-                label: const Text('Descargar'),
-              ),
             ],
                   ),
                   const SizedBox(height: 16),
@@ -237,7 +232,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
   String? _selectedVisualization;
   
   final Map<String, List<String>> _visualizationTypes = {
-    'likert_scale': ['descriptive_stats', 'diverging_chart', 'distribution_chart', 'box_plot'],
+    'likert_scale': ['descriptive_stats', 'diverging_chart', 'distribution_chart'],
     'single_choice': ['pie_chart', 'bar_chart', 'spectrum'],
     'multiple_choice': ['pie_chart', 'bar_chart', 'spectrum'],
   };
@@ -269,8 +264,6 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
         return 'Gráfico de divergencia';
       case 'distribution_chart':
         return 'Distribución y tendencia';
-      case 'box_plot':
-        return 'Diagrama de caja';
       case 'pie_chart':
         return 'Gráfico circular';
       case 'bar_chart':
@@ -280,6 +273,33 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
       default:
         return type;
     }
+  }
+
+  IconData _getVisualizationIcon(String type) {
+    IconData icon;
+      switch (type) {
+        case 'descriptive_stats':
+          icon = Icons.analytics_outlined;
+          break;
+        case 'diverging_chart':
+          icon = Icons.stacked_bar_chart;
+          break;
+        case 'distribution_chart':
+          icon = Icons.show_chart;
+          break;
+        case 'pie_chart':
+          icon = Icons.pie_chart_outline;
+          break;
+        case 'bar_chart':
+          icon = Icons.bar_chart;
+          break;
+        case 'spectrum':
+          icon = Icons.linear_scale;
+          break;
+      default:
+        icon = Icons.analytics_outlined;
+    }
+    return icon;
   }
 
   @override
@@ -343,7 +363,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.insert_chart,
+                            _getVisualizationIcon(_selectedVisualization!),
                             color: theme.colorScheme.primary,
                             size: 20,
                           ),
@@ -363,32 +383,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                     },
                     itemBuilder: (BuildContext context) => 
                       _visualizationTypes[questionType]?.map((type) {
-                        IconData icon;
-                        switch (type) {
-                          case 'descriptive_stats':
-                            icon = Icons.analytics_outlined;
-                            break;
-                          case 'diverging_chart':
-                            icon = Icons.stacked_bar_chart;
-                            break;
-                          case 'distribution_chart':
-                            icon = Icons.show_chart;
-                            break;
-                          case 'box_plot':
-                            icon = Icons.candlestick_chart;
-                            break;
-                          case 'pie_chart':
-                            icon = Icons.pie_chart_outline;
-                            break;
-                          case 'bar_chart':
-                            icon = Icons.bar_chart;
-                            break;
-                          case 'spectrum':
-                            icon = Icons.linear_scale;
-                            break;
-                          default:
-                            icon = Icons.analytics_outlined;
-                        }
+                        final icon = _getVisualizationIcon(type);
                         
                         return PopupMenuItem<String>(
                           value: type,
@@ -451,8 +446,6 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
         return _buildDivergingChart(options, theme);
       case 'distribution_chart':
         return _buildDistributionChart(options, theme);
-      case 'box_plot':
-        return _buildBoxPlot(options, theme);
       default:
         return const SizedBox();
     }
@@ -1246,98 +1239,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildBoxPlot(Map<String, dynamic> options, ThemeData theme) {
-    final sortedOptions = options.entries.toList()
-      ..sort((a, b) {
-        final pointsA = a.value['points'] ?? 0;
-        final pointsB = b.value['points'] ?? 0;
-        return pointsA.compareTo(pointsB);
-      });
-
-    // Preparar datos para el box plot
-    final List<double> values = [];
-    int totalResponses = 0;
-    
-    for (var option in sortedOptions) {
-      final count = option.value['count'] as int;
-      final points = option.value['points'] as int;
-      totalResponses += count;
-      for (var i = 0; i < count; i++) {
-        values.add(points.toDouble());
-      }
-    }
-
-    if (values.isEmpty || totalResponses < 2) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Se necesitan al menos dos respuestas para mostrar el diagrama de caja',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-
-    values.sort();
-    final stats = _calculateBoxPlotStats(values);
-
-    return Column(
-      children: [
-        Container(
-          height: 180,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: CustomPaint(
-            size: const Size(double.infinity, 180),
-            painter: BoxPlotPainter(
-              min: stats['min']!,
-              max: stats['max']!,
-              q1: stats['q1']!,
-              q2: stats['median']!,
-              q3: stats['q3']!,
-              theme: theme,
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          children: [
-            _buildLegendStat(
-              'Mínimo',
-              stats['min']!.toStringAsFixed(1),
-              theme,
-              color: theme.colorScheme.primary.withOpacity(0.7),
-            ),
-            _buildLegendStat(
-              'Q1',
-              stats['q1']!.toStringAsFixed(1),
-              theme,
-            ),
-            _buildLegendStat(
-              'Mediana',
-              stats['median']!.toStringAsFixed(1),
-              theme,
-              color: theme.colorScheme.primary,
-            ),
-            _buildLegendStat(
-              'Q3',
-              stats['q3']!.toStringAsFixed(1),
-              theme,
-            ),
-            _buildLegendStat(
-              'Máximo',
-              stats['max']!.toStringAsFixed(1),
-              theme,
-              color: theme.colorScheme.primary.withOpacity(0.7),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  
 
   Widget _buildLegendStat(String label, String value, ThemeData theme, {Color? color}) {
     return Container(
@@ -1438,166 +1340,4 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     };
   }
 
-  Map<String, double> _calculateBoxPlotStats(List<double> values) {
-    if (values.isEmpty) {
-      return {
-        'min': 0,
-        'max': 0,
-        'q1': 0,
-        'median': 0,
-        'q3': 0,
-      };
-    }
-
-    values.sort();
-    final n = values.length;
-    
-    final min = values.first;
-    final max = values.last;
-
-    // Calcular mediana (Q2)
-    final medianIndex = n ~/ 2;
-    final median = n.isOdd 
-        ? values[medianIndex]
-        : (values[medianIndex - 1] + values[medianIndex]) / 2;
-
-    // Calcular Q1 y Q3
-    final q1Index = n ~/ 4;
-    final q3Index = (3 * n) ~/ 4;
-
-    final q1 = n < 4 
-        ? min 
-        : n.isOdd 
-            ? values[q1Index]
-            : (values[q1Index - 1] + values[q1Index]) / 2;
-
-    final q3 = n < 4 
-        ? max 
-        : n.isOdd 
-            ? values[q3Index]
-            : (values[q3Index - 1] + values[q3Index]) / 2;
-
-    return {
-      'min': min,
-      'max': max,
-      'q1': q1,
-      'median': median,
-      'q3': q3,
-    };
-  }
-}
-
-class BoxPlotPainter extends CustomPainter {
-  final double min;
-  final double max;
-  final double q1;
-  final double q2;
-  final double q3;
-  final ThemeData theme;
-
-  BoxPlotPainter({
-    required this.min,
-    required this.max,
-    required this.q1,
-    required this.q2,
-    required this.q3,
-    required this.theme,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = theme.colorScheme.primary
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    final fillPaint = Paint()
-      ..color = theme.colorScheme.primary.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
-
-    final medianPaint = Paint()
-      ..color = theme.colorScheme.primary
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final whiskerPaint = Paint()
-      ..color = theme.colorScheme.primary.withOpacity(0.7)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-
-    final height = size.height;
-    final width = size.width;
-    final padding = width * 0.1;
-    final boxWidth = width - (padding * 2);
-    final boxHeight = height * 0.3;
-    final y = height / 2;
-
-    // Función para mapear valores a posiciones X
-    double mapToX(double value) {
-      return padding + ((value - min) / (max - min)) * boxWidth;
-    }
-
-    // Dibujar líneas de bigotes
-    final minX = mapToX(min);
-    final maxX = mapToX(max);
-    final q1X = mapToX(q1);
-    final q2X = mapToX(q2);
-    final q3X = mapToX(q3);
-
-    // Dibujar línea horizontal completa (bigotes)
-    canvas.drawLine(
-      Offset(minX, y),
-      Offset(maxX, y),
-      whiskerPaint,
-    );
-
-    // Dibujar líneas verticales en min y max
-    canvas.drawLine(Offset(minX, y - boxHeight/2), Offset(minX, y + boxHeight/2), whiskerPaint);
-    canvas.drawLine(Offset(maxX, y - boxHeight/2), Offset(maxX, y + boxHeight/2), whiskerPaint);
-
-    // Dibujar caja
-    final rect = Rect.fromPoints(
-      Offset(q1X, y - boxHeight),
-      Offset(q3X, y + boxHeight),
-    );
-    canvas.drawRect(rect, fillPaint);
-    canvas.drawRect(rect, paint);
-
-    // Dibujar línea mediana
-    canvas.drawLine(
-      Offset(q2X, y - boxHeight),
-      Offset(q2X, y + boxHeight),
-      medianPaint,
-    );
-
-    // Dibujar etiquetas
-    final textStyle = TextStyle(
-      color: theme.colorScheme.onSurface,
-      fontSize: 11,
-    );
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.center,
-    );
-
-    void drawLabel(double value, double x, double y) {
-      textPainter.text = TextSpan(
-        text: value.toStringAsFixed(1),
-        style: textStyle,
-      );
-      textPainter.layout();
-      textPainter.paint(
-        canvas,
-        Offset(x - textPainter.width / 2, y),
-      );
-    }
-
-    // Dibujar etiquetas con valores
-    drawLabel(min, minX, y + boxHeight + 10);
-    drawLabel(max, maxX, y + boxHeight + 10);
-    drawLabel(q2, q2X, y - boxHeight - 15);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
