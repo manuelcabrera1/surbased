@@ -7,6 +7,8 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../domain/survey_model.dart';
+
 class SurveyAnswersDownloadDialog extends StatefulWidget {
 
 
@@ -27,6 +29,12 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
   late String defaultFileName;
 
 
+  void _generateDefaultFileName(Survey survey) {
+    final surveyName = survey.name.replaceAll(' ', '_');
+    defaultFileName = '${surveyName}_answers_${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -35,7 +43,7 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
       final survey = surveyProvider.currentSurvey;
       if (survey != null) {
         setState(() {
-          defaultFileName = 'survey_${survey.id}_answers_${DateTime.now().millisecondsSinceEpoch}';
+          _generateDefaultFileName(survey);
           selectedFormat = 'csv';
         });
       }
@@ -84,7 +92,6 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
         final appDir = await getDownloadsDirectory();
         final appDirPath = appDir!.path;
 
-        print(appDirPath);
         
         // Asegurarse de que el directorio existe
         if (!await appDir.exists()) {
@@ -93,7 +100,6 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
 
         final url = 'http://192.168.1.69:8000/surveys/$surveyId/answers/export/$format?filename=$fileName';
 
-        print(url);
 
         final taskId = await FlutterDownloader.enqueue(
           url: url.toString(),
@@ -148,9 +154,11 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
             const SizedBox(height: 10),
             TextFormField(
               controller: filenameController,
+              maxLength: 100,
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
                 labelText: t.survey_download_answers_filename,
+                hintText: defaultFileName,
               ),
               validator: _fieldValidator,
             ),
