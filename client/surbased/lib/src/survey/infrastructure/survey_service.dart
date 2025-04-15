@@ -217,7 +217,6 @@ class SurveyService {
 
   Future<Map<String, dynamic>> addUserToSurvey(String surveyId, String email, String token, String notificationTitle, String notificationBody) async {
     try {
-      print('mano que yo aqui llegue');
       final response = await http.post(
         Uri.parse('$_baseUrl/surveys/$surveyId/users/add'),
         headers: {
@@ -237,6 +236,24 @@ class SurveyService {
           'success': false,
           'data': json.decode(utf8.decode(response.bodyBytes))['detail']
         };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> requestSurveyAccess(String surveyId, String userId, String notificationTitle, String notificationBody, String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/surveys/$surveyId/users/$userId/request'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: json.encode({'notification_title': notificationTitle, 'notification_body': notificationBody}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      } else {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
       }
     } catch (e) {
       return {'success': false, 'data': e.toString()};

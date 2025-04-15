@@ -241,8 +241,10 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        print(json.decode(utf8.decode(response.bodyBytes)));
         return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
       } else {
+        print(json.decode(utf8.decode(response.bodyBytes)));  
         return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
       }
     } catch (e) {
@@ -266,4 +268,5 @@ class AuthService {
       return {'success': false, 'data': e.toString()};
     }
   }
+
 }

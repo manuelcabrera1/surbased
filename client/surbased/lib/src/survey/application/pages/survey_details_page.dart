@@ -82,7 +82,6 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     }
     if (mounted) {
       final theme = Theme.of(context);
-      if (surveyProvider.currentSurvey!.scope != 'public') {
           tabTitles = [
             Tab(
                     text: t.survey_info,
@@ -101,21 +100,6 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
             SurveyAnswers(),
           ];
         
-      } else {
-        tabTitles = [
-            Tab(
-              text: t.survey_info,
-              icon: Icon(Icons.info, color: theme.colorScheme.surface)),
-            Tab(
-                text: t.survey_stats,
-                icon:
-                    Icon(Icons.bar_chart, color: theme.colorScheme.surface)),
-          ];
-          tabViews = const [
-            SurveyInfo(),
-            SurveyAnswers(),
-          ];
-      }
     }
 
     tabController.dispose(); // Primero liberar el controlador actual
@@ -276,7 +260,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
         controller: tabController,
         children: tabViews,
       ),
-      floatingActionButton: tabController.index == 1 && surveyProvider.currentSurvey!.scope != 'public'
+      floatingActionButton: tabController.index == 1
           ? FloatingActionButton(
               heroTag: 'participants',
               onPressed: () => _showAddParticipantsModal(),

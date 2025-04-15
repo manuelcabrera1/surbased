@@ -329,7 +329,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> acceptSurveyAssignment(String surveyId, String token) async {
+  Future<bool> acceptSurveyAssignment(String userId, String surveyId, String token) async {
     try {
       _error = null;
       _isLoading = true;
@@ -339,11 +339,11 @@ class AuthProvider with ChangeNotifier {
         _error = 'Not authenticated';
         _isLoading = false;
         notifyListeners();
-        return;
+        return false;
       }
 
       final getSurveysResponse = await _authService.acceptSurveyAssignment(
-        user!.id,
+        userId,
         surveyId,
         token,
       );
@@ -353,19 +353,22 @@ class AuthProvider with ChangeNotifier {
         _error = null;
         _isLoading = false;
         notifyListeners();
+        return true;
       } else {
-        _error = getSurveysResponse['error'];
+        _error = getSurveysResponse['data'];
         _isLoading = false;
         notifyListeners();
+        return false;
       }
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+      return false;
     }
   }
 
-  Future<void> rejectSurveyAssignment(String surveyId, String token) async {
+  Future<bool> rejectSurveyAssignment(String userId, String surveyId, String token) async {
     try {
       _error = null;
       _isLoading = true;
@@ -375,11 +378,11 @@ class AuthProvider with ChangeNotifier {
         _error = 'Not authenticated';
         _isLoading = false;
         notifyListeners();
-        return;
+        return false;
       }
 
       final getSurveysResponse = await _authService.rejectSurveyAssignment(
-        user!.id,
+        userId,
         surveyId,
         token,
       );
@@ -388,16 +391,20 @@ class AuthProvider with ChangeNotifier {
         _surveysAssigned.removeWhere((survey) => survey.id == surveyId);
         _error = null;
         _isLoading = false;
-        notifyListeners();
+        notifyListeners();  
+        return true;
       } else {
-        _error = getSurveysResponse['error'];
+        _error = getSurveysResponse['data'];
         _isLoading = false;
         notifyListeners();
+        return false;
       }
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+      return false;
     }
   }
+
 }

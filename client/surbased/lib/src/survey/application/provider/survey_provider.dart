@@ -16,7 +16,8 @@ class SurveyProvider extends ChangeNotifier {
   Survey? _currentSurvey;
   List<Survey> _privateSurveys = [];
   List<Survey> _organizationSurveys = [];
-  List<String> _pendingAssignmentsInCurrentSurvey = [];
+  Map<String, dynamic> _pendingAssignmentsInCurrentSurvey = {};
+  int? numberOfSurveysBeingShown;
 
   List<Survey> get publicSurveys => _publicSurveys;
   List<Survey> get highlightedPublicSurveys => _highlightedPublicSurveys;
@@ -26,7 +27,7 @@ class SurveyProvider extends ChangeNotifier {
   Survey? get currentSurvey => _currentSurvey;
   List<Survey> get privateSurveys => _privateSurveys;
   List<Survey> get organizationSurveys => _organizationSurveys;
-  List<String> get pendingAssignmentsInCurrentSurvey => _pendingAssignmentsInCurrentSurvey;
+  Map <String, dynamic> get pendingAssignmentsInCurrentSurvey => _pendingAssignmentsInCurrentSurvey;
 
   set currentSurvey(Survey? value) {
     _currentSurvey = value;
@@ -40,13 +41,13 @@ class SurveyProvider extends ChangeNotifier {
     _publicSurveys = [];
     _surveysOwned = [];
     _currentSurvey = null;
-    _pendingAssignmentsInCurrentSurvey = [];
+    _pendingAssignmentsInCurrentSurvey = {};
     notifyListeners();
   }
 
   void clearCurrentSurvey() {
     _currentSurvey = null;
-    _pendingAssignmentsInCurrentSurvey = [];
+    _pendingAssignmentsInCurrentSurvey = {};
     notifyListeners();
   }
 
@@ -242,7 +243,6 @@ class SurveyProvider extends ChangeNotifier {
     try {
       _error = null;
       _isLoading = true;
-      // Primera notificación para mostrar el estado de carga
       notifyListeners();
 
       final getSurveyUsersResponse =
@@ -252,13 +252,12 @@ class SurveyProvider extends ChangeNotifier {
       );
 
       if (getSurveyUsersResponse['success']) {
-        final List<User> newAssignedUsers = (getSurveyUsersResponse['data']['users'] as List<dynamic>)
+
+        final newAssignedUsers = (getSurveyUsersResponse['data']['users'] as List<dynamic>)
             .map((s) => User.fromJson(s))
             .toList();
-            
-        final List<String> newPendingAssignments = 
-            List<String>.from(getSurveyUsersResponse['data']['pending_assignments']);
-
+        newAssignedUsers.sort((a, b) => a.name!.compareTo(b.name!));
+        final newPendingAssignments = getSurveyUsersResponse['data']['pending_assignments'];
         _currentSurvey!.assignedUsers = newAssignedUsers;
         _pendingAssignmentsInCurrentSurvey = newPendingAssignments;
         _error = null;
@@ -346,6 +345,40 @@ class SurveyProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
     return false;
+    }
+  }
+
+  Future<bool> requestSurveyAccess(String surveyId, String userId, String email, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final requestSurveyAccessResponse =
+          await _surveyService.requestSurveyAccess(
+        surveyId,
+        userId,
+        "New survey access request",
+        "$email has requested access to your survey: ${_currentSurvey!.name}",
+        token,
+      );
+
+      if (requestSurveyAccessResponse['success']) {
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = requestSurveyAccessResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 }

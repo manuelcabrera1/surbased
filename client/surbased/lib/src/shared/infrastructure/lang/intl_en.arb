@@ -16,6 +16,7 @@
     "go_back": "Return",
     "submit": "Submit",
     "export": "Export",
+    "request": "Request",
     "required": "Required",
     "email": "Email",
     "password": "Password",
@@ -210,5 +211,15 @@
     "ok": "OK",
     "survey_download_answers": "Export answers",
     "survey_download_answers_filename": "File Name",
-    "survey_download_answers_format": "Format"
+    "survey_download_answers_format": "Format",
+    "survey_request_access_title": "Request survey access",
+    "survey_request_access_content": "This survey requires authorization before you can participate.\nYou can request access from the owner.",
+    "survey_request_access_error": "Error requesting access to this survey",
+    "survey_pending_request": "Pending request",
+    "survey_pending_invitation": "Pending invitation",
+    "survey_request_message": "{email} has requested to join the survey. Do you want to approve or reject the request?",
+    "survey_invitation_waiting": "Waiting for {email}'s response to the invitation.",
+    "survey_reject": "Reject",
+    "survey_approve": "Approve",
+    "survey_accept": "Accept"
 }

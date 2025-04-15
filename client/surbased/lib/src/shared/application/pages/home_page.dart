@@ -18,8 +18,8 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../../organization/application/widgets/organization_list.dart';
 import '../../../survey/application/widgets/survey_explore.dart';
-import '../../../survey/application/pages/survey_invitation_dialog.dart';
-
+import '../../../survey/application/widgets/survey_invitation_dialog.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -64,6 +64,7 @@ class _HomePageState extends State<HomePage> {
   
 
   Future<void> _onDestinationSelected(int index) async {
+    print(dotenv.get('LANGUAGE_MODEL'));
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
       if (index == 0 || index == 1 || index == 2) {
@@ -86,6 +87,9 @@ class _HomePageState extends State<HomePage> {
             surveyId: message.notification?.body ?? '',
             surveyName: message.notification?.title ?? '',
             inviterName: message.notification?.title ?? '',
+            notificationTitle: message.notification?.title ?? '',
+            notificationBody: message.notification?.body ?? '',
+            userId: message.data['user_id'],
           ),
         );
       }

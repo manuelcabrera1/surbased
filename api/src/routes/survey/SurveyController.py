@@ -31,7 +31,7 @@ async def get_surveys_by_scope(current_user: Annotated[User, Depends(get_current
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
         if scope == SurveyScopeEnum.public:
-            result = await db.execute(select(Survey).where(Survey.scope == SurveyScopeEnum.public))
+            result = await db.execute(select(Survey).where(and_(Survey.scope == SurveyScopeEnum.public, Survey.end_date >= date.today())))
         else: 
             if current_user.role != "admin":
                 raise HTTPException(status_code=403, detail="Forbidden")

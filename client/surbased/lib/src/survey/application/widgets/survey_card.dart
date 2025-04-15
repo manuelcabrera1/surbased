@@ -109,7 +109,7 @@ class SurveyCard extends StatelessWidget {
 
     final isSurveyNotStarted = survey.startDate.isAfter(DateTime.now());
     final isSurveyFinished = survey.endDate.isBefore(DateTime.now());
-    final isSurveyPending = survey.assignmentStatus == 'pending' && survey.endDate.isAfter(DateTime.now());
+    final isSurveyPending = survey.assignmentStatus == 'invited_pending' && survey.endDate.isAfter(DateTime.now());
 
     return Card(
       elevation: 4,

@@ -21,7 +21,8 @@ class UserRoleRequestEnum(str, Enum):
     participant="participant"
 
 class AssignmentStatusEnum(str, Enum):
-    pending="pending"
+    requested_pending="requested_pending"
+    invited_pending="invited_pending"
     accepted="accepted"
     rejected="rejected"
 
@@ -31,6 +32,10 @@ class UserBase(BaseModel):
 
 
 class AssignParticipantToSurvey(UserBase): 
+    notification_title: str
+    notification_body: str
+
+class RequestSurveyAccess(BaseModel): 
     notification_title: str
     notification_body: str
 
@@ -83,7 +88,7 @@ class UserResponseWithLength(BaseModel):
 
 class UserResponseWithPendingAssignments(BaseModel):
     users: List[UserResponse]
-    pending_assignments: List[str]
+    pending_assignments: dict[str, AssignmentStatusEnum]
     
 
 class UserUpdatePasswordRequest(BaseModel):

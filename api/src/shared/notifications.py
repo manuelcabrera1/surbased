@@ -6,12 +6,12 @@ import google.auth.transport.requests
 import requests
 from typing import TYPE_CHECKING
 from google.auth.transport.requests import Request
+from schemas.NotificationSchema import NotificationRequest
+
+def send_notification(payload: NotificationRequest):
 
 
-def send_notification(token: str, title: str, body: str, email: str, survey_id: str, survey_name: str):
-
-
-    if not token:
+    if not payload.token:
         print("No token provided for notification")
         return False
         
@@ -20,15 +20,16 @@ def send_notification(token: str, title: str, body: str, email: str, survey_id: 
 
     message = {
         "message": {
-            "token": token,
+            "token": payload.token,
             "notification": {
-                "title": title,
-                "body": body
+                "title": payload.title,
+                "body": payload.body
             },
             "data": {
-                "survey_id": str(survey_id),
-                "survey_name": survey_name,
-                "email": email
+                "survey_id": str(payload.survey_id),
+                "survey_name": payload.survey_name,
+                "email": payload.email,
+                "user_id": str(payload.user_id)
             }
         }
     }
@@ -40,6 +41,8 @@ def send_notification(token: str, title: str, body: str, email: str, survey_id: 
 
     response = requests.post(url, headers=headers, data=json.dumps(message))
 
+    print(payload)
+
     print("status code: ", response.status_code, "response: ", response.json() )
      
     return response.json()
@@ -49,7 +52,6 @@ def  get_access_token():
     api_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     credentials = service_account.Credentials.from_service_account_file(os.path.join(api_dir, 'surbased-9d626-firebase-adminsdk-fbsvc-5b498651ed.json'), scopes=['https://www.googleapis.com/auth/cloud-platform'])
     credentials.refresh(Request())
-    print(credentials.token)
     return credentials.token
     
 

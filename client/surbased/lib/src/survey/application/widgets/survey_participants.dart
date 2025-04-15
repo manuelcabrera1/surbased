@@ -12,6 +12,52 @@ class SurveyParticipants extends StatefulWidget {
 }
 
 class _SurveyParticipantsState extends State<SurveyParticipants> {
+
+  Future<void> rejectSurveyAssignment(String userId, String surveyId) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      final result = await authProvider.rejectSurveyAssignment(userId, surveyId, authProvider.token!);
+      if (result &&mounted) {
+        Navigator.pop(context);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(authProvider.error!)),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.toString())),
+          );
+        }
+    }
+  }
+
+  Future<void> acceptSurveyAssignment(String userId, String surveyId) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      final result = await authProvider.acceptSurveyAssignment(userId, surveyId, authProvider.token!);
+      if (result &&mounted) {
+        Navigator.pop(context);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(authProvider.error!)),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.toString())),
+          );
+        }
+    }
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -43,7 +89,10 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
       itemCount: surveyProvider.currentSurvey!.assignedUsers!.length,
       itemBuilder: (context, index) {
         final user = surveyProvider.currentSurvey!.assignedUsers![index];
-        final isPending = surveyProvider.pendingAssignmentsInCurrentSurvey.contains(user.id.toString());
+        final isRequested = surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] != null &&
+            surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] == 'requested_pending';
+        final isInvited = surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] != null &&
+            surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] == 'invited_pending';
 
         return ListTile(
           shape: RoundedRectangleBorder(
@@ -87,7 +136,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
           title: Row(
             children: [
               Text(user.name ?? user.email.split('@')[0]),
-              if (isPending) ...[
+              if (isRequested || isInvited) ...[
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
@@ -97,30 +146,50 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
                         title: Row(
                           children: [
                             Icon(
-                              Icons.schedule,
-                              color: theme.colorScheme.inversePrimary,
+                              isRequested ? Icons.person_add : Icons.mail,
+                              color: isRequested 
+                                ? theme.colorScheme.tertiary 
+                                : theme.colorScheme.inversePrimary,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
-                            Text(t.survey_invitation_pending),
+                            Text(isRequested 
+                              ? t.survey_pending_request 
+                              : t.survey_pending_invitation),
                           ],
                         ),
-                        content: Text(
-                          t.survey_invitation_waiting_response(user.email),
-                        ),
+                        content: isRequested
+                          ? Text(t.survey_request_message(user.email))
+                          : Text(t.survey_invitation_waiting(user.email)),
                         actions: [
-                          FilledButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(t.ok),
-                          ),
+                          if (isRequested) ...[
+                            OutlinedButton(
+                              onPressed: () async {
+                                await rejectSurveyAssignment(user.id.toString(), surveyProvider.currentSurvey!.id.toString());
+                              },
+                              child: Text(t.survey_reject),
+                            ),
+                            FilledButton(
+                              onPressed: () async {
+                                await acceptSurveyAssignment(user.id.toString(), surveyProvider.currentSurvey!.id.toString());
+                              },
+                              child: Text(t.survey_approve),
+                            ),
+                          ] else
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(t.survey_accept),
+                            ),
                         ],
                       ),
                     );
                   },
                   child: Icon(
-                    Icons.schedule,
+                    isRequested ? Icons.person_add : Icons.mail,
                     size: 18,
-                    color: theme.colorScheme.inversePrimary,
+                    color: isRequested 
+                      ? theme.colorScheme.tertiary 
+                      : theme.colorScheme.inversePrimary,
                   ),
                 ),
               ],

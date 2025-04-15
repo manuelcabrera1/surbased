@@ -6,7 +6,7 @@ import 'package:surbased/src/category/application/provider/category_provider.dar
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
-import 'package:surbased/src/survey/application/pages/survey_invitation_dialog.dart';
+import 'package:surbased/src/survey/application/widgets/survey_invitation_dialog.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/widgets/survey_card.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
@@ -64,8 +64,8 @@ class _SurveyListState extends State<SurveyList> {
       if (mounted && authProvider.token != null) {
         final owner = await userProvider.getUserById(survey.ownerId, authProvider.token!);
 
-        if (owner != null) {
-
+        if (owner != null && mounted) {
+          final t = AppLocalizations.of(context)!;
           showDialog(
             context: navigatorKey.currentContext!,
             builder: (context) => Dialog(
@@ -73,6 +73,9 @@ class _SurveyListState extends State<SurveyList> {
                 surveyId: survey.id!,
                 surveyName: survey.name,
                 inviterName: owner.email,
+                notificationTitle: t.survey_invitation_title,
+                notificationBody: t.survey_invitation_message(owner.email, survey.name),
+                userId: authProvider.user!.id.toString(),
               ),
             ),
           );
@@ -97,7 +100,7 @@ class _SurveyListState extends State<SurveyList> {
             Provider.of<AnswerProvider>(context, listen: false);
         answerProvider.setCurrentSurveyBeingAnswered(survey);
         surveyProvider.currentSurvey = survey;
-        if (survey.assignmentStatus == 'pending') {
+        if (survey.assignmentStatus == 'invited_pending') {
           _showSurveyInvitationDialog(survey);
         } else {
           Navigator.pushNamed(context, AppRoutes.surveyComplete);

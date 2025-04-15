@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:surbased/src/app.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:http/http.dart' as http;
-import 'package:surbased/src/survey/application/pages/survey_invitation_dialog.dart';
+import 'package:surbased/src/survey/application/widgets/survey_invitation_dialog.dart';
 
 class FirebaseService {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -29,6 +29,8 @@ class FirebaseService {
 
   Future<void> _handleMessage(RemoteMessage? message) async {
 
+    print('Message: $message');
+
 
     if (message == null) return;
 
@@ -41,13 +43,14 @@ class FirebaseService {
     
     showDialog(
       context: navigatorKey.currentContext!,
-      builder: (context) => Dialog(
-        child: SurveyInvitationDialog(
+      builder: (context) => SurveyInvitationDialog(
           surveyId: message.data['survey_id'],
           surveyName: message.data['survey_name'],
           inviterName: message.data['email'],
+          notificationTitle: message.notification?.title ?? '',
+          notificationBody: message.notification?.body ?? '',
+          userId: message.data['user_id'],
         ),
-      ),
     );
   }
 

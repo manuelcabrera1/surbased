@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
+import 'package:surbased/src/survey/application/pages/survey_access_request_dialog.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';
@@ -64,13 +65,17 @@ class _SurveyExploreState extends State<SurveyExplore> {
       if (userRole == 'participant') {
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
-        answerProvider.setCurrentSurveyBeingAnswered(survey);
-        surveyProvider.currentSurvey = survey;
-        Navigator.pushNamed(
-          context,
-          AppRoutes.surveyComplete,
-          arguments: survey,
-        );
+
+        if (authProvider.surveysAssigned.any((e) => e.id == survey.id)) {
+          surveyProvider.currentSurvey = survey;
+          answerProvider.setCurrentSurveyBeingAnswered(survey);
+          Navigator.pushNamed(context, AppRoutes.surveyComplete);
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => SurveyAccessRequestDialog(survey: survey),
+          );
+        }
       }
     }
   }

@@ -17,10 +17,11 @@ import 'package:surbased/src/survey/application/provider/survey_answers_provider
 import 'package:surbased/src/shared/application/provider/accessibility_provider.dart';
 import 'package:firebase_core/firebase_core.dart'; 
 import 'firebase_options.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  
+  await dotenv.load();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FlutterDownloader.initialize();
