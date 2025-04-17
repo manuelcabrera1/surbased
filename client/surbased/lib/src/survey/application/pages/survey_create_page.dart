@@ -35,7 +35,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
                           child: const Icon(Icons.arrow_back),
                         ),
                         const SizedBox(width: 8),
