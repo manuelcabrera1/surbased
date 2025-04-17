@@ -405,7 +405,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
                           child: Wrap(children: [
-                            Text(t.survey_answers_ai_summary, 
+                            Text(t.generate_summary, 
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 fontSize: 13.5, 
                                 color: theme.colorScheme.onPrimary
