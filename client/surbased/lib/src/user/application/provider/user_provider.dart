@@ -45,6 +45,35 @@ class UserProvider with ChangeNotifier {
 
   }
 
+  Future<User?> getUserByEmail(String email, String token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final userResponse = await _userService.getUserByEmail(email, token);
+      if (userResponse['success']) {
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return User.fromJson(userResponse['data']);
+
+      } else {
+        _error = userResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return null;
+      }
+
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return null;
+    }
+
+  }
+
   String getUserEmail(String userId) {
     if (_users.isEmpty) {
       return '';

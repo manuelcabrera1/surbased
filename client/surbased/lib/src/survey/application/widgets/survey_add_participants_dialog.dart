@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/user/application/widgets/user_not_registered_dialog.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
 import '../provider/survey_provider.dart';
 
 
@@ -24,6 +26,7 @@ class _SurveyAddParticipantsDialogState
     if (_formKey.currentState!.validate()) {  
       final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
       final t = AppLocalizations.of(context)!;
       try {
         if (authProvider.token != null) {
@@ -38,12 +41,23 @@ class _SurveyAddParticipantsDialogState
             }
             return;
           }
-          
-          final success = await surveyProvider.addUserToSurvey(
-            surveyProvider.currentSurvey!.id!,
-            _participantController.text,
-            authProvider.token!,
-          );
+
+          final user = await userProvider.getUserByEmail(_participantController.text, authProvider.token!);
+          bool success = false;
+          if (user == null && mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => UserNotRegisteredDialog(
+                userEmail: _participantController.text,
+              ),
+            );
+          } else {
+              success = await surveyProvider.addUserToSurvey(
+              surveyProvider.currentSurvey!.id!,
+              _participantController.text,
+              authProvider.token!,
+            );
+          }
           
           if (success) {
             if (mounted) {

@@ -127,6 +127,21 @@ async def get_user_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get
         
         return existing_user
 
+@user_router.get("/users/", status_code=200, response_model=UserResponse)
+async def get_user_by_email(email:str, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+
+        result = await db.execute(select(User).where(User.email == email))
+        existing_user = result.unique().scalars().first()
+
+
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found") 
+        
+        return existing_user
+
 
 @user_router.put("/users/change-password", status_code=200, dependencies=[Depends(check_current_user)])
 async def update_password(current_user: Annotated[User, Depends(get_current_user)], pw: UserUpdatePasswordRequest, db: Annotated[AsyncSession, Depends(get_db)]):
@@ -200,24 +215,6 @@ async def delete_user(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)
     
         return None
 
-
-@user_router.get("/users/", status_code=200, response_model=UserResponseWithLength, dependencies=[Depends(check_current_user)])
-async def filter_users(db: Annotated[AsyncSession, Depends(get_db)], role:Optional[UserRoleEnum] = None, org_id: Optional[uuid.UUID] = None):
-
-        query = select(User)
-
-        if role:
-            query = query.where(User.role == role)
-        
-        if org_id:
-        
-            query = query.where(User.organization_id == org_id)
-        
-        result = await db.execute(query)
-        users = result.unique().scalars().all()
-
-        return { "users": users, "length": len(users) }
-    
 
 @user_router.post("/users/logout", status_code=200)
 def logout():    

@@ -44,17 +44,17 @@
 </head>
 <body>
     <div class="header">
-        <h1>Invitación a Encuesta</h1>
+        <h1>Invitación a Encuesta {{ survey_name }}</h1>
     </div>
     <div class="content">
-        <p>Hola {{ recipient_name }},</p>
+        <p>Hola,</p>
         
-        <p>Has sido invitado/a a participar en la encuesta "{{ survey_title }}".</p>
+        <p>Has sido invitado/a a participar en la encuesta "{{ survey_name }}".</p>
         
-        <p>{{ invitation_message }}</p>
+        <p>Descarga la aplicación Surbased en tu dispositivo móvil y crea tu cuenta para participar en la encuesta.</p>
         
         <p style="text-align: center;">
-            <a href="{{ survey_url }}" class="button">Participar en la Encuesta</a>
+            <a href="{{ survey_url }}" class="button">Descargar Surbased</a>
         </p>
         
         <p>Si el botón no funciona, puedes copiar y pegar el siguiente enlace en tu navegador:</p>

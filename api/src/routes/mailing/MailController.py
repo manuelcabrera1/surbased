@@ -14,32 +14,24 @@ from models.UserModel import User
 mail_router = APIRouter(prefix="/mail", tags=["mail"])
 
 
-@mail_router.post("/send-survey-invitation/")
+@mail_router.post("/survey-invitation")
 async def send_survey_invitation(invitation: MailSurveyInvitation,
-                                 db: Annotated[AsyncSession, Depends(get_db)],
                                  conf: ConnectionConfig = Depends(get_conf), 
                                  templates: Environment = Depends(get_templates)):
     try:
-        # Verificar si el usuario existe en la base de datos
-        result = await db.execute(select(User).where(User.email == invitation.recipient_email))
-        user = result.unique().scalars().first()
-
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
 
         # Cargar y renderizar la plantilla
         template = templates.get_template('survey_invitation.html')
         html_content = template.render(
-            recipient_name=invitation.recipient_name,
-            survey_title=invitation.survey_title,
+            recipient_name=invitation.email,
+            survey_name=invitation.survey_name,
             survey_url=invitation.survey_url,
-            invitation_message=invitation.invitation_message
         )
 
         # Crear el mensaje
         message = MessageSchema(
-            subject=f"Invitación a la encuesta: {invitation.survey_title}",
-            recipients=[invitation.recipient_email],
+            subject=f"Invitación a la encuesta: {invitation.survey_name}",
+            recipients=[invitation.email],
             body=html_content,
             subtype="html"
         )
@@ -50,7 +42,7 @@ async def send_survey_invitation(invitation: MailSurveyInvitation,
 
         return {
             "success": True,
-            "message": f"Invitación enviada exitosamente a {invitation.recipient_email}"
+            "message": f"Invitación enviada exitosamente a {invitation.email}"
         }
     except Exception as e:
         # Mejorar el mensaje de error para depuración

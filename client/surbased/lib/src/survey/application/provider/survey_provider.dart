@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/shared/infrastructure/lm_service.dart';
+import 'package:surbased/src/shared/infrastructure/mail_service.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/domain/tag_model.dart';
@@ -10,6 +11,7 @@ import '../../../user/domain/user_model.dart';
 class SurveyProvider extends ChangeNotifier {
   final SurveyService _surveyService = SurveyService();
   final LmService _lmService = LmService();
+  final MailService _mailService = MailService();
   List<Survey> _publicSurveys = [];
   List<Survey> _highlightedPublicSurveys = [];
   List<Survey> _surveysOwned = [];
@@ -117,24 +119,12 @@ class SurveyProvider extends ChangeNotifier {
 
       _currentSurvey!.scope = scope;
       _currentSurvey!.organizationId = organizationId;
-
-      print(_currentSurvey!.name);
-      print(_currentSurvey!.scope);
-      print(_currentSurvey!.categoryId);
-      print(_currentSurvey!.ownerId);
-      print(_currentSurvey!.organizationId);
-      print(_currentSurvey!.description);
-      print(_currentSurvey!.startDate);
-      print(_currentSurvey!.endDate);
-      print(_currentSurvey!.questions);
-      print(_currentSurvey!.tags);
       
       
       final response = await _surveyService.createSurvey(
         _currentSurvey!.toJson(),
         token,
       );
-            print(response['data']);
 
 
       if (response['success']) {
@@ -151,7 +141,6 @@ class SurveyProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      print(e.toString());
       _isLoading = false;
       _error = e.toString();
       notifyListeners();
@@ -443,7 +432,6 @@ class SurveyProvider extends ChangeNotifier {
         _isGeneratingQuestions = false;
         _error = null;
         _currentSurvey = Survey.fromJson((response['data']) as Map<String, dynamic>);
-        print(_currentSurvey!.tags as List<Tag>);
 
         notifyListeners();
       } else {
@@ -457,6 +445,32 @@ class SurveyProvider extends ChangeNotifier {
       _error = e.toString();
       _isGeneratingQuestions = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> sendSurveyInvitationMail(String email, String surveyName, String token) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final response = await _mailService.sendSurveyInvitationMail(email, surveyName, token);
+
+      if (response['success']) {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = response['data'];
+        notifyListeners();
+        return false;
+      }
+    } catch(e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 }

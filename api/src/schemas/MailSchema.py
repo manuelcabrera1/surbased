@@ -5,9 +5,8 @@ class MailBase(BaseModel):
     email: EmailStr
 
 class MailSurveyInvitation(MailBase):
-    survey_title: str
+    survey_name: str
     survey_url: str
-    invitation_message: str = "Nos gustaría contar con tu participación en esta encuesta."
 
 class MailForgotPassword(MailBase):...
 

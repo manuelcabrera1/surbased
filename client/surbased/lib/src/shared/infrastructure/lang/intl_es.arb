@@ -322,5 +322,10 @@
     "create_survey": "Crear Encuesta",
     "create_user": "Crear Usuario",
     "create_blank": "Crear en blanco",
-    "generate_with_ai": "Generar con IA"
+    "generate_with_ai": "Generar con IA",
+    "user_not_registered": "Usuario No Registrado",
+    "user_not_registered_description": "Este usuario no está registrado en la aplicación. ¿Deseas enviarle una invitación para unirse al cuestionario?",
+    "send_invitation": "Enviar Invitación",
+    "invitation_sent": "Invitación enviada correctamente",
+    "invitation_error": "Error al enviar la invitación"
 }

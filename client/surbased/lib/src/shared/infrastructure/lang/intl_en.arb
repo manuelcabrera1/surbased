@@ -322,5 +322,10 @@
     "create_survey": "Create Survey",
     "create_user": "Create User",
     "create_blank": "Create blank",
-    "generate_with_ai": "Generate with AI"
+    "generate_with_ai": "Generate with AI",
+    "user_not_registered": "User Not Registered",
+    "user_not_registered_description": "This user is not registered in the application. Would you like to send them an invitation to join the survey?",
+    "send_invitation": "Send Invitation",
+    "invitation_sent": "Invitation sent successfully",
+    "invitation_error": "Error sending invitation"
 }

@@ -210,8 +210,6 @@ async def assign_users_to_survey(id: uuid.UUID, user: AssignParticipantToSurvey,
                     success = send_notification(notifcation_params)
                     if not success:
                         raise HTTPException(status_code=500, detail="Error sending notification")
-                    else:
-                        raise HTTPException(status_code=500, detail="Error sending notification")
         
         except Exception as e:
             print(e)
@@ -455,8 +453,6 @@ async def request_survey_access(id: uuid.UUID, user_id: uuid.UUID, payload: Requ
 
             if fcm_tokens:
                  for token in fcm_tokens:
-                    print(payload.notification_title)
-                    print(payload.notification_body)
                     #enviar notificaciones al owner del cuestionario
                     send_notification_params = NotificationRequest(token=token, title=payload.notification_title, body=payload.notification_body, email=current_user.email, survey_id=existing_survey.id, survey_name=existing_survey.name, user_id=existing_user.id)
                     success = send_notification(send_notification_params)
