@@ -9,7 +9,7 @@ class SurveyCreateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -21,7 +21,7 @@ class SurveyCreateDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Crear encuesta',
+              t.create_survey,
               style: theme.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -30,7 +30,7 @@ class SurveyCreateDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: Icons.edit_square,
-              title: 'Create blank',
+              title: t.create_blank,
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.surveyCreate,);
               },
@@ -39,7 +39,7 @@ class SurveyCreateDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: CupertinoIcons.sparkles,
-              title: 'Generate with AI',
+              title: t.generate_with_ai,
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.surveyCreate, arguments: true);
               },
@@ -49,7 +49,7 @@ class SurveyCreateDialog extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 200),
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(l10n.cancel),
+                child: Text(t.cancel),
               ),
             ),
           ],

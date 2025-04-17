@@ -316,5 +316,11 @@
     "survey_answers_max": "Máximo",
     "survey_answers_responses_percentage": "Respuestas (%)",
     "survey_answers_responses_count": "{count} respuestas",
-    "survey_answers_response": "1 respuesta"
+    "survey_answers_response": "1 respuesta",
+    "create_resource_title": "Crear Recurso",
+    "create_organization": "Crear Organización",
+    "create_survey": "Crear Encuesta",
+    "create_user": "Crear Usuario",
+    "create_blank": "Crear en blanco",
+    "generate_with_ai": "Generar con IA"
 }

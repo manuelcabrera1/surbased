@@ -8,7 +8,7 @@ class CreateResourceDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -20,16 +20,16 @@ class CreateResourceDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-                  'Crear recurso',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              t.create_resource_title,
+              style: theme.textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
+            ),
             const SizedBox(height: 24),
             _buildOption(
               context,
               icon: Icons.business_outlined,
-              title: 'Crear organización',
+              title: t.create_organization,
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.organizationCreate);
               },
@@ -38,7 +38,7 @@ class CreateResourceDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: Icons.assignment_outlined,
-              title: 'Crear encuesta',
+              title: t.create_survey,
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.surveyCreate);
               },
@@ -47,7 +47,7 @@ class CreateResourceDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: Icons.person_add_outlined,
-              title: 'Crear usuario',
+              title: t.create_user,
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.userCreate);
               },
@@ -57,7 +57,7 @@ class CreateResourceDialog extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 200),
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(l10n.cancel),
+                child: Text(t.cancel),
               ),
             ),
           ],
