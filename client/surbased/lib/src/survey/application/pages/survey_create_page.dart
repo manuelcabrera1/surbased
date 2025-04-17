@@ -10,7 +10,8 @@ import '../../../category/application/provider/category_provider.dart';
 
 
 class SurveyCreatePage extends StatefulWidget {
-  const SurveyCreatePage({super.key});
+  final bool isGeneratingWithAI;
+  const SurveyCreatePage({super.key, this.isGeneratingWithAI = false});
 
   @override
   State<SurveyCreatePage> createState() => SurveyCreatePageState();
@@ -30,7 +31,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.only(left: 10, right: 20),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -43,7 +44,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                             fit: BoxFit.scaleDown,
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              t.survey_create_page_title,
+                              widget.isGeneratingWithAI ? t.survey_create_page_title_ai : t.survey_create_page_title,
                               style: theme.textTheme.displayMedium?.copyWith(
                                 fontSize: 30,
                               ),
@@ -53,7 +54,14 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                       ],
                     ),
                   ),
-                  const SurveyForm(),
+                  if (widget.isGeneratingWithAI) ...[
+                    const SizedBox(height: 20),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 10), 
+                    child: Text('Complete the following fields to generate the survey. You can edit it later.', style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),)),
+                  ],
+                  SurveyForm(isGeneratingWithAI: widget.isGeneratingWithAI),
                 ],
               ),
           ),

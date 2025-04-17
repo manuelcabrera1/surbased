@@ -1,12 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/shared/application/provider/lang_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_answers_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
-import 'package:surbased/src/survey/application/widgets/survey_answers_download_dialog.dart';
 
 class SurveyAnswers extends StatefulWidget {
   const SurveyAnswers({super.key});
@@ -27,29 +28,20 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
   String _getVisualizationName(String type, AppLocalizations t) {
     switch (type) {
       case 'descriptive_stats':
-        return 'Estadísticas descriptivas';
-      case 'frequency_chart':
-        return 'Gráfico de frecuencias';
+        return t.survey_answers_visualization_descriptive_stats;
+      case 'diverging_chart':
+        return t.survey_answers_visualization_diverging_chart;
+      case 'distribution_chart':
+        return t.survey_answers_visualization_distribution_chart;
       case 'pie_chart':
-        return 'Gráfico circular';
+        return t.survey_answers_visualization_pie_chart;
       case 'bar_chart':
-        return 'Histograma';
+        return t.survey_answers_visualization_bar_chart;
       case 'spectrum':
-        return 'Gráfico de espectro';
+        return t.survey_answers_visualization_spectrum;
       default:
         return type;
     }
-  }
-
-  String _getDefaultVisualization(String questionType) {
-    if (!_visualizationTypes.containsKey(questionType)) {
-      return '';
-    }
-    return questionType == 'likert_scale' ? 'descriptive_stats' : 'pie_chart';
-  }
-
-  bool _isValidVisualization(String questionType, String? visualization) {
-    return _visualizationTypes[questionType]?.contains(visualization) ?? false;
   }
 
   @override
@@ -73,21 +65,12 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
     }
   }
 
-  void _updateVisualization(String questionId, String questionType, String newValue) {
-    print("Actualizando visualización - ID: $questionId, Tipo: $questionType, Nuevo valor: $newValue");
-    if (_visualizationTypes[questionType]?.contains(newValue) ?? false) {
-      setState(() {
-        _selectedVisualization[questionId] = newValue;
-      });
-      print("Visualización actualizada - Nuevo estado: ${_selectedVisualization[questionId]}");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final answersProvider = Provider.of<SurveyAnswersProvider>(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
+    final t = AppLocalizations.of(context)!;
 
     if (answersProvider.isLoading || surveyProvider.isLoading || surveyProvider.currentSurvey == null) {
       return const Center(child: CircularProgressIndicator());
@@ -107,7 +90,7 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
     if (answersProvider.answers.isEmpty) {
       return Center(
         child: Text(
-          'No hay respuestas para mostrar',
+          t.survey_answers_no_responses,
           style: theme.textTheme.titleMedium,
         ),
       );
@@ -120,16 +103,16 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Resumen General',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+            children: [
+              Text(
+                t.survey_answers_general_summary,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
-                  ),
-                  const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -140,13 +123,13 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildStatCard(
-                        'Total Respuestas',
+                        t.survey_answers_total_responses,
                         answersProvider.statistics['total_answers'].toString(),
                         Icons.people,
                         theme.colorScheme.primary,
                       ),
                       _buildStatCard(
-                        'Preguntas',
+                        t.survey_answers_questions,
                         surveyProvider.currentSurvey?.questions.length.toString() ?? '0',
                         Icons.question_answer,
                         theme.colorScheme.secondary,
@@ -158,9 +141,8 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
             ),
           ),
           const SizedBox(height: 24),
-
           Text(
-            'Estadísticas por Pregunta',
+            t.survey_answers_question_stats,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -207,13 +189,6 @@ class _SurveyAnswersState extends State<SurveyAnswers> {
       ),
     );
   }
-
-  void _showDownloadDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => const SurveyAnswersDownloadDialog(),
-    );
-  }
 }
 
 class QuestionStatsCard extends StatefulWidget {
@@ -230,12 +205,32 @@ class QuestionStatsCard extends StatefulWidget {
 
 class _QuestionStatsCardState extends State<QuestionStatsCard> {
   String? _selectedVisualization;
+  String? _summary;
   
   final Map<String, List<String>> _visualizationTypes = {
     'likert_scale': ['descriptive_stats', 'diverging_chart', 'distribution_chart'],
     'single_choice': ['pie_chart', 'bar_chart', 'spectrum'],
     'multiple_choice': ['pie_chart', 'bar_chart', 'spectrum'],
   };
+
+  String _getVisualizationName(String type, AppLocalizations t) {
+    switch (type) {
+      case 'descriptive_stats':
+        return t.survey_answers_visualization_descriptive_stats;
+      case 'diverging_chart':
+        return t.survey_answers_visualization_diverging_chart;
+      case 'distribution_chart':
+        return t.survey_answers_visualization_distribution_chart;
+      case 'pie_chart':
+        return t.survey_answers_visualization_pie_chart;
+      case 'bar_chart':
+        return t.survey_answers_visualization_bar_chart;
+      case 'spectrum':
+        return t.survey_answers_visualization_spectrum;
+      default:
+        return type;
+    }
+  }
 
   @override
   void initState() {
@@ -253,25 +248,6 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
         return 'pie_chart';
       default:
         return '';
-    }
-  }
-
-  String _getVisualizationName(String type, AppLocalizations t) {
-    switch (type) {
-      case 'descriptive_stats':
-        return 'Estadísticas descriptivas';
-      case 'diverging_chart':
-        return 'Gráfico de divergencia';
-      case 'distribution_chart':
-        return 'Distribución y tendencia';
-      case 'pie_chart':
-        return 'Gráfico circular';
-      case 'bar_chart':
-        return 'Histograma';
-      case 'spectrum':
-        return 'Gráfico de espectro';
-      default:
-        return type;
     }
   }
 
@@ -305,11 +281,12 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final questionType = widget.questionData['type'] as String;
-    final description = widget.questionData['description'] as String;
-    final options = Map<String, dynamic>.from(widget.questionData['options']);
-    final totalResponses = widget.questionData['total_responses'] as int;
-
+    final t = AppLocalizations.of(context)!;
+    final String questionType = widget.questionData['type'];
+    final String description = widget.questionData['description'];
+    final Map<String, dynamic> options = Map<String, dynamic>.from(widget.questionData['options']);
+    final int totalResponses = widget.questionData['total_responses'];
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     // Asegurarse de que tenemos un tipo de visualización válido
     final availableTypes = _visualizationTypes[questionType];
     if (_selectedVisualization == null || 
@@ -330,29 +307,31 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Total respuestas: $totalResponses',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        description,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        totalResponses > 1 
+                            ? t.survey_answers_responses_count(totalResponses.toString())
+                            : t.survey_answers_response,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                if (questionType != 'open' && _visualizationTypes.containsKey(questionType))
+                if (questionType != 'open' && _visualizationTypes.containsKey(questionType)) ...[
                   PopupMenuButton<String>(
                     initialValue: _selectedVisualization,
-                    tooltip: 'Cambiar visualización',
+                    tooltip: t.survey_answers_visualization_change,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
@@ -398,7 +377,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                _getVisualizationName(type, AppLocalizations.of(context)!),
+                                _getVisualizationName(type, t),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: _selectedVisualization == type 
                                       ? theme.colorScheme.primary 
@@ -413,84 +392,143 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                         );
                       }).toList() ?? [],
                   ),
+                ],
+                if (questionType == 'open') ...[
+                  FilledButton(
+                    onPressed: surveyProvider.isGeneratingSummary ? null : () => _handleGenerateSummary(description, options),
+                    child: Row(children: [
+                      if (!surveyProvider.isGeneratingSummary) ...[
+                        GestureDetector(
+                          child: const Icon(CupertinoIcons.sparkles, size: 20),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+                          child: Wrap(children: [
+                            Text(t.survey_answers_ai_summary, 
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontSize: 13.5, 
+                                color: theme.colorScheme.onPrimary
+                              )
+                            )
+                          ],),
+                        )
+                      ] else ...[
+                        CircularProgressIndicator(
+                          strokeWidth: 0.5, 
+                          color: theme.colorScheme.onPrimary
+                        )
+                      ]
+                    ],)
+                  ),
+                ]
               ],
             ),
             const SizedBox(height: 16),
-            _buildVisualizationContent(questionType, options, theme),
+            _buildVisualizationContent(questionType, options),
           ],
         ),
       ),
     );
   }
 
+  Future<void> _handleGenerateSummary(String questionDescription, Map<String, dynamic> options) async {
+    try {
+      final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+      final locale = Provider.of<LangProvider>(context, listen: false).locale;
+      List<String> optionsArray = [];
+      options.forEach((key, value) {
+        optionsArray.add(value['text']);
+      });
+      final summary = await surveyProvider.generateSummary(questionDescription, optionsArray, locale.toString());
+      if (summary != null && summary.isNotEmpty) {
+        setState(() {
+          _summary = summary;
+        });
+      } else {
+        setState(() {
+          _summary = null;
+        });
+      }
+      
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
   Widget _buildVisualizationContent(
     String questionType,
     Map<String, dynamic> options,
-    ThemeData theme,
   ) {
     if (questionType == 'likert_scale') {
-      return _buildLikertScaleVisualization(options, theme);
+      return _buildLikertScaleVisualization(options);
     } else if ((questionType == 'single_choice' || questionType == 'multiple_choice') && 
               _visualizationTypes.containsKey(questionType)) {
-      return _buildChoiceVisualization(options, theme);
+      return _buildChoiceVisualization(options);
     } else {
-      return _buildOpenAnswers(options, theme);
+      return _buildOpenAnswers(options, _summary ?? '');
     }
   }
 
-  Widget _buildLikertScaleVisualization(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildLikertScaleVisualization(Map<String, dynamic> options) {
     switch (_selectedVisualization) {
       case 'descriptive_stats':
-        return _buildDescriptiveStats(_calculateLikertStats(options.entries.toList()), theme);
+        return _buildDescriptiveStats(_calculateLikertStats(options.entries.toList()));
       case 'diverging_chart':
-        return _buildDivergingChart(options, theme);
+        return _buildDivergingChart(options);
       case 'distribution_chart':
-        return _buildDistributionChart(options, theme);
+        return _buildDistributionChart(options);
       default:
         return const SizedBox();
     }
   }
 
-  Widget _buildChoiceVisualization(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildChoiceVisualization(Map<String, dynamic> options) {
     switch (_selectedVisualization) {
       case 'pie_chart':
-        return _buildPieChart(options, theme);
+        return _buildPieChart(options);
       case 'bar_chart':
-        return _buildBarChart(options, theme);
+        return _buildBarChart(options);
       case 'spectrum':
-        return _buildSpectrumChart(options, theme);
+        return _buildSpectrumChart(options);
       default:
         return const SizedBox();
     }
   }
 
-  Widget _buildDescriptiveStats(Map<String, double> stats, ThemeData theme) {
+  Widget _buildDescriptiveStats(Map<String, double> stats) {
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatBox('Media', stats['mean']?.toStringAsFixed(2) ?? '0.00', theme),
-                    _buildStatBox('Mediana', stats['median']?.toStringAsFixed(2) ?? '0.00', theme),
-                    _buildStatBox('Moda', stats['mode']?.toStringAsFixed(2) ?? '0.00', theme),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatBox('Desv. Est.', stats['stdDev']?.toStringAsFixed(2) ?? '0.00', theme),
-                    _buildStatBox('Mínimo', stats['min']?.toInt().toString() ?? '0', theme),
-                    _buildStatBox('Máximo', stats['max']?.toInt().toString() ?? '0', theme),
-                  ],
-                ),
+                _buildStatBox(t.survey_answers_mean, stats['mean']?.toStringAsFixed(2) ?? '0.00', theme),
+                _buildStatBox(t.survey_answers_median, stats['median']?.toStringAsFixed(2) ?? '0.00', theme),
+                _buildStatBox(t.survey_answers_mode, stats['mode']?.toStringAsFixed(2) ?? '0.00', theme),
               ],
             ),
-          ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatBox(t.survey_answers_std_dev, stats['stdDev']?.toStringAsFixed(2) ?? '0.00', theme),
+                _buildStatBox(t.survey_answers_min, stats['min']?.toInt().toString() ?? '0', theme),
+                _buildStatBox(t.survey_answers_max, stats['max']?.toInt().toString() ?? '0', theme),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -525,7 +563,9 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildDivergingChart(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildDivergingChart(Map<String, dynamic> options) {
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     final sortedOptions = options.entries.toList()
       ..sort((a, b) {
         final pointsA = a.value['points'] ?? 0;
@@ -533,7 +573,6 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
         return pointsA.compareTo(pointsB);
       });
 
-    // Encontrar el punto medio de la escala
     final middlePoint = (sortedOptions.first.value['points'] + sortedOptions.last.value['points']) / 2;
 
     return Column(
@@ -596,8 +635,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                     },
                   ),
                 ),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               gridData: FlGridData(
                 show: true,
@@ -643,19 +682,19 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
           alignment: WrapAlignment.center,
           children: [
             _buildLegendStat(
-              'Respuestas Positivas',
+              t.survey_answers_positive_responses,
               '${_calculatePositivePercentage(sortedOptions, middlePoint)}%',
               theme,
               color: theme.colorScheme.primary,
             ),
             _buildLegendStat(
-              'Respuestas Negativas',
+              t.survey_answers_negative_responses,
               '${_calculateNegativePercentage(sortedOptions, middlePoint)}%',
               theme,
               color: theme.colorScheme.error,
             ),
             _buildLegendStat(
-              'Neutrales',
+              t.survey_answers_neutral_responses,
               '${_calculateNeutralPercentage(sortedOptions, middlePoint)}%',
               theme,
             ),
@@ -665,11 +704,13 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildPieChart(Map<String, dynamic> options, ThemeData theme) {
-    return _buildChoiceChart(options, theme);  // Reutilizamos el existente
+  Widget _buildPieChart(Map<String, dynamic> options) {
+    return _buildChoiceChart(options);  // Reutilizamos el existente
   }
 
-  Widget _buildBarChart(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildBarChart(Map<String, dynamic> options) {
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     final sortedOptions = options.entries.toList()
       ..sort((a, b) => (b.value['percentage'] as String)
           .compareTo(a.value['percentage'] as String));
@@ -698,7 +739,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(
-              'Respuestas (%)',
+              t.survey_answers_responses_percentage,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -725,7 +766,7 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                       final percentage = double.parse(option.value['percentage']);
                       final count = option.value['count'] as int;
                     return BarTooltipItem(
-                        '${option.value['description']}\n$count respuestas (${percentage.toStringAsFixed(1)}%)',
+                        '${option.value['description']}\n${t.survey_answers_responses_count(count.toString())} (${percentage.toStringAsFixed(1)}%)',
                         TextStyle(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
@@ -782,8 +823,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
                     },
                   ),
                 ),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               gridData: FlGridData(
                 show: true,
@@ -884,7 +925,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildSpectrumChart(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildSpectrumChart(Map<String, dynamic> options) {
+    final theme = Theme.of(context);
     final sortedOptions = options.entries.toList()
       ..sort((a, b) => (b.value['percentage'] as String)
           .compareTo(a.value['percentage'] as String));
@@ -927,7 +969,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildChoiceChart(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildChoiceChart(Map<String, dynamic> options) {
+    final theme = Theme.of(context);
     final List<PieChartSectionData> sections = [];
     final List<Widget> indicators = [];
     final colors = [
@@ -1014,48 +1057,90 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     );
   }
 
-  Widget _buildOpenAnswers(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildOpenAnswers(Map<String, dynamic> options, String summary) {
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
+    const maxNumberOfAnswers = 5;
+    final totalAnswers = options.length;
+    final answersToShow = options.entries.take(maxNumberOfAnswers).toList();
+    final hasMoreAnswers = totalAnswers > maxNumberOfAnswers;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: options.entries.map((entry) {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entry.value['text'] ?? entry.value['description'],
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${entry.value['count']} respuestas (${entry.value['percentage']}%)',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+        children: [
+          if (summary.isNotEmpty) ...[
+            Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              elevation: 10,
+              color: theme.colorScheme.onTertiaryContainer.withOpacity(0.15),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.survey_answers_ai_summary,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      summary,
+                      style: theme.textTheme.bodyMedium,
+                      maxLines: 7,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ),
-          );
-        }).toList(),
+            const SizedBox(height: 10),
+          ],
+          Text(
+            t.survey_answers_responses_count(totalAnswers.toString()),
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 9),
+          ...answersToShow.map((entry) {
+            return Card(
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+                side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+              ),
+              color: theme.colorScheme.onPrimary,
+              margin: const EdgeInsets.only(bottom: 6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry.value['text'] ?? entry.value['description'],
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+          if (hasMoreAnswers) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                t.survey_answers_more_responses(totalAnswers - maxNumberOfAnswers),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -1078,7 +1163,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
         .fold(0.0, (sum, option) => sum + double.parse(option.value['percentage']));
   }
 
-  Widget _buildDistributionChart(Map<String, dynamic> options, ThemeData theme) {
+  Widget _buildDistributionChart(Map<String, dynamic> options) {
+    final theme = Theme.of(context);
     final sortedOptions = options.entries.toList()
       ..sort((a, b) {
         final pointsA = a.value['points'] ?? 0;
@@ -1102,8 +1188,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
     }
 
     return Column(
-      children: [
-        Container(
+                    children: [
+                      Container(
           height: 220,
           padding: const EdgeInsets.fromLTRB(40, 16, 24, 24),
           child: LineChart(
@@ -1121,8 +1207,8 @@ class _QuestionStatsCardState extends State<QuestionStatsCard> {
               ),
               titlesData: FlTitlesData(
                 show: true,
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,

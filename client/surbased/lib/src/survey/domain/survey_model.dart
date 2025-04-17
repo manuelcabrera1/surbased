@@ -44,20 +44,23 @@ class Survey {
   });
 
   factory Survey.fromJson(Map<String, dynamic> json) => Survey(
-        name: json["name"],
+        name: json["name"] ?? '',
         assignmentStatus: json["assignment_status"],
         invitationsRejected: json["invitations_rejected"],
-        categoryId: json["category_id"],
-        ownerId: json["owner_id"],
+        categoryId: json["category_id"] ?? '',
+        ownerId: json["owner_id"] ?? '',
         id: json["id"],
         description: json["description"] ?? '',
-        scope: json["scope"],
+        scope: json["scope"] ?? 'private',
         organizationId: json["organization_id"],
         startDate: DateTime.parse(json["start_date"]),
         endDate: DateTime.parse(json["end_date"]),
-        questions: List<Question>.from(
-            json["questions"].map((x) => Question.fromJson(x))),
-        tags: json["tags"] != null ? List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))) : null,
+        questions: json["questions"] == null 
+            ? [] 
+            : List<Question>.from(json["questions"].map((x) => Question.fromJson(x))),
+        tags: json["tags"] == null 
+            ? [] 
+            : List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))),
         responseCount: json["response_count"],
       );
 

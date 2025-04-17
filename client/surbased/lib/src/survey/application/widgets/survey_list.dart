@@ -220,19 +220,20 @@ class _SurveyListState extends State<SurveyList> {
   }
 
   String _getSortFieldName(String field) {
+    final t = AppLocalizations.of(context)!;
     switch (field) {
       case 'name':
-        return 'Nombre';
+        return t.list_sort_name;
       case 'startDate':
-        return 'Fecha de inicio';
+        return t.list_sort_start_date;
       case 'endDate':
-        return 'Fecha de fin';
+        return t.list_sort_end_date;
       case 'organization':
-        return 'Organización';
+        return t.list_sort_organization;
       case 'questions':
-        return 'Número de preguntas';
+        return t.list_sort_questions;
       default:
-        return 'Nombre';
+        return t.list_sort_name;
     }
   }
 
@@ -373,9 +374,9 @@ class _SurveyListState extends State<SurveyList> {
                     InkWell(
                       onTap: _showFilterDialog,
                       child: Wrap(children: [
-                        Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                        Text(t.list_sorted_by, style: theme.textTheme.bodySmall),
                       Text(
-                        _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                        _getSortFieldName(_sortField) + (_isAscending ? t.list_ascending : t.list_descending),
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,

@@ -147,7 +147,7 @@ class _OrganizationListFilterDialogState extends State<OrganizationListFilterDia
                 );
                 Navigator.pop(context);
               },
-              child: const Text('Aplicar', style: TextStyle(fontSize: 16)),
+              child: Text(t.apply, style: const TextStyle(fontSize: 16)),
             ),
           ),
         ),

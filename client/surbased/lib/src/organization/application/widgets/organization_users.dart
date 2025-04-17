@@ -119,15 +119,16 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
   }
 
   String _getSortFieldName(String field) {
+    final t = AppLocalizations.of(context)!;
     switch (field) {
       case 'name':
-        return 'Nombre';
+        return t.user_list_sort_name;
       case 'email':
-        return 'Email';
+        return t.user_list_sort_email;
       case 'role':
-        return 'Rol';
+        return t.user_list_sort_role;
       default:
-        return 'Nombre';
+        return t.user_list_sort_name;
     }
   }
 
@@ -214,9 +215,9 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                     InkWell(
                       onTap: _showFilterDialog,
                       child: Wrap(children: [
-                        Text('Ordenado por: ', style: theme.textTheme.bodySmall),
+                        Text(t.list_sorted_by, style: theme.textTheme.bodySmall),
                       Text(
-                        _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
+                        _getSortFieldName(_sortField) + (_isAscending ? t.list_ascending : t.list_descending),
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surbased/src/shared/infrastructure/lm_service.dart';
 import 'package:surbased/src/survey/domain/question_model.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/survey/domain/tag_model.dart';
@@ -8,10 +9,13 @@ import '../../../user/domain/user_model.dart';
 
 class SurveyProvider extends ChangeNotifier {
   final SurveyService _surveyService = SurveyService();
+  final LmService _lmService = LmService();
   List<Survey> _publicSurveys = [];
   List<Survey> _highlightedPublicSurveys = [];
   List<Survey> _surveysOwned = [];
   bool _isLoading = false;
+  bool _isGeneratingSummary = false;
+  bool _isGeneratingQuestions = false;
   String? _error;
   Survey? _currentSurvey;
   List<Survey> _privateSurveys = [];
@@ -28,7 +32,8 @@ class SurveyProvider extends ChangeNotifier {
   List<Survey> get privateSurveys => _privateSurveys;
   List<Survey> get organizationSurveys => _organizationSurveys;
   Map <String, dynamic> get pendingAssignmentsInCurrentSurvey => _pendingAssignmentsInCurrentSurvey;
-
+  bool get isGeneratingSummary => _isGeneratingSummary;
+  bool get isGeneratingQuestions => _isGeneratingQuestions;
   set currentSurvey(Survey? value) {
     _currentSurvey = value;
     notifyListeners();
@@ -112,11 +117,25 @@ class SurveyProvider extends ChangeNotifier {
 
       _currentSurvey!.scope = scope;
       _currentSurvey!.organizationId = organizationId;
+
+      print(_currentSurvey!.name);
+      print(_currentSurvey!.scope);
+      print(_currentSurvey!.categoryId);
+      print(_currentSurvey!.ownerId);
+      print(_currentSurvey!.organizationId);
+      print(_currentSurvey!.description);
+      print(_currentSurvey!.startDate);
+      print(_currentSurvey!.endDate);
+      print(_currentSurvey!.questions);
+      print(_currentSurvey!.tags);
+      
       
       final response = await _surveyService.createSurvey(
         _currentSurvey!.toJson(),
         token,
       );
+            print(response['data']);
+
 
       if (response['success']) {
         _surveysOwned.add(_currentSurvey!);
@@ -132,6 +151,7 @@ class SurveyProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      print(e.toString());
       _isLoading = false;
       _error = e.toString();
       notifyListeners();
@@ -379,6 +399,64 @@ class SurveyProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<String?> generateSummary(String questionDescription, List<String> options, String locale) async {
+    try {
+      _error = null;
+      _isGeneratingSummary = true;
+      notifyListeners();
+
+      final response = await _lmService.sendMessageToGenerateAnswersSummary(questionDescription, options, locale);
+
+      if (response['success']) {
+        _isGeneratingSummary = false;
+        notifyListeners();
+        return response['data'];
+      } else {
+        _isGeneratingSummary = false;
+        _error = response['data'];
+        notifyListeners();
+        return null;
+      }
+      
+      
+    } catch (e) {
+      _error = e.toString();
+      _isGeneratingSummary = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  Future<void> generateQuestionsWithAI(String categoryId, String ownerId, String name, String category, List<String> tags, String description, String locale, String numberOfQuestions, DateTime startDate, DateTime endDate) async {
+    try {
+      _error = null;
+      _isGeneratingQuestions = true;
+      notifyListeners();
+      
+
+      final response = await _lmService.sendMessageToGenerateSurvey(categoryId, ownerId, name, category, tags, description, locale, numberOfQuestions, startDate, endDate);
+
+      if (response['success']) {
+        _isGeneratingQuestions = false;
+        _error = null;
+        _currentSurvey = Survey.fromJson((response['data']) as Map<String, dynamic>);
+        print(_currentSurvey!.tags as List<Tag>);
+
+        notifyListeners();
+      } else {
+        _isGeneratingQuestions = false;
+        _error = response['data'];
+        notifyListeners();
+      }
+      
+      
+    } catch (e) {
+      _error = e.toString();
+      _isGeneratingQuestions = false;
+      notifyListeners();
     }
   }
 }

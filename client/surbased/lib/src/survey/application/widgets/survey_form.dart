@@ -10,7 +10,8 @@ import 'package:surbased/src/survey/application/provider/tags_provider.dart';
 import '../../../category/application/provider/category_provider.dart';
 
 class SurveyForm extends StatefulWidget {
-  const SurveyForm({super.key});
+  final bool isGeneratingWithAI;
+  const SurveyForm({super.key, this.isGeneratingWithAI = false});
 
   @override
   State<SurveyForm> createState() => SurveyFormState();
@@ -21,6 +22,10 @@ class SurveyFormState extends State<SurveyForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController =
+      TextEditingController(text: '');
+  final TextEditingController _numberOfQuestionsController =
+      TextEditingController(text: '');
+  final TextEditingController _localeController =
       TextEditingController(text: '');
   final TextEditingController _tagController = TextEditingController();
   DateTime? _startDate;
@@ -101,6 +106,22 @@ class SurveyFormState extends State<SurveyForm> {
     return null;
   }
 
+  String? _fieldNumberValidator(String? value) {
+    if (value == null || value.isEmpty || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.input_error_required;
+    }
+
+    if (int.tryParse(value) == null) {
+      return AppLocalizations.of(context)!.survey_form_number_error;
+    }
+
+    if (int.parse(value) < 1) {
+      return AppLocalizations.of(context)!.survey_form_number_positive;
+    }
+
+    return null;
+  }
+
   String? _endDateValidator(DateTime? value) {
     if (value != null && _startDate != null && value.isBefore(_startDate!)) {
       return AppLocalizations.of(context)!.start_end_date_error;
@@ -145,6 +166,7 @@ class SurveyFormState extends State<SurveyForm> {
       final surveyProvider =
           Provider.of<SurveyProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
       bool success = surveyProvider.addOrUpdateSurveyInfo(
         _nameController.text,
@@ -156,6 +178,21 @@ class SurveyFormState extends State<SurveyForm> {
         _selectedTags
       );
       if (success) {
+        if (widget.isGeneratingWithAI) {
+          
+          surveyProvider.generateQuestionsWithAI(
+            _categoryId!,
+            authProvider.user!.id,
+            _nameController.text,
+            categoryProvider.getCategoryById(_categoryId!).name,
+            _selectedTags,
+            _descriptionController.text,
+            _localeController.text,
+            _numberOfQuestionsController.text,
+            _startDate ?? DateTime.now(),
+            _endDate ?? DateTime.now().add(const Duration(days: 7)),
+          );
+        }
         Navigator.pushNamed(context, AppRoutes.surveyAddQuestions);
       } else {
         if (mounted) {
@@ -186,7 +223,7 @@ class SurveyFormState extends State<SurveyForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 10),
+            //const SizedBox(height: 10),
             TextFormField(
               keyboardType: TextInputType.text,
               controller: _nameController,
@@ -194,7 +231,7 @@ class SurveyFormState extends State<SurveyForm> {
                 labelText: t.survey_name,
                 border: const OutlineInputBorder(),
               ),
-              validator: _fieldValidator,
+              validator: widget.isGeneratingWithAI ? null : _fieldValidator,
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
@@ -302,16 +339,65 @@ class SurveyFormState extends State<SurveyForm> {
               ],
             ),
             const SizedBox(height: 20),
-            TextFormField(
-              keyboardType: TextInputType.multiline,
-              minLines: 2,
-              maxLines: 4,
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                labelText: t.description,
-                border: const OutlineInputBorder(),
+            if (widget.isGeneratingWithAI) ...[
+              Column(
+                children:[ 
+                  TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  minLines: 2,
+                  maxLines: 4,
+                  controller: _descriptionController,
+                  decoration: InputDecoration(
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: t.survey_form_ai_description,
+                    border: const OutlineInputBorder(),
+                    hintText: t.survey_form_ai_description_hint,
+                    hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    ),
+                    validator: _fieldValidator,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 2,
+                    controller: _localeController,
+                    decoration: InputDecoration(
+                      labelText: t.survey_form_ai_locale,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: _fieldValidator,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    minLines: 1,
+                    maxLines: 2,
+                    controller: _numberOfQuestionsController,
+                    decoration: InputDecoration(
+                      labelText: t.survey_form_ai_number_questions,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: _fieldNumberValidator,
+                  ),
+                  const SizedBox(height: 20),
+                  
+                ]
               ),
-            ),
+            ] else ...[
+              TextFormField(
+                keyboardType: TextInputType.multiline,
+                minLines: 2,
+                maxLines: 4,
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  labelText: t.description,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
             DateFormField(
               context: context,

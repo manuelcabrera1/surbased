@@ -69,7 +69,7 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
     
     if (token == null || surveyId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo autenticar la descarga')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.survey_download_auth_error)),
       );
       return;
     }
@@ -115,9 +115,9 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Descarga iniciada: $fileName.$format en $appDirPath'),
+              content: Text(AppLocalizations.of(context)!.survey_download_started('$fileName.$format', appDirPath)),
               action: SnackBarAction(
-                label: 'Abrir',
+                label: AppLocalizations.of(context)!.survey_download_open,
                 onPressed: () {
                   if (taskId != null) {
                     FlutterDownloader.open(taskId: taskId);
@@ -131,7 +131,7 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
         if (mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al descargar: $e')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.survey_download_error(e.toString()))),
           );
         }
       }

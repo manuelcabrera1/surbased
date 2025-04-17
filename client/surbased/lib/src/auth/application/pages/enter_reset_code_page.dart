@@ -82,7 +82,6 @@ class _EnterResetCodePageState extends State<EnterResetCodePage> {
                           setState(() {                          
                             inputResetCode[index] = value;
                           });
-                          print(authProvider.resetCode!);
                         },
                         isFirstField: index == 0,
                         isLastField: index == authProvider.resetCode!.toString().length - 1,

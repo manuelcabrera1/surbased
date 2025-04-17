@@ -9,6 +9,7 @@ import 'package:surbased/src/shared/application/widgets/create_resource_dialog.d
 import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';
+import 'package:surbased/src/survey/application/widgets/survey_create_dialog.dart';
 import 'package:surbased/src/survey/application/widgets/survey_events_calendar.dart';
 import 'package:surbased/src/survey/application/widgets/survey_section.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
@@ -64,7 +65,6 @@ class _HomePageState extends State<HomePage> {
   
 
   Future<void> _onDestinationSelected(int index) async {
-    print(dotenv.get('LANGUAGE_MODEL'));
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
       if (index == 0 || index == 1 || index == 2) {
@@ -314,7 +314,10 @@ class _HomePageState extends State<HomePage> {
               shape: const CircleBorder(),
               onPressed: () {
                 if (role == 'researcher') {
-                  Navigator.pushNamed(context, AppRoutes.surveyCreate);
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SurveyCreateDialog(),
+                  );
                 } else if (role == 'admin') {
                   showDialog(
                     context: context,

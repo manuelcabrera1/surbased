@@ -22,13 +22,14 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
   String? _organizationName;
   bool _isSendingInvitation = false;
   List<Category> _userCategoriesOfInterest  = [];
+  int _userSurveysCompleted = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _loadUserDetails();
-      _loadUserCategoriesOfInterest();
+      _loadUserData();
     });
   }
 
@@ -69,7 +70,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     }
   }
 
-  void _loadUserCategoriesOfInterest() async {
+  void _loadUserData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     
@@ -77,6 +78,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
       try {
         final surveys = await authProvider.getSurveysAssignedToUser(widget.userId, authProvider.token!);
         setState(() {
+          _userSurveysCompleted = surveys.length;
           _userCategoriesOfInterest = surveys.map((survey) => categoryProvider.getCategoryById(survey.categoryId)).toList();
           _userCategoriesOfInterest = _userCategoriesOfInterest.toSet().toList();
         });
@@ -247,20 +249,20 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // --- Información Personal ---
-                              _buildCardSubSectionTitle(context, 'Información Personal'),
+                              _buildCardSubSectionTitle(context, t.user_details_personal_info),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Column(
                                   children: [
                                     _buildInfoRow(
-                                      'Organización', 
+                                      t.user_details_organization, 
                                       _organizationName ?? 'Sin asignar',
                                       Icons.business,
                                       theme,
                                     ),
-                                    const SizedBox(height: 12), // Espaciado entre filas
+                                    const SizedBox(height: 12),
                                     _buildInfoRow(
-                                      'Género',
+                                      t.user_details_gender,
                                       _getGenderTranslation(_user!.gender),
                                       Icons.person,
                                       theme,
@@ -268,7 +270,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                     if (_user!.birthdate != null) ...[
                                       const SizedBox(height: 12),
                                       _buildInfoRow(
-                                        'Fecha Nacimiento',
+                                        t.user_details_birthdate,
                                         DateFormat('dd/MM/yyyy').format(_user!.birthdate!),
                                         Icons.cake,
                                         theme,
@@ -277,8 +279,8 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                     if (_user!.age != null) ...[
                                       const SizedBox(height: 12),
                                       _buildInfoRow(
-                                        'Edad',
-                                        '${_user!.age} años',
+                                        t.user_details_age,
+                                        '${_user!.age} ${t.user_details_years}',
                                         Icons.calendar_today,
                                         theme,
                                       ),
@@ -290,14 +292,14 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                               const Divider(height: 32, thickness: 0.5, indent: 16, endIndent: 16),
                               
                               // --- Actividad ---
-                              _buildCardSubSectionTitle(context, 'Actividad'),
+                              _buildCardSubSectionTitle(context, t.user_details_activity),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: _buildStatRow(
-                                  'Encuestas Completadas',
-                                  '5',
-                                  Icons.check,
-                                  Colors.green,
+                                  t.user_details_surveys_completed,
+                                  '$_userSurveysCompleted',
+                                  Icons.assignment,
+                                  theme.colorScheme.primary,
                                   theme,
                                 ),
                               ),
@@ -305,7 +307,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                               const Divider(height: 32, thickness: 0.5, indent: 16, endIndent: 16),
 
                               // --- Categorías de Interés ---
-                              _buildCardSubSectionTitle(context, 'Categorías de Interés'),
+                              _buildCardSubSectionTitle(context, t.user_details_categories),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: _userCategoriesOfInterest.isEmpty
@@ -356,12 +358,11 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                           children: [
                             Expanded(
                               child: _buildActionButton(
-                                label: 'Enviar Mensaje',
+                                label: t.user_details_send_message,
                                 icon: Icons.message,
                                 onPressed: () {
-                                  // Implementar la lógica para enviar mensaje
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Funcionalidad de mensajes próximamente')),
+                                    SnackBar(content: Text(t.user_details_message_coming_soon)),
                                   );
                                 },
                                 theme: theme,
@@ -370,7 +371,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: _buildActionButton(
-                                label: 'Enviar Invitación',
+                                label: t.user_details_send_invitation,
                                 icon: Icons.send,
                                 isLoading: _isSendingInvitation,
                                 onPressed: _sendInvitation,
@@ -436,14 +437,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
   Widget _buildStatRow(String label, String value, IconData icon, Color color, ThemeData theme) {
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
+        Icon(icon, color: color, size: 24),
         const SizedBox(width: 16),
         Expanded(
           child: Column(

@@ -95,15 +95,33 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
             children: [
               Text(t.survey_publish_explanation),
                const SizedBox(height: 10),
-               ...scopeOptions.entries.map((entry) => RadioListTile(
+               RadioListTile(
                 visualDensity: VisualDensity.compact,
                 contentPadding: EdgeInsets.zero,
-                title: Text(entry.key, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w400)),
-                subtitle: Text(entry.value, style: Theme.of(context).textTheme.bodyMedium),
-                value: entry.key,
+                title: Text(t.scope_private, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w400)),
+                subtitle: Text(t.scope_private_explanation, style: Theme.of(context).textTheme.bodyMedium),
+                value: 'private',
                 groupValue: _selectedScope,
                 onChanged: (String? value) => setState(() => _selectedScope = value!),
-               )),
+               ),
+               RadioListTile(
+                visualDensity: VisualDensity.compact,
+                contentPadding: EdgeInsets.zero,
+                title: Text(t.scope_organization, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w400)),
+                subtitle: Text(t.scope_organization_explanation, style: Theme.of(context).textTheme.bodyMedium),
+                value: 'organization',
+                groupValue: _selectedScope,
+                onChanged: (String? value) => setState(() => _selectedScope = value!),
+               ),
+               RadioListTile(
+                visualDensity: VisualDensity.compact,
+                contentPadding: EdgeInsets.zero,
+                title: Text(t.scope_public, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w400)),
+                subtitle: Text(t.scope_public_explanation, style: Theme.of(context).textTheme.bodyMedium),
+                value: 'public',
+                groupValue: _selectedScope,
+                onChanged: (String? value) => setState(() => _selectedScope = value!),
+               )
             ],
           ),
         ),

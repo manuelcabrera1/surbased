@@ -102,15 +102,30 @@ class _OrganizationListState extends State<OrganizationList> {
   }
 
   String _getSortFieldName(String field) {
+    final t = AppLocalizations.of(context)!;
     switch (field) {
       case 'name':
-        return 'Nombre';
+        return t.list_sort_name;
       case 'size':
-        return 'Tamaño';
+        return t.list_sort_size;
       case 'surveys':
-        return 'Número de encuestas';
+        return t.list_sort_surveys;
       default:
-        return 'Nombre';
+        return t.list_sort_name;
+    }
+  }
+
+  String _getSizeName(String size) {
+    final t = AppLocalizations.of(context)!;
+    switch (size) {
+      case 'small':
+        return t.list_size_small;
+      case 'medium':
+        return t.list_size_medium;
+      case 'large':
+        return t.list_size_large;
+      default:
+        return t.list_size_small;
     }
   }
 
@@ -257,15 +272,15 @@ class _OrganizationListState extends State<OrganizationList> {
                     InkWell(
                       onTap: _showFilterDialog,
                       child: Wrap(children: [
-                        Text('Ordenado por: ', style: theme.textTheme.bodySmall),
-                      Text(
-                        _getSortFieldName(_sortField) + (_isAscending ? ' ↑' : ' ↓'),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary,
+                        Text(t.list_sorted_by, style: theme.textTheme.bodySmall),
+                        Text(
+                          _getSortFieldName(_sortField) + (_isAscending ? t.list_ascending : t.list_descending),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
-                      ),
-                      ],),
+                      ]),
                     )
                   ],
                 ),

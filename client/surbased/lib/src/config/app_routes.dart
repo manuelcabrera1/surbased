@@ -52,7 +52,7 @@ class AppRoutes {
     resetPassword: (context) => ResetPasswordPage(email: ModalRoute.of(context)!.settings.arguments as String),
     surveyDetails: (_) => const SurveyDetailsPage(),
     surveyComplete: (_) => const SurveyCompletePage(),
-    surveyCreate: (_) => const SurveyCreatePage(),
+    surveyCreate: (context) => SurveyCreatePage(isGeneratingWithAI: ModalRoute.of(context)?.settings.arguments == true),
     surveyEdit: (_) => const SurveyEditPage(),
     userEditInfo: (_) => const UserEditInfoPage(),
     userEditPassword: (_) => const UserEditPasswordPage(),

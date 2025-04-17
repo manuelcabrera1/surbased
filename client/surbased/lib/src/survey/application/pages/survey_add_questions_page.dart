@@ -72,14 +72,15 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
     );
   }
 
-
+  
   @override
   Widget build(BuildContext context) {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final t = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    //print(surveyProvider.currentSurvey!.toJson());
 
     //final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(t.survey_add_questions_page_title),
@@ -96,61 +97,76 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 20),
-            // Lista de preguntas añadidas
-            if (surveyProvider.currentSurvey == null ||
-                surveyProvider.currentSurvey!.questions.isEmpty)
-              const SurveyWithoutQuestionsCard()
-            else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 20),
+              // Lista de preguntas añadidas
+          
+              if (surveyProvider.isGeneratingQuestions) ...[
+                Column(crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center, 
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.survey_added_questions,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                const SizedBox(height: 70),
+                const Align(alignment: Alignment.center, child: CircularProgressIndicator()),
+                const SizedBox(height: 20),
+                Text(t.survey_generating_questions, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface)),
+                ]),
+                ] else ...[
+              if (surveyProvider.currentSurvey == null ||
+                  surveyProvider.currentSurvey!.questions.isEmpty)
+                const SurveyWithoutQuestionsCard()
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          t.survey_added_questions,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        t.drag_to_reorder,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey,
+                        const SizedBox(width: 10),
+                        Text(
+                          t.drag_to_reorder,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ReorderableListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: surveyProvider.currentSurvey!.questions.length,
-                    onReorder: _reorderQuestions,
-                    buildDefaultDragHandles:
-                        false, // Desactivar los manejadores de arrastre predeterminados
-                    itemBuilder: (context, index) {
-                      return _buildDraggableQuestionCard(index);
-                    },
-                  ),
-                  /*
-                  ElevatedButton(onPressed: canContinue ? _handleContinue : null, 
-                  child: canContinue 
-                    ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white) 
-                    : Text(AppLocalizations.of(context)!.go_forward)),
-                  */
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: surveyProvider.currentSurvey!.questions.length,
+                      onReorder: _reorderQuestions,
+                      buildDefaultDragHandles:
+                          false, // Desactivar los manejadores de arrastre predeterminados
+                      itemBuilder: (context, index) {
+                        return _buildDraggableQuestionCard(index);
+                      },
+                    ),
+                    /*
+                    ElevatedButton(onPressed: canContinue ? _handleContinue : null, 
+                    child: canContinue 
+                      ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white) 
+                      : Text(AppLocalizations.of(context)!.go_forward)),
+                    */
+                  ],
+                ),
                 ],
-              ),
-          ],
+            ],
+          ),
         ),
+        
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
