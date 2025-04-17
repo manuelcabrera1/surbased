@@ -78,6 +78,7 @@ class UserResponse(UserBase):
     birthdate: Optional[date] = None
     gender: Optional[GenderEnum] = None
     age: Optional[int] = None
+    allow_notifications: bool
 
 class UserByRoleRequest(BaseModel):
     role: UserRoleRequestEnum
@@ -90,6 +91,8 @@ class UserResponseWithPendingAssignments(BaseModel):
     users: List[UserResponse]
     pending_assignments: dict[str, AssignmentStatusEnum]
     
+class UserUpdateNotificationsRequest(BaseModel):
+    allow_notifications: bool
 
 class UserUpdatePasswordRequest(BaseModel):
     password: str

@@ -2,7 +2,7 @@ from datetime import date
 import uuid
 from typing import List, Optional, TYPE_CHECKING
 from database import Base
-from sqlalchemy import CheckConstraint, ForeignKey, Integer, String, Date, UUID
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String, Date, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .SurveyUserModel import survey_user
@@ -29,6 +29,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     birthdate: Mapped[date] = mapped_column(Date, nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
+    allow_notifications: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
 
     organization_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("organizations.id"), nullable=True)

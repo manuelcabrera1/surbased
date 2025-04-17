@@ -14,6 +14,7 @@ class User {
   final DateTime? birthdate;
   final String? gender;
   final int? age;
+  final bool? allowNotifications;
 
   User({
     required this.email,
@@ -25,6 +26,7 @@ class User {
     this.birthdate,
     this.gender,
     this.age,
+    this.allowNotifications,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -39,6 +41,7 @@ class User {
             : null,
         gender: json["gender"],
         age: json["age"],
+        allowNotifications: json["allow_notifications"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,5 +55,6 @@ class User {
             "${birthdate?.year.toString().padLeft(4, '0')}-${birthdate?.month.toString().padLeft(2, '0')}-${birthdate?.day.toString().padLeft(2, '0')}",
         "gender": gender,
         "age": age,
+        "allow_notifications": allowNotifications,
       };
 }

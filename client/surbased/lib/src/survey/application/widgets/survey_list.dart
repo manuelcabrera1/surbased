@@ -68,8 +68,7 @@ class _SurveyListState extends State<SurveyList> {
           final t = AppLocalizations.of(context)!;
           showDialog(
             context: navigatorKey.currentContext!,
-            builder: (context) => Dialog(
-              child: SurveyInvitationDialog(
+            builder: (context) => SurveyInvitationDialog(
                 surveyId: survey.id!,
                 surveyName: survey.name,
                 inviterName: owner.email,
@@ -77,7 +76,6 @@ class _SurveyListState extends State<SurveyList> {
                 notificationBody: t.survey_invitation_message(owner.email, survey.name),
                 userId: authProvider.user!.id.toString(),
               ),
-            ),
           );
         }
       }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/widgets/organization_section.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/shared/application/provider/firebase_provider.dart';
 import 'package:surbased/src/shared/application/widgets/create_resource_dialog.dart';
 import 'package:surbased/src/shared/application/widgets/custom_navigation_bar_widget.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
@@ -230,8 +232,14 @@ class _HomePageState extends State<HomePage> {
               Provider.of<CategoryProvider>(context, listen: false);
       final tagProvider =
               Provider.of<TagsProvider>(context, listen: false);
+      final firebaseProvider =
+              Provider.of<FirebaseProvider>(context, listen: false);
 
       if (authProvider.isAuthenticated) {
+        if (authProvider.user!.allowNotifications != null && authProvider.user!.allowNotifications != firebaseProvider.notificationsEnabled) {
+          await authProvider.updateUserNotifications(authProvider.user!.id, firebaseProvider.notificationsEnabled, authProvider.token!);
+        }
+        
         await categoryProvider.getCategories(null, authProvider.token!);
         await tagProvider.getTags(authProvider.token ?? '');
         switch (authProvider.userRole) {

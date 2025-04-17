@@ -193,6 +193,33 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateUserNotifications(
+      String id, bool notifications, String token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final isUpdated =
+          await _authService.updateUserNotifications(id, notifications, token);
+      if (isUpdated['success']) {
+        _isLoading = false;
+        _error = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = isUpdated['data'];
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> resetUserPassword(
       String email, String password) async {
     _isLoading = true;

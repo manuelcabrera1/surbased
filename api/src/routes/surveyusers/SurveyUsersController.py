@@ -204,7 +204,7 @@ async def assign_users_to_survey(id: uuid.UUID, user: AssignParticipantToSurvey,
             fcm_tokens = [token.fcm_token for token in tokens]
 
         #enviar notificaciones a los usuarios que estan asignados al cuestionario
-            if fcm_tokens:
+            if fcm_tokens and existing_user.allow_notifications:
                  for token in fcm_tokens:
                     notifcation_params = NotificationRequest(token=token, title=user.notification_title, body=user.notification_body, email=current_user.email, survey_id=existing_survey.id, survey_name=existing_survey.name, user_id=existing_user.id)
                     success = send_notification(notifcation_params)
@@ -451,7 +451,7 @@ async def request_survey_access(id: uuid.UUID, user_id: uuid.UUID, payload: Requ
 
             fcm_tokens = [token.fcm_token for token in tokens]
 
-            if fcm_tokens:
+            if fcm_tokens and existing_user.allow_notifications:
                  for token in fcm_tokens:
                     #enviar notificaciones al owner del cuestionario
                     send_notification_params = NotificationRequest(token=token, title=payload.notification_title, body=payload.notification_body, email=current_user.email, survey_id=existing_survey.id, survey_name=existing_survey.name, user_id=existing_user.id)

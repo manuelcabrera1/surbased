@@ -15,12 +15,11 @@ class FirebaseService {
   Future<String?> initNotifications() async {
     
     await _firebaseMessaging.requestPermission();
-
+    
     final token = await _firebaseMessaging.getToken();
-
     print('Firebase token: $token');
 
-    FirebaseMessaging.onMessage.listen(_handleMessage);  
+  FirebaseMessaging.onMessage.listen(_handleMessage);  
 
     await initPushNotifications(); 
 

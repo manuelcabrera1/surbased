@@ -188,12 +188,38 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
             if result3.unique().scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
             
+            
         if current_user.role == "admin":
             await db.execute(update(User).where(User.id == id).values(user.model_dump()))
             await db.commit()
         else:
+            if current_user.id != id:
+                raise HTTPException(status_code=403, detail="You are not allowed to update this user")
+            
             await db.execute(update(User).where(User.id == id).values(email= user.email, name= user.name, lastname= user.lastname, birthdate= user.birthdate))
             await db.commit()
+
+
+        return existing_user
+
+
+@user_router.put("/users/{id}/notifications", status_code=200, response_model=UserResponse, dependencies=[Depends(check_current_user)])
+async def update_user_notifications(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], notifications: UserUpdateNotificationsRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+
+        #check if user exists
+        result = await db.execute(select(User).where(User.id == id))
+        existing_user = result.unique().scalars().first()
+
+        if current_user.role != "admin" and current_user.id != id:
+            raise HTTPException(status_code=403, detail="You are not allowed to update this user")
+
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        await db.execute(update(User).where(User.id == id).values(allow_notifications=notifications.allow_notifications))
+        await db.commit()
 
 
         return existing_user

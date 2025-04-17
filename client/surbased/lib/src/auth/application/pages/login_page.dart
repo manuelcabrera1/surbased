@@ -50,7 +50,9 @@ class _LoginPageState extends State<LoginPage> {
         if (isLogged && mounted) {
           _navigateToHome();
           if (authProvider.token != null && authProvider.user != null) {
-            await firebaseProvider.sendFcmToken(authProvider.token!, authProvider.user!.id);
+            if (firebaseProvider.notificationsEnabled) {
+              await firebaseProvider.sendFcmToken(authProvider.token!, authProvider.user!.id);
+            }
           }
         } else {
           if (mounted) {

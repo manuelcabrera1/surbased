@@ -327,5 +327,7 @@
     "user_not_registered_description": "This user is not registered in the application. Would you like to send them an invitation to join the survey?",
     "send_invitation": "Send Invitation",
     "invitation_sent": "Invitation sent successfully",
-    "invitation_error": "Error sending invitation"
+    "invitation_error": "Error sending invitation",
+    "notifications_error": "Error updating notification settings",
+    "notifications_permission_required": "Notification permissions are required to enable notifications"
 }
