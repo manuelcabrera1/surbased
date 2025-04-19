@@ -37,8 +37,9 @@ class SurveyService {
 
   Future<Map<String, dynamic>> getSurveysByScope(String scope, String token) async {
     try {
+      final scopeQuery = '?scope=$scope';
       final response = await http
-          .get(Uri.parse('$_baseUrl/surveys/$scope'), headers: {
+          .get(Uri.parse('$_baseUrl/surveys/$scopeQuery'), headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       });

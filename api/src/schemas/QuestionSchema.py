@@ -20,7 +20,13 @@ class QuestionBase(BaseModel):
 class QuestionCreateRequest(QuestionBase):
     options: List[OptionCreateRequest]
 
-class QuestionUpdateRequest(QuestionBase):...
+class QuestionUpdateRequest(BaseModel):
+    id: Optional[uuid.UUID] = Field(default=None)
+    number: Optional[int] = Field(default=None)
+    description: Optional[str] = Field(default=None)
+    type: Optional[QuestionTypeEnum] = Field(default=None)
+    required: Optional[bool] = Field(default=None)
+    options: Optional[List[OptionUpdateRequest]] = Field(default=None)
 
 class QuestionResponse(QuestionBase):
     number: int

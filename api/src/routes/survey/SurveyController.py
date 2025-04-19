@@ -22,7 +22,7 @@ from models.SurveyTagModel import survey_tag
 
 survey_router = APIRouter(tags=["Survey"])
 
-@survey_router.get("/surveys/{scope}", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/", status_code=200, response_model=SurveyResponseWithLength)
 @required_roles(["admin", "researcher", "participant"])
 async def get_surveys_by_scope(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
                         scope: SurveyScopeEnum):
@@ -61,35 +61,6 @@ async def get_survey_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(g
 
         return survey
 
-    
-    
-
-@survey_router.put("/surveys/{id}", status_code=200, response_model=SurveyResponse)
-@required_roles(["admin", "researcher"])
-async def update_survey(id:uuid.UUID, survey: SurveyCreate, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
-
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-        
-        #check if survey exists
-        if current_user.role == "admin":
-            result = await db.execute(select(Survey).join(User).where(Survey.id == id))
-
-        if current_user.role == "researcher":
-            result = await db.execute(select(Survey).join(User).where(and_(Survey.id == id, User.organization_id == current_user.organization_id)))
-
-        existing_survey = result.unique().scalars().first()
-
-        if not existing_survey:
-            raise HTTPException(status_code=404, detail="Survey not found")
-
-        await db.execute(update(Survey).where(Survey.id == id).values(survey.model_dump()))
-        await db.commit()
-    
-
-        return existing_survey
-    
-
 
 @survey_router.delete("/surveys/{id}", status_code=204)
 @required_roles(["admin", "researcher"])
@@ -98,21 +69,22 @@ async def delete_survey(id:uuid.UUID, current_user: Annotated[User, Depends(get_
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
-        if current_user.role == "admin":
-            result = await db.execute(select(Survey).join(User).where(Survey.id == id))
-
-        if current_user.role == "researcher":
-            result = await db.execute(select(Survey).join(User).where(and_(Survey.id == id, User.organization_id == current_user.organization_id)))
+        
+        result = await db.execute(select(Survey).join(User).where(Survey.id == id))
 
         survey = result.unique().scalars().first()  
 
         if not survey:
             raise HTTPException(status_code=404, detail="Survey not found")
+        
+        if current_user.role == "researcher" and survey.owner_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Forbidden")
 
         await db.delete(survey)
         await db.commit()
 
         return None
+
 
 @survey_router.post("/surveys", status_code=201, response_model=SurveyResponse)
 @required_roles(["admin", "researcher"])
@@ -126,12 +98,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     category = result.unique().scalars().first()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    
-    #check if survey exists in this category (by name)
-    result = await db.execute(select(Survey).where(Survey.name == survey.name, Survey.category_id == survey.category_id))
-    existing_survey = result.unique().scalars().first()
-    if existing_survey:
-        raise HTTPException(status_code=400, detail="Survey name already registered in this category")
+
     
     if survey.scope == SurveyScopeEnum.organization:
         #check if org id is provided
@@ -151,14 +118,6 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
     if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
         raise HTTPException(status_code=400, detail="Start date cannot be after end date")
     
-
-    
-    #questions
-    # descriptions and number should be unique
-    #options:
-    # description should be unique
-    # if the question referenced is not multiple_answer, then there should be at most one correct answer
-    # if the question referenced is multiple_answer, then there should be at least one correct answer
 
     questions_descriptions = set()
     
@@ -348,6 +307,183 @@ async def get_highlighted_public_surveys(current_user: Annotated[User, Depends(g
         surveys.append(survey)
 
     return {"surveys": surveys, "length": len(surveys)}
+
+
+@survey_router.put("/surveys/{id}", status_code=200, response_model=SurveyResponse)
+@required_roles(["admin", "researcher"])
+async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annotated[User, Depends(get_current_user)], 
+                       db: Annotated[AsyncSession, Depends(get_db)]):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+    # Obtener el cuestionario existente con sus preguntas y opciones
+    result = await db.execute(
+        select(Survey)
+        .options(selectinload(Survey.questions).selectinload(Question.options))
+        .where(Survey.id == id)
+    )
+    existing_survey = result.unique().scalars().first()
+
+    if not existing_survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+
+    if survey.category_id and survey.category_id != existing_survey.category_id:
+        result = await db.execute(select(Category).where(Category.id == survey.category_id))
+        category = result.unique().scalars().first()
+        if not category:
+            raise HTTPException(status_code=404, detail="Category not found")
+    
+
+    if survey.scope == SurveyScopeEnum.organization:
+        #check if org id is provided
+        if not survey.organization_id:
+            raise HTTPException(status_code=400, detail="Organization must be specified")
+
+        #check if researcher org and survey org match
+        if survey.owner_id and survey.owner_id != existing_survey.owner_id:
+            result = await db.execute(select(User).where(User.id == survey.owner_id, User.organization_id == survey.organization_id))
+            researcher = result.unique().scalars().first()
+            if not researcher:
+                raise HTTPException(status_code=404, detail="Researcher does not belong to the specified organization")
+    
+
+    if survey.start_date and survey.start_date < date.today():
+        raise HTTPException(status_code=400, detail="Start date cannot be in the past")
+    if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
+        raise HTTPException(status_code=400, detail="Start date cannot be after end date")
+    
+
+    # Actualizar datos básicos del cuestionario
+    if survey.name:
+        existing_survey.name = survey.name
+    if survey.description:
+        existing_survey.description = survey.description
+    if survey.scope:
+        existing_survey.scope = survey.scope
+    if survey.organization_id:
+        existing_survey.organization_id = survey.organization_id
+    if survey.start_date:
+        existing_survey.start_date = survey.start_date
+    if survey.end_date:
+        existing_survey.end_date = survey.end_date
+    if survey.category_id:
+        existing_survey.category_id = survey.category_id
+
+#check if tags exist, if not, create them
+    if survey.tags:  # Solo procesar tags si hay alguno
+        survey_tags_names = [tag.name for tag in survey.tags]
+        result = await db.execute(select(Tag).where(Tag.name.in_(survey_tags_names)))
+        existing_tags = result.unique().scalars().all()
+
+        new_tags = []
+
+        if len(existing_tags) != len(survey_tags_names):
+
+            existing_tags_names = [t.name for t in existing_tags]
+            tags_to_add = list(set(survey_tags_names) - set(existing_tags_names))
+            
+            new_tags = [Tag(name=tag) for tag in tags_to_add]
+
+            db.add_all(new_tags)
+            await db.flush()
+
+            for tag in existing_survey.tags:
+                if tag.name not in survey_tags_names:
+                    await db.delete(survey_tag.where(survey_tag.tag_id == tag.id, survey_tag.survey_id == existing_survey.id))
+
+                if tag.name in existing_tags_names:
+                    new_tags.append(tag)
+        
+        await db.execute(insert(survey_tag).values(
+            [{"survey_id": existing_survey.id, "tag_id": tag.id} for tag in new_tags]))
+        
+        await db.commit()
+
+    existing_questions = {q.id: q for q in existing_survey.questions}
+    new_questions = {q.id: q for q in survey.questions}
+
+    question_number = 1
+
+    # Procesar preguntas
+    for question_id, new_question in new_questions.items():
+        if question_id in existing_questions:
+            # Actualizar pregunta existente
+            existing_question = existing_questions[question_id]
+            existing_question.description = new_question.description
+            existing_question.required = new_question.required
+            existing_question.type = new_question.type
+            existing_question.number = question_number
+            existing_question.survey_id = existing_survey.id
+
+            # Procesar opciones
+            existing_options = {o.id: o for o in existing_question.options}
+            new_options = {o.id: o for o in new_question.options}
+
+            # Actualizar/Añadir opciones
+            for opt_id, new_opt in new_options.items():
+                if opt_id in existing_options:
+                    # Actualizar opción existente
+                    existing_options[opt_id].points = new_opt.points
+                    existing_options[opt_id].description = new_opt.description
+                else:
+                    # Añadir nueva opción
+                    new_option = Option(
+                        description=new_opt.description,
+                        points=new_opt.points,
+                        question_id=existing_question.id
+                    )
+                    db.add(new_option)
+                    await db.flush()
+
+            # Eliminar opciones que ya no existen
+            for opt_id, old_opt in existing_options.items():
+                if opt_id not in new_options:
+                    await db.delete(old_opt)
+
+        else:
+            # Añadir nueva pregunta
+            new_q = Question(
+                number=question_number,
+                description=new_question.description,
+                survey_id=existing_survey.id,
+                required=new_question.required,
+                type=new_question.type
+            )
+            db.add(new_q)
+            await db.flush()  # Para obtener el ID
+
+            # Añadir sus opciones
+            for option in new_question.options:
+                new_option = Option(
+                    description=option.description,
+                    points=option.points,
+                    question_id=new_q.id
+                )
+                db.add(new_option)
+
+        question_number += 1
+
+    # Eliminar preguntas que ya no existen
+    for question_id, old_question in existing_questions.items():
+        if question_id not in new_questions:
+            await db.delete(old_question)
+
+    try:
+        await db.commit()
+        
+        # Recargar el cuestionario actualizado
+        result = await db.execute(
+            select(Survey)
+            .options(selectinload(Survey.questions).selectinload(Question.options))
+            .where(Survey.id == id)
+        )
+        updated_survey = result.unique().scalars().first()
+        
+        return updated_survey
+
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating survey: {str(e)}")
 
 
 
