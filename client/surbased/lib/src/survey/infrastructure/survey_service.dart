@@ -35,6 +35,34 @@ class SurveyService {
     }
   }
 
+  Future<Map<String, dynamic>> updateSurvey(
+      Map<String, dynamic> survey, String token) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/surveys/${survey['id']}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(survey),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> getSurveysByScope(String scope, String token) async {
     try {
       final scopeQuery = '?scope=$scope';

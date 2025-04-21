@@ -8,7 +8,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class SurveySavePublishDialog extends StatefulWidget {
-  const SurveySavePublishDialog({super.key});
+  final bool isEditing;
+  const SurveySavePublishDialog({super.key, this.isEditing = false});
 
   @override
   State<SurveySavePublishDialog> createState() => _SurveySavePublishDialogState();
@@ -44,15 +45,22 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
       
       String scope = _selectedScope.toLowerCase();
 
-      
-      bool success = scope == 'organization' ? await surveyProvider.createSurvey(
-        authProvider.token!,
-        scope,
-        organizationId: organizationProvider.organization!.id,
-      ) : await surveyProvider.createSurvey(
-        authProvider.token!,
-        scope,
-      );
+
+      bool success = false;
+
+      if (widget.isEditing) {
+        success = await surveyProvider.updateSurvey(
+          authProvider.token!,
+          scope,
+          organizationId: scope == 'organization' ? organizationProvider.organization!.id : null,
+        );
+      } else {
+        success = await surveyProvider.createSurvey(
+          authProvider.token!,
+          scope,
+          organizationId: scope == 'organization' ? organizationProvider.organization!.id : null
+        );
+      }
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -79,11 +87,7 @@ class _SurveySavePublishDialogState extends State<SurveySavePublishDialog> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final Map<String, String> scopeOptions = {
-    t.scope_private: t.scope_private_explanation,
-    t.scope_organization: t.scope_organization_explanation,
-    t.scope_public: t.scope_public_explanation,
-  };
+
     return AlertDialog(
         title: Text(t.survey_save_publish),
         content: Padding(

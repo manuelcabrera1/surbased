@@ -11,7 +11,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../widgets/survey_save_publish_dialog.dart';
 
 class SurveyAddQuestionsPage extends StatefulWidget {
-  const SurveyAddQuestionsPage({super.key});
+  final bool isEditing;
+  const SurveyAddQuestionsPage({super.key, this.isEditing = false});
 
   @override
   State<SurveyAddQuestionsPage> createState() => _SurveyAddQuestionsPageState();
@@ -68,7 +69,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
   void _showSaveSurveyDialog() {
     showDialog(
       context: context,
-      builder: (context) => const SurveySavePublishDialog(),
+      builder: (context) => SurveySavePublishDialog(isEditing: widget.isEditing),
     );
   }
 

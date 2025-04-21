@@ -30,7 +30,7 @@ class SurveyEditPageState extends State<SurveyEditPage> {
         ),
       ),
       body: const SingleChildScrollView(
-        child: SurveyForm(),
+        child: SurveyForm(isEditing: true),
       ),
     );
   }

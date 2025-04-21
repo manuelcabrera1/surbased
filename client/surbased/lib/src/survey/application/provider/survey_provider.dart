@@ -148,6 +148,42 @@ class SurveyProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateSurvey(String token, String scope, {String? organizationId}) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      _currentSurvey!.scope = scope;
+      _currentSurvey!.organizationId = organizationId;
+      
+      
+      final response = await _surveyService.updateSurvey(
+        _currentSurvey!.toJson(),
+        token,
+      );
+
+
+      if (response['success']) {
+        _isLoading = false;
+        _error = null;
+        _currentSurvey = null;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        _error = response['data'];
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> getSurveysByScope(String scope, String token) async {
     _isLoading = true;
     _error = null;

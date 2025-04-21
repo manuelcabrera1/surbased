@@ -11,7 +11,8 @@ import '../../../category/application/provider/category_provider.dart';
 
 class SurveyForm extends StatefulWidget {
   final bool isGeneratingWithAI;
-  const SurveyForm({super.key, this.isGeneratingWithAI = false});
+  final bool isEditing;
+  const SurveyForm({super.key, this.isGeneratingWithAI = false, this.isEditing = false});
 
   @override
   State<SurveyForm> createState() => SurveyFormState();
@@ -123,7 +124,7 @@ class SurveyFormState extends State<SurveyForm> {
   }
 
   String? _endDateValidator(DateTime? value) {
-    if (value != null && _startDate != null && value.isBefore(_startDate!)) {
+    if (value != null && _startDate != null && value.isBefore(_startDate!) && !widget.isEditing) {
       return AppLocalizations.of(context)!.start_end_date_error;
     }
     return null;
@@ -191,9 +192,9 @@ class SurveyFormState extends State<SurveyForm> {
             _numberOfQuestionsController.text,
             _startDate ?? DateTime.now(),
             _endDate ?? DateTime.now().add(const Duration(days: 7)),
-          );
+          ); 
         }
-        Navigator.pushNamed(context, AppRoutes.surveyAddQuestions);
+        Navigator.pushNamed(context, AppRoutes.surveyAddQuestions, arguments: widget.isEditing);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -365,7 +366,7 @@ class SurveyFormState extends State<SurveyForm> {
                     maxLines: 2,
                     controller: _localeController,
                     decoration: InputDecoration(
-                      labelText: t.survey_form_ai_locale,
+                      labelText: t.language,
                       border: const OutlineInputBorder(),
                     ),
                     validator: _fieldValidator,

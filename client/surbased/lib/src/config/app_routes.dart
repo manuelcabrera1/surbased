@@ -61,7 +61,7 @@ class AppRoutes {
     userTheme: (_) => const UserThemePage(),
     userAccessibility: (_) => const UserAccessibilityPage(),
     userDetails: (context) => UserDetailsPage(userId: ModalRoute.of(context)!.settings.arguments as String),
-    surveyAddQuestions: (_) => const SurveyAddQuestionsPage(),
+    surveyAddQuestions: (context) => SurveyAddQuestionsPage(isEditing: ModalRoute.of(context)?.settings.arguments == true),
     organizationDetails: (_) => const OrganizationDetails(),
     userCreate: (_) => const UserCreatePage(),
     organizationCreate: (_) => const OrganizationCreatePage(),
