@@ -66,8 +66,6 @@ class _SurveyExploreState extends State<SurveyExplore> {
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
 
-            print(authProvider.surveysAssigned.any((e) => e.id == survey.id));
-
         if (authProvider.surveysAssigned.any((e) => e.id == survey.id)) {
           surveyProvider.currentSurvey = survey;
           answerProvider.setCurrentSurveyBeingAnswered(survey);
