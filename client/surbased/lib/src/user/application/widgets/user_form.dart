@@ -27,7 +27,7 @@ class _UserFormState extends State<UserForm> {
   final _passwordController = TextEditingController();
   DateTime? _birthdate;
   String? _gender;
-  String? _selectedRole;
+  String _selectedRole = "participant";
 
   @override
   void dispose() {
@@ -51,7 +51,7 @@ class _UserFormState extends State<UserForm> {
         final isRegistered = await authProvider.register(
             _nameController.text,
             _lastNameController.text,
-            _selectedRole!,
+            _selectedRole,
             _organizationController.text,
             _emailController.text,
             _passwordController.text,
@@ -60,7 +60,7 @@ class _UserFormState extends State<UserForm> {
 
         if (isRegistered) {
           if (mounted) {
-            widget.isCreate ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
+            !widget.isCreate ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
           }
         } else {
           if (mounted) {

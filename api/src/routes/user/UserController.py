@@ -226,15 +226,27 @@ async def update_user_notifications(id: uuid.UUID, current_user: Annotated[User,
 
 
 
-@user_router.delete("/users/{id}", status_code=200, dependencies=[Depends(check_current_user)])
-async def delete_user(id: uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)]):
+@user_router.delete("/users/{id}", status_code=200)
+async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
         #check if user exists
         result = await db.execute(select(User).where(User.id == id))
         existing_user = result.unique().scalars().first()
 
+        if current_user.role != "admin" and current_user.id != id:
+            raise HTTPException(status_code=403, detail="You are not allowed to delete this user")
+
         if not existing_user:
             raise HTTPException(status_code=400, detail="User not found")
+
+        #check if password is correct
+        password_is_valid = bcrypt.checkpw(password.password.encode('utf-8'), existing_user.password.encode('utf-8'))
+
+        if not password_is_valid:
+            raise HTTPException(status_code=401, detail="Incorrect password")
 
         await db.delete(existing_user)
         await db.commit()

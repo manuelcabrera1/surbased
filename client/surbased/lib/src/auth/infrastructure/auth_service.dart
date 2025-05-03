@@ -297,4 +297,28 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> deleteUser(String id, String password, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/$id'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: json.encode({'password': password})
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      } 
+      else if (response.statusCode == 401) {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
+      }
+      else {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
+      }
+
+
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
 }

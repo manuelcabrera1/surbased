@@ -29,7 +29,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     birthdate: Mapped[date] = mapped_column(Date, nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
-    allow_notifications: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    allow_notifications: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
 
     organization_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("organizations.id"), nullable=True)

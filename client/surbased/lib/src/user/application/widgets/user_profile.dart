@@ -66,8 +66,8 @@ class _UserProfileState extends State<UserProfile> {
       t.notifications_page_title: () {
         Navigator.pushNamed(context, AppRoutes.userNotifications);
       },
-      t.security_page_title: () {
-        Navigator.pushNamed(context, AppRoutes.userSecurity);
+      t.delete_account_page_title: () {
+        Navigator.pushNamed(context, AppRoutes.userDeleteAccount);
       },
     };
     final appearanceSettings = {

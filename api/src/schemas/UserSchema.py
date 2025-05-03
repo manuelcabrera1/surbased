@@ -101,4 +101,7 @@ class UserResetPasswordRequest(BaseModel):
     email: EmailStr
     password: str
 
+class DeleteUserPasswordRequest(BaseModel):
+    password: str
+
 

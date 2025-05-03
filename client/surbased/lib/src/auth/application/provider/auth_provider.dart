@@ -434,4 +434,32 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> deleteUser(String id, String password, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final isDeleted = await _authService.deleteUser(id, password, token);
+
+      if (isDeleted['success']) {
+        await _clearAuthState();
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = isDeleted['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) { 
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
 }

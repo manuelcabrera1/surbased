@@ -18,7 +18,7 @@ import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_info_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
 import 'package:surbased/src/user/application/pages/user_notifications_page.dart';
-import 'package:surbased/src/user/application/pages/user_security_page.dart';
+import 'package:surbased/src/user/application/pages/user_delete_account_page.dart';
 import 'package:surbased/src/user/application/pages/user_theme_page.dart';
 
 class AppRoutes {
@@ -36,7 +36,7 @@ class AppRoutes {
   static const String userEditInfo = '/user/edit/info';
   static const String userEditPassword = '/user/edit/password';
   static const String userNotifications = '/user/notifications';
-  static const String userSecurity = '/user/security';
+  static const String userDeleteAccount = '/user/delete-account';
   static const String userTheme = '/user/theme';
   static const String userAccessibility = '/user/accessibility';
   static const String userDetails = '/user/details';
@@ -57,7 +57,7 @@ class AppRoutes {
     userEditInfo: (_) => const UserEditInfoPage(),
     userEditPassword: (_) => const UserEditPasswordPage(),
     userNotifications: (_) => const UserNotificationsPage(),
-    userSecurity: (_) => const UserSecurityPage(),
+    userDeleteAccount: (_) => const UserDeleteAccountPage(),
     userTheme: (_) => const UserThemePage(),
     userAccessibility: (_) => const UserAccessibilityPage(),
     userDetails: (context) => UserDetailsPage(userId: ModalRoute.of(context)!.settings.arguments as String),

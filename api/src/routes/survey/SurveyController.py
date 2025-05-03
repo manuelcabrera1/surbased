@@ -347,8 +347,6 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
                 raise HTTPException(status_code=404, detail="Researcher does not belong to the specified organization")
     
 
-    if survey.start_date and survey.start_date < date.today():
-        raise HTTPException(status_code=400, detail="Start date cannot be in the past")
     if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
         raise HTTPException(status_code=400, detail="Start date cannot be after end date")
     
