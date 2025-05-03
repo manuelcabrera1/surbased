@@ -229,13 +229,32 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                 ),
               ),
             if (_usersToShow.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Text(
-                    t.users_error_no_users,
-                  ),
-                ),
-              )
+              Container(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [    
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search_off,
+                                    size: 64,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    t.users_error_no_users,
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
             else
               Expanded(
                 child: ListView.builder(
