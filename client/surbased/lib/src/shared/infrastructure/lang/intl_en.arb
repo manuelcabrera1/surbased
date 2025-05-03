@@ -329,5 +329,11 @@
     "invitation_sent": "Invitation sent successfully",
     "invitation_error": "Error sending invitation",
     "notifications_error": "Error updating notification settings",
-    "notifications_permission_required": "Notification permissions are required to enable notifications"
+    "featured_surveys": "Featured Surveys",
+    "all_surveys": "All Surveys ({count})",
+    "categories": "Categories",
+    "category_survey_count": "{count} surveys",
+    "category_survey_count_one": "1 survey",
+    "category_response_count": "{count} responses",
+    "category_response_count_one": "1 response"
 }

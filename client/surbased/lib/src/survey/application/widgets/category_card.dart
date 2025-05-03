@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategoryCard extends StatelessWidget {
   final Category category;
@@ -16,6 +17,7 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
 
     return Card(
       color: theme.colorScheme.primaryContainer,
@@ -53,7 +55,9 @@ class CategoryCard extends StatelessWidget {
               // Número de encuestas
               const SizedBox(height: 4),
               Text(
-                '$surveyCount encuestas',
+                surveyCount == 1 
+                    ? t.category_survey_count_one
+                    : t.category_survey_count(surveyCount),
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 13,
                   color: theme.colorScheme.onSurfaceVariant,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PublicSurveyCard extends StatelessWidget {
   final Survey survey;
@@ -51,6 +52,7 @@ class PublicSurveyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -131,7 +133,9 @@ class PublicSurveyCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '$responseCount respuestas',
+                        responseCount == 1 
+                            ? t.public_survey_response
+                            : t.public_survey_responses(responseCount),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

@@ -329,5 +329,11 @@
     "invitation_sent": "Invitación enviada correctamente",
     "invitation_error": "Error al enviar la invitación",
     "notifications_error": "Error al actualizar la configuración de notificaciones",
-    "notifications_permission_required": "Se requieren permisos de notificación para activar las notificaciones"
+    "featured_surveys": "Encuestas destacadas",
+    "all_surveys": "Todas las encuestas ({count})",
+    "categories": "Categorías",
+    "category_survey_count": "{count} encuestas",
+    "category_survey_count_one": "1 encuesta",
+    "category_response_count": "{count} respuestas",
+    "category_response_count_one": "1 respuesta"
 }

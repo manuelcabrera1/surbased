@@ -86,7 +86,6 @@ class _SurveyExploreState extends State<SurveyExplore> {
     final theme = Theme.of(context);
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
     final t = AppLocalizations.of(context)!;
 
     return SafeArea(
@@ -185,7 +184,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No se encontraron encuestas',
+                              t.surveys_error_no_surveys,
                               style: theme.textTheme.titleMedium,
                             ),
                           ],
@@ -222,6 +221,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
   final theme = Theme.of(context);
   final surveyProvider = Provider.of<SurveyProvider>(context);
   final categoryProvider = Provider.of<CategoryProvider>(context);
+  final t = AppLocalizations.of(context)!;
   return Expanded(
                 child: surveyProvider.isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -232,7 +232,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Text(
-                                'Encuestas destacadas',
+                                t.featured_surveys,
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -267,7 +267,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Text(
-                                'Categorías',
+                                t.categories,
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -301,7 +301,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Text(
-                              'Todas las encuestas (${surveyProvider.publicSurveys.length})',
+                              t.all_surveys(surveyProvider.publicSurveys.length),
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
