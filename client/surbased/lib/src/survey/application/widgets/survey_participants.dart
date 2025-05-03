@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/config/app_routes.dart';
 import '../provider/survey_provider.dart';
 
 class SurveyParticipants extends StatefulWidget {
@@ -95,6 +96,10 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
             surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] == 'invited_pending';
 
         return ListTile(
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.userDetails, 
+                              arguments: user.id);
+          },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
