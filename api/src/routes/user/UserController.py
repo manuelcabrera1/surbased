@@ -182,22 +182,30 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
 
         #check if email is already registered
 
+
         if existing_user.email != user.email:
             result3 = await db.execute(select(User).where(User.email == user.email))
 
             if result3.unique().scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
+    
+        if user.name:
+             existing_user.name = user.name
+        if user.lastname:
+             existing_user.lastname = user.lastname
+        if user.organization:
+             existing_user.organization_id = user.organization
+        if user.birthdate:
+             existing_user.birthdate = user.birthdate
+        if user.gender:
+             existing_user.gender = user.gender
             
             
-        if current_user.role == "admin":
-            await db.execute(update(User).where(User.id == id).values(user.model_dump()))
-            await db.commit()
-        else:
-            if current_user.id != id:
+        if current_user.id != id and current_user.role != "admin":
                 raise HTTPException(status_code=403, detail="You are not allowed to update this user")
-            
-            await db.execute(update(User).where(User.id == id).values(email= user.email, name= user.name, lastname= user.lastname, birthdate= user.birthdate))
-            await db.commit()
+        
+        await db.flush()
+        await db.commit()
 
 
         return existing_user
@@ -242,11 +250,12 @@ async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, curren
         if not existing_user:
             raise HTTPException(status_code=400, detail="User not found")
 
-        #check if password is correct
-        password_is_valid = bcrypt.checkpw(password.password.encode('utf-8'), existing_user.password.encode('utf-8'))
 
-        if not password_is_valid:
-            raise HTTPException(status_code=401, detail="Incorrect password")
+        if current_user.role != "admin":
+            password_is_valid = bcrypt.checkpw(password.password.encode('utf-8'), existing_user.password.encode('utf-8'))
+
+            if not password_is_valid:
+                raise HTTPException(status_code=401, detail="Incorrect password")
 
         await db.delete(existing_user)
         await db.commit()

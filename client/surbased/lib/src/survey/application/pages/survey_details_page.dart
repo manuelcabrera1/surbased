@@ -117,16 +117,16 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
     );
   }
 
-  void _removeSurvey() {
+  Future<void> _removeSurvey() async {
     final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
       if (authProvider.token != null && mounted) {
-        surveyProvider.removeSurvey(authProvider.token!);
+        await surveyProvider.removeSurvey(authProvider.token!);
         surveyProvider.clearCurrentSurvey();
-        Navigator.pushNamed(context, AppRoutes.home);
         if (mounted) {
+          Navigator.pushNamed(context, AppRoutes.home);
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.survey_removed)),
           );

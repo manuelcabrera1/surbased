@@ -345,5 +345,11 @@
     "category_survey_count": "{count} encuestas",
     "category_survey_count_one": "1 encuesta",
     "category_response_count": "{count} respuestas",
-    "category_response_count_one": "1 respuesta"
+    "category_response_count_one": "1 respuesta",
+    "user_not_found": "Usuario no encontrado",
+    "user_not_assigned": "Sin asignar",
+    "user_no_categories": "Sin categorías de interés definidas",
+    "user_invitation_sent": "Invitación enviada correctamente",
+    "user_remove": "Eliminar Usuario",
+    "user_remove_confirmation": "¿Está seguro que desea eliminar este usuario?"
 }

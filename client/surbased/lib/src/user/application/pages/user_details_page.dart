@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
+import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
@@ -20,7 +21,6 @@ class UserDetailsPage extends StatefulWidget {
 class _UserDetailsPageState extends State<UserDetailsPage> {
   User? _user;
   String? _organizationName;
-  bool _isSendingInvitation = false;
   List<Category> _userCategoriesOfInterest  = [];
   int _userSurveysCompleted = 0;
 
@@ -121,32 +121,62 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     }
   }
 
-  void _sendInvitation() {
-    // Aquí implementar la lógica para enviar invitaciones 
-    setState(() {
-      _isSendingInvitation = true;
-    });
+  void _removeUser() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    // Simular un delay para mostrar la animación
-    Future.delayed(const Duration(seconds: 1), () {
+    try {
+      if (authProvider.token != null && mounted) {
+        final isDeleted = await authProvider.deleteUser(widget.userId, null, authProvider.token!, isCurrentUser: false);
+        if (isDeleted && mounted) {
+          Navigator.pushNamed(context, AppRoutes.home);
+
+        } else{ 
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(authProvider.error!)),
+            );
+          }
+        }
+      }
+    } catch (e) {
       if (mounted) {
-        setState(() {
-          _isSendingInvitation = false;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invitation sent successfully')),
+          SnackBar(content: Text(e.toString())),
         );
       }
-    });
+    }
   }
+
+  void _showRemoveUserDialog() {
+    final t = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.user_remove),
+        content: Text(t.user_remove_confirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t.cancel),
+          ),
+          TextButton(
+            onPressed: () => _removeUser(),
+            child: Text(t.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userProvider = Provider.of<UserProvider>(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
     final t = AppLocalizations.of(context)!;
+    final authProvider = Provider.of<AuthProvider>(context);
 
     if (userProvider.isLoading || organizationProvider.isLoading) {
       return Scaffold(
@@ -157,21 +187,47 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
       );
     }
 
-    // Verificar si el usuario actual coincide con el usuario de la página
-    final bool isCurrentUser = _user != null && authProvider.userId == _user!.id;
 
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_user?.name != null 
-            ? '${_user!.name} ${_user!.lastname ?? ''}'
-            : t.profile_page_title),
-      ),
+        title: Text(t.profile_page_title),
+        actions: [
+            PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () => {
+                          Navigator.pushNamed(context, AppRoutes.userEdit, arguments: _user)
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.edit, color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text(t.edit),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => _showRemoveUserDialog(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.delete,
+                                color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text(t.remove),
+                          ],
+                        ),
+                      ),
+                    ])
+          ]),
       body: SafeArea(
         child: _user == null
             ? Center(
                 child: Text(
-                  'User not found',
+                  t.user_not_found,
                   style: theme.textTheme.titleLarge,
                 ),
               )
@@ -180,6 +236,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 10),
                     // Encabezado con avatar y nombre
                     Align(
                       alignment: Alignment.center,
@@ -256,7 +313,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                   children: [
                                     _buildInfoRow(
                                       t.user_details_organization, 
-                                      _organizationName ?? 'Sin asignar',
+                                      _organizationName ?? t.user_not_assigned,
                                       Icons.business,
                                       theme,
                                     ),
@@ -315,7 +372,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                                         child: Text(
-                                          'Sin categorías de interés definidas.',
+                                          t.user_no_categories,
                                           style: theme.textTheme.bodyMedium?.copyWith(
                                             color: theme.colorScheme.onSurfaceVariant,
                                           ),
@@ -349,39 +406,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                       ),
                     ),
                     
-                    // Botones de acción
-                    if (!isCurrentUser) ...[
-                      const SizedBox(height: 32),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _buildActionButton(
-                                label: t.user_details_send_message,
-                                icon: Icons.message,
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(t.user_details_message_coming_soon)),
-                                  );
-                                },
-                                theme: theme,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildActionButton(
-                                label: t.user_details_send_invitation,
-                                icon: Icons.send,
-                                isLoading: _isSendingInvitation,
-                                onPressed: _sendInvitation,
-                                theme: theme,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    
                   ],
                 ),
               ),
@@ -465,33 +490,5 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     );
   }
   
-  Widget _buildActionButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-    required ThemeData theme,
-    bool isLoading = false,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: isLoading ? null : onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        minimumSize: const Size(150, 48),
-      ),
-      icon: isLoading
-          ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: theme.colorScheme.onPrimary,
-              ),
-            )
-          : Icon(icon),
-      label: Text(label),
-    );
-  }
+ 
 }

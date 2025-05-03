@@ -16,10 +16,12 @@ import 'package:surbased/src/user/application/pages/user_accessibility_page.dart
 import 'package:surbased/src/user/application/pages/user_create_page.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_info_page.dart';
+import 'package:surbased/src/user/application/pages/user_edit_page.dart';
 import 'package:surbased/src/user/application/pages/user_edit_password_page.dart';
 import 'package:surbased/src/user/application/pages/user_notifications_page.dart';
 import 'package:surbased/src/user/application/pages/user_delete_account_page.dart';
 import 'package:surbased/src/user/application/pages/user_theme_page.dart';
+import 'package:surbased/src/user/domain/user_model.dart';
 
 class AppRoutes {
   static const String home = '/home';
@@ -41,7 +43,8 @@ class AppRoutes {
   static const String userAccessibility = '/user/accessibility';
   static const String userDetails = '/user/details';
   static const String organizationDetails = '/organization/details';
-  static const String userCreate = '/user/create';  
+  static const String userCreate = '/user/create';
+  static const String userEdit = '/user/edit';
   static const String organizationCreate = '/organization/create';
   static Map<String, WidgetBuilder> routes = {
     register: (_) => const RegisterPage(),
@@ -64,6 +67,7 @@ class AppRoutes {
     surveyAddQuestions: (context) => SurveyAddQuestionsPage(isEditing: ModalRoute.of(context)?.settings.arguments == true),
     organizationDetails: (_) => const OrganizationDetails(),
     userCreate: (_) => const UserCreatePage(),
+    userEdit: (context) => UserEditPage(user: ModalRoute.of(context)!.settings.arguments as User),
     organizationCreate: (_) => const OrganizationCreatePage(),
     //researcherHome: (_) => const ResearcherHomePage(),
     //adminHome: (_) => const AdminHomePage(),

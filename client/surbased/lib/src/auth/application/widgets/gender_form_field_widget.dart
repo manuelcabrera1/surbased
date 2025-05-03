@@ -35,7 +35,7 @@ class GenderFormField extends FormField<String> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Radio<String>(
-                            value: gender,
+                            value: gender.toLowerCase(),
                             groupValue: state.value,
                             onChanged: (value) {
                               state.didChange(value);

@@ -57,9 +57,10 @@ class UserCreateRequest(UserBase):
         return self
 
 class UserUpdateRequest(UserBase):
-    role: Optional[UserRoleRequestEnum] = None
+    role: Optional[UserRoleEnum] = None
     name: Optional[str] = None
     lastname: Optional[str] = None
+    organization: Optional[str] = None
     birthdate: Optional[date] = None
     gender: Optional[GenderEnum] = None
 
@@ -102,6 +103,6 @@ class UserResetPasswordRequest(BaseModel):
     password: str
 
 class DeleteUserPasswordRequest(BaseModel):
-    password: str
+    password: Optional[str] = None
 
 

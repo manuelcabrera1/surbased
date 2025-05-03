@@ -138,14 +138,14 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> updateUser(String id, String name, String lastname, String email,
-      String birthdate, String token) async {
+  Future<bool> updateUser(String id, String token, {String? name, String? lastname, String? role, String? organization, String? email,
+      String? birthdate, String? gender}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
     try {
       final isUpdated = await _authService.updateUser(
-          id, name, lastname, email, birthdate, token);
+          id, token, name: name, lastname: lastname, role: role, organization: organization, email: email, birthdate: birthdate, gender: gender);
       if (isUpdated['success']) {
         _user = User.fromJson(isUpdated['data']);
         _isLoading = false;
@@ -434,7 +434,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteUser(String id, String password, String token) async {
+  Future<bool> deleteUser(String id, String? password, String token, {bool isCurrentUser = true}) async {
     try {
       _error = null;
       _isLoading = true;
@@ -443,7 +443,9 @@ class AuthProvider with ChangeNotifier {
       final isDeleted = await _authService.deleteUser(id, password, token);
 
       if (isDeleted['success']) {
-        await _clearAuthState();
+        if (isCurrentUser) {
+          await _clearAuthState();
+        }
         _error = null;
         _isLoading = false;
         notifyListeners();

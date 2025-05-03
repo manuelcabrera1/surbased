@@ -8,10 +8,12 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/user/domain/user_model.dart';
 
 class UserForm extends StatefulWidget {
   final bool isCreate;
-  const UserForm({super.key, this.isCreate = false});
+  final User? user;
+  const UserForm({super.key, this.isCreate = false, this.user});
 
   @override
   State<UserForm> createState() => _UserFormState();
@@ -48,7 +50,23 @@ class _UserFormState extends State<UserForm> {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-        final isRegistered = await authProvider.register(
+        bool isSuccess = false;
+
+        if (widget.user != null) {
+          isSuccess = await authProvider.updateUser(
+            widget.user!.id,
+            authProvider.token!,
+            name: _nameController.text,
+            lastname: _lastNameController.text,
+            role: _selectedRole,
+            organization: _organizationController.text,
+            email: _emailController.text,
+            birthdate: DateFormat('yyyy-MM-dd').format(_birthdate!),
+            gender: _gender!.toLowerCase()
+          );
+        }
+        else {
+          isSuccess = await authProvider.register(
             _nameController.text,
             _lastNameController.text,
             _selectedRole,
@@ -57,10 +75,11 @@ class _UserFormState extends State<UserForm> {
             _passwordController.text,
             DateFormat('yyyy-MM-dd').format(_birthdate!),
             _gender!.toLowerCase());
+        }
 
-        if (isRegistered) {
+        if (isSuccess) {
           if (mounted) {
-            !widget.isCreate ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
+            (!widget.isCreate && widget.user == null) ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
           }
         } else {
           if (mounted) {
@@ -84,6 +103,24 @@ class _UserFormState extends State<UserForm> {
       return AppLocalizations.of(context)!.input_error_required;
     }
     return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.user != null) {
+      print(widget.user!.gender);
+      if (widget.user!.name != null) _nameController.text = widget.user!.name!;
+      if (widget.user!.lastname != null) _lastNameController.text = widget.user!.lastname!;
+      _emailController.text = widget.user!.email;
+      if (widget.user!.organizationId != null) _organizationController.text = widget.user!.organizationId!;
+      if (widget.user!.birthdate != null) _birthdate = widget.user!.birthdate;
+      setState(() {
+        _gender = widget.user!.gender;
+        _selectedRole = widget.user!.role;
+      });
+      
+    }
   }
 
   @override
@@ -184,6 +221,7 @@ class _UserFormState extends State<UserForm> {
                   validator: _fieldValidator,
                 ),
                 const SizedBox(height: 20),
+                if (widget.user == null)
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,

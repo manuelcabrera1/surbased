@@ -111,8 +111,8 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> updateUser(String id, String name,
-      String lastname, String email, String birthdate, String token) async {
+  Future<Map<String, dynamic>> updateUser(String id, String token, {String? name,
+      String? lastname, String? role, String? organization, String? email, String? birthdate, String? gender}) async {
     try {
       final response = await http.put(
         Uri.parse('$_baseUrl/$id'),
@@ -121,10 +121,13 @@ class AuthService {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'name': name,
-          'lastname': lastname,
-          'email': email,
-          'birthdate': birthdate,
+          if (name != null) 'name': name,
+          if (lastname != null) 'lastname': lastname,
+          if (role != null) 'role': role,
+          if (organization != null) 'organization': organization,
+          if (email != null) 'email': email,
+          if (birthdate != null) 'birthdate': birthdate,
+          if (gender != null) 'gender': gender,
         }),
       );
 
@@ -297,12 +300,12 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteUser(String id, String password, String token) async {
+  Future<Map<String, dynamic>> deleteUser(String id, String? password, String token) async {
     try {
       final response = await http.delete(
         Uri.parse('$_baseUrl/$id'),
         headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
-        body: json.encode({'password': password})
+        body: json.encode({if (password != null) 'password': password})
       );
 
       if (response.statusCode == 200) {

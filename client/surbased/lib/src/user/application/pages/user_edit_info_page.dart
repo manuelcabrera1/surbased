@@ -55,11 +55,11 @@ class _UserEditInfoPageState extends State<UserEditInfoPage> {
 
         final updatedUser = await authProvider.updateUser(
             authProvider.user!.id,
-            _nameController.text,
-            _lastNameController.text,
-            _emailController.text,
-            DateFormat('yyyy-MM-dd').format(_birthdate!),
-            authProvider.token!);
+            authProvider.token!,
+            name: _nameController.text,
+            lastname: _lastNameController.text,
+            email: _emailController.text,
+            birthdate: DateFormat('yyyy-MM-dd').format(_birthdate!));
         if (updatedUser) {
           setState(() => _isEditing = false);
           if (mounted) {
