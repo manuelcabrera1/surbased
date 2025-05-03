@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/pages/survey_access_request_dialog.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
@@ -23,6 +24,7 @@ class SurveyExplore extends StatefulWidget {
 class _SurveyExploreState extends State<SurveyExplore> {
   final _searchController = SearchController();
   List<Survey> _surveysToShow = [];
+  String? selectedCategoryId;
 
   @override
   void initState() {
@@ -33,13 +35,12 @@ class _SurveyExploreState extends State<SurveyExplore> {
   }
 
 
-  void filterSurveys() {
-    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
+  void filterSurveys(List<Survey> surveys) {
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
     if (mounted) {
       setState(() {
-        _surveysToShow = surveyProvider.publicSurveys.where((survey) {
+        _surveysToShow = surveys.where((survey) {
           String categoryName = categoryProvider.getCategoryById(survey.categoryId).name;
           bool search = survey.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
           categoryName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
@@ -143,7 +144,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             ],
                             onChanged: (value) {
                               if (_searchController.text != '') {
-                                filterSurveys();
+                                selectedCategoryId != null ? filterSurveys(surveyProvider.publicSurveys.where((survey) => survey.categoryId == selectedCategoryId).toList()) : filterSurveys(surveyProvider.publicSurveys);
                               } else {
                                 setState(() {
                                   _surveysToShow = surveyProvider.publicSurveys;
@@ -151,7 +152,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                               }
                             },
                             onSubmitted: (value) {
-                              filterSurveys();
+                              selectedCategoryId != null ? filterSurveys(surveyProvider.publicSurveys.where((survey) => survey.categoryId == selectedCategoryId).toList()) : filterSurveys(surveyProvider.publicSurveys);
                             },
                             hintText: t.surveys_searchbar_placeholder,
                           ),
@@ -165,7 +166,63 @@ class _SurveyExploreState extends State<SurveyExplore> {
             ),
             // Contenido principal
             if (_searchController.text.isEmpty) ...[
+              if (selectedCategoryId == null)
+                _buildSurveyExploreContent(context)
+              else
+                _buildSurveyListByCategory(context)
+            ] else ...[
+              // Resultados de búsqueda
               Expanded(
+                child: _surveysToShow.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se encontraron encuestas',
+                              style: theme.textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                          childAspectRatio: 0.85,
+                          mainAxisSpacing: 2,
+                          crossAxisSpacing: 2,
+                        ),
+                        itemCount: _surveysToShow.length,
+                        itemBuilder: (context, index) {
+                          final survey = _surveysToShow[index];
+                          return PublicSurveyCard(
+                            survey: survey,
+                            onTap: () => _handleOnTap(survey),
+                            category: categoryProvider.getCategoryById(survey.categoryId),
+                            responseCount: survey.responseCount ?? 0,
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSurveyExploreContent(BuildContext context) {
+  final theme = Theme.of(context);
+  final surveyProvider = Provider.of<SurveyProvider>(context);
+  final categoryProvider = Provider.of<CategoryProvider>(context);
+  return Expanded(
                 child: surveyProvider.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ListView(
@@ -229,7 +286,9 @@ class _SurveyExploreState extends State<SurveyExplore> {
                                     child: CategoryCard(
                                       category: category,
                                       onTap: () {
-                                        // TODO: Navegar a la página de encuestas por categoría
+                                        setState(() {
+                                          selectedCategoryId = category.id;
+                                        });
                                       },
                                       surveyCount: _getSurveyCountForCategory(category.id),
                                     ),
@@ -270,52 +329,93 @@ class _SurveyExploreState extends State<SurveyExplore> {
                           ),
                         ],
                       ),
-              ),
-            ] else ...[
-              // Resultados de búsqueda
-              Expanded(
-                child: _surveysToShow.isEmpty
-                    ? Center(
+    );
+  }
+
+  Widget _buildSurveyListByCategory(BuildContext context) {
+  final theme = Theme.of(context);
+  final t = AppLocalizations.of(context)!;
+  final surveyProvider = Provider.of<SurveyProvider>(context);
+  final categoryProvider = Provider.of<CategoryProvider>(context);
+  final surveys = surveyProvider.publicSurveys.where((survey) => survey.categoryId == selectedCategoryId).toList();
+  return Expanded(
+          child: surveyProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCategoryId = null;
+                              });
+                            },
+                            child: const Icon(Icons.arrow_back),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            Category.getCategoryName(context, categoryProvider.getCategoryById(selectedCategoryId!).name),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    if (surveys.isEmpty) ...[
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        alignment: Alignment.center,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.search_off,
-                              size: 64,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No se encontraron encuestas',
-                              style: theme.textTheme.titleMedium,
+                          children: [    
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search_off,
+                                    size: 64,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    t.surveys_error_no_surveys,
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       )
-                    : GridView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                          childAspectRatio: 0.85,
-                          mainAxisSpacing: 2,
-                          crossAxisSpacing: 2,
-                        ),
-                        itemCount: _surveysToShow.length,
-                        itemBuilder: (context, index) {
-                          final survey = _surveysToShow[index];
-                          return PublicSurveyCard(
-                            survey: survey,
-                            onTap: () => _handleOnTap(survey),
-                            category: categoryProvider.getCategoryById(survey.categoryId),
-                            responseCount: survey.responseCount ?? 0,
-                          );
-                        },
+                    ],                        
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                        childAspectRatio: 0.95,
+                        mainAxisSpacing: 2,
                       ),
-              ),
-            ],
-          ],
-        ),
-      ),
+                      itemCount: surveys.length,
+                      itemBuilder: (context, index) {
+                        final survey = surveys[index];
+                        return PublicSurveyCard(
+                          survey: survey,
+                          onTap: () => _handleOnTap(survey),
+                          category: categoryProvider.getCategoryById(survey.categoryId),
+                          responseCount: survey.responseCount ?? 0,
+                        );
+                      },
+                    ),
+                  ],
+                ),
     );
   }
 }
+
