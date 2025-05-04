@@ -68,8 +68,13 @@ class _SurveyExploreState extends State<SurveyExplore> {
             Provider.of<AnswerProvider>(context, listen: false);
 
         if (authProvider.surveysAssigned.any((e) => e.id == survey.id)) {
+        
+          if (authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id)) {
+            answerProvider.setCurrentSurveyBeingAnswered(authProvider.surveysAnswers.firstWhere((answer) => answer.surveyId == survey.id));
+          } else {
+            answerProvider.initializeCurrentSurveyBeingAnswered(survey);
+          }
           surveyProvider.currentSurvey = survey;
-          answerProvider.setCurrentSurveyBeingAnswered(survey);
           Navigator.pushNamed(context, AppRoutes.surveyComplete);
         } else {
           showDialog(

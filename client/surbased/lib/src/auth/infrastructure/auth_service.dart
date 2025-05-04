@@ -324,4 +324,23 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> getSurveysAnswers(String userId, String token) async {
+    try {
+
+      final response = await http.get(
+        Uri.parse('$_baseUrl/$userId/answers'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      } else {
+        return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};
+      }
+      
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
 }

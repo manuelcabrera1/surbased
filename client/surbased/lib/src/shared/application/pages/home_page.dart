@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
-import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/widgets/organization_section.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/shared/application/provider/firebase_provider.dart';
@@ -22,7 +20,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../../organization/application/widgets/organization_list.dart';
 import '../../../survey/application/widgets/survey_explore.dart';
 import '../../../survey/application/widgets/survey_invitation_dialog.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -113,6 +111,7 @@ class _HomePageState extends State<HomePage> {
                   authProvider.userId!,
                   authProvider.token!,
                 );
+        
         await surveyProvider.getSurveysByScope(
                 'public',
                 authProvider.token!,
@@ -127,6 +126,10 @@ class _HomePageState extends State<HomePage> {
           );
 
           await organizationProvider.getSurveysInOrganization(
+          authProvider.token!,
+        );
+        await authProvider.getSurveysAnswers(
+          authProvider.userId!,
           authProvider.token!,
         );      
         }
@@ -267,7 +270,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
     final role = authProvider.userRole;
 
     if (!authProvider.isAuthenticated || role == null || authProvider.isLoading) {

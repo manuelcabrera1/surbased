@@ -132,19 +132,28 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@answer_router.get("/answers", status_code=200)
-async def get_all_user_answers(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+@answer_router.get("/users/{user_id}/answers", status_code=200)
+async def get_all_user_answers(user_id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
     #check current user
     if not current_user:
         raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
+    #check if user exists
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.unique().scalars().first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    
+    if current_user.id != user_id and current_user.role != UserRoleEnum.admin:
+        raise HTTPException(status_code=403, detail="You are not allowed to access this user's answers")
+    
     #get all answers from user
     result = await db.execute(
         select(Answer, Option, Question, Survey)
-        .join(Option, Answer.option_id == Option.id)
+        .outerjoin(Option, Answer.option_id == Option.id)
         .join(Question, Answer.question_id == Question.id)
         .join(Survey, Question.survey_id == Survey.id)
-        .where(Answer.user_id == current_user.id)
+        .where(Answer.user_id == user_id)
     )
     answers = result.all()
 
@@ -159,17 +168,21 @@ async def get_all_user_answers(current_user: Annotated[User, Depends(get_current
         question_found = False
         for q in explored_answers[survey.id]["questions"]:
             if q["id"] == str(question.id):
-                q["options"].append({
-                    "id": str(option.id),
-                })
+                if question.type == QuestionTypeEnum.open:
+                    q["text"] = answer.text
+                else:
+                    q["options"].append({
+                        "id": str(option.id),
+                    })
                 question_found = True
                 break
         if not question_found:
             explored_answers[survey.id]["questions"].append({
                 "id": str(question.id),
+                "text": answer.text if question.type == QuestionTypeEnum.open else None,
                 "options": [{
                     "id": str(option.id),
-                }]
+                }] if question.type != QuestionTypeEnum.open else None
             })
     answers_list = list(explored_answers.values())
     

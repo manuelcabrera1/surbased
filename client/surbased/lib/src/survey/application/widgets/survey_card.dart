@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
@@ -102,7 +103,10 @@ class SurveyCard extends StatelessWidget {
     final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final t = AppLocalizations.of(context)!;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
+
+    final isSurveyAnswered = authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id);
     final isSurveyAvailable = survey.startDate.isBefore(
                                 DateTime.now().add(const Duration(days: 1))) &&
                             survey.endDate.isAfter(DateTime.now());
@@ -130,14 +134,34 @@ class SurveyCard extends StatelessWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(right: isSurveyPending || isSurveyFinished ? 75 : 0),
-                    child: Text(
-                      survey.name,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: RichText(
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: survey.name,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (isSurveyAnswered) ...[
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              baseline: TextBaseline.alphabetic,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Icon(
+                                  Icons.check_circle_outline,
+                                  color: theme.colorScheme.primary,
+                                  size: 20, // Ajusta este valor según necesites
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   ),
                   if (userRole == 'admin') ...[

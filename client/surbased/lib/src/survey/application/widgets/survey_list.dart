@@ -96,7 +96,12 @@ class _SurveyListState extends State<SurveyList> {
       if (userRole == 'participant') {
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
-        answerProvider.setCurrentSurveyBeingAnswered(survey);
+        
+        if (authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id)) {
+          answerProvider.setCurrentSurveyBeingAnswered(authProvider.surveysAnswers.firstWhere((answer) => answer.surveyId == survey.id));
+        } else {
+          answerProvider.initializeCurrentSurveyBeingAnswered(survey);
+        }
         surveyProvider.currentSurvey = survey;
         if (survey.assignmentStatus == 'invited_pending') {
           _showSurveyInvitationDialog(survey);

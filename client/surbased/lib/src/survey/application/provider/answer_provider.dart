@@ -30,8 +30,14 @@ class AnswerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCurrentSurveyBeingAnswered(Survey survey) {
+  void setCurrentSurveyBeingAnswered(Answer answer) {
+    _currentSurveyBeingAnswered = answer;
+    notifyListeners();
+  }
+
+  void initializeCurrentSurveyBeingAnswered(Survey survey) {
     _currentSurveyBeingAnswered = Answer(
+        surveyId: survey.id,
         questions: survey.questions
             .map((q) => Question(id: q.id, type: q.type, options: [], text: ''))
             .toList());

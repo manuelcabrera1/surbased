@@ -21,6 +21,40 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
   final textController = TextEditingController();
 
   @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
+      print(answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).text);
+      switch (widget.question.type) {
+        case "multiple_choice":
+          setState(() {
+            selectedMultipleOptions = answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).options?.map((e) => e.id!).toList() ?? [];
+          });
+          break;
+        case "single_choice" || "likert_scale":
+          setState(() {
+            selectedSingleOption = answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).options?.first.id;
+          });
+
+          break;
+        case "open":
+          setState(() {
+            textController.text = answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).text ?? '';
+          });
+          break;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final question = widget.question;
     final theme = Theme.of(context);

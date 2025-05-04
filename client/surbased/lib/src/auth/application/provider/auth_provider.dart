@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surbased/src/shared/infrastructure/mail_service.dart';
+import 'package:surbased/src/survey/domain/answer_model.dart';
 import '../../../survey/domain/survey_model.dart';
 import '../../infrastructure/auth_service.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
@@ -17,6 +18,7 @@ class AuthProvider with ChangeNotifier {
   List<User> _users = [];
   List<Survey> _surveysAssigned = [];
   int? _resetCode;
+  List<Answer> _surveysAnswers = [];
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   String? get token => _token;
@@ -28,6 +30,7 @@ class AuthProvider with ChangeNotifier {
   List<User> get users => _users;
   List<Survey> get surveysAssigned => _surveysAssigned;
   int? get resetCode => _resetCode;
+  List<Answer> get surveysAnswers => _surveysAnswers;
 
   void clearResetCode() {
     _resetCode = null;
@@ -342,6 +345,41 @@ class AuthProvider with ChangeNotifier {
         _isLoading = false;
         notifyListeners();
         return surveys;
+      } else {
+        _error = getSurveysResponse['error'];
+        _isLoading = false;
+        notifyListeners();
+        return [];
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return [];
+    }
+  }
+
+  Future<List<Answer>> getSurveysAnswers(String userId, String token) async {
+    try {
+      _error = null;
+      _isLoading = true;
+      notifyListeners();
+
+      final getSurveysResponse = await _authService.getSurveysAnswers(
+        userId,
+        token,
+      );
+        
+      if (getSurveysResponse['success']) {
+        List<Answer> answers = (getSurveysResponse['data']['answers'] as List<dynamic>)
+            .map((s) => Answer.fromJson(s))
+            .toList();
+
+        _surveysAnswers = answers;
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return answers;
       } else {
         _error = getSurveysResponse['error'];
         _isLoading = false;
