@@ -52,7 +52,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final organizationProvider =
           Provider.of<OrganizationProvider>(context, listen: false);
-
+      final t = AppLocalizations.of(context)!;
       _events.clear();
 
       DateTime now = DateTime(
@@ -78,12 +78,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
 
       if (allSurveys.isNotEmpty) {
         for (var survey in allSurveys) {
-          if (survey.endDate != null) {
-            if (survey.endDate!.isAfter(now) ||
-                survey.endDate!.isAtSameMomentAs(now)) {
+
               for (DateTime date = survey.startDate;
-                  date.isBefore(survey.endDate!) ||
-                      date.isAtSameMomentAs(survey.endDate!);
+                  date.isBefore(survey.endDate) ||
+                      date.isAtSameMomentAs(survey.endDate);
                   date = date.add(const Duration(days: 1))) {
                 final eventDate = DateTime(date.year, date.month, date.day);
                 if (!_events.containsKey(eventDate)) {
@@ -94,10 +92,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                   'surveyDescription': survey.description,
                   'surveyCategory':
                       categoryProvider.getCategoryById(survey.categoryId).name,
+                  'surveyAnswered': authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id) ? t.yes : t.no,
                 });
               }
-            }
-          }
+
         }
       }
 
@@ -113,16 +111,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
   }
 
   List<dynamic> _getEventsForDay(DateTime day) {
-    final now = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-    );
 
-    // No mostrar eventos para días anteriores al actual
-    if (day.isBefore(now)) {
-      return [];
-    }
 
     return _events[DateTime(day.year, day.month, day.day)] ?? [];
   }
@@ -283,7 +272,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${event['surveyName']} - ${event['surveyCategory']}',
+                                              '${event['surveyName']}',
                                               style: theme.textTheme.titleMedium
                                                   ?.copyWith(
                                                 fontWeight: FontWeight.bold,
@@ -292,6 +281,30 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                               ),
                                             ),
                                             const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  t.calendar_category(event['surveyCategory']),
+                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Text('|', style: theme.textTheme.bodyMedium?.copyWith(
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),),
+                                              const SizedBox(width: 10),
+                                              Text(
+                                                t.calendar_answered(event['surveyAnswered']),
+                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                            const SizedBox(height: 10),
                                             Text(
                                               '${event['surveyDescription']}',
                                               style: theme.textTheme.bodyMedium,

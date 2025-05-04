@@ -1,6 +1,8 @@
 {
     "@@locale": "en",
     "app_title": "Surbased",
+    "yes": "Yes",
+    "no": "No",
     "none": "None",
     "input_error_required": "This field is required",
     "input_error_email": "Email is required",
@@ -356,5 +358,7 @@
     "user_remove_confirmation": "Are you sure you want to remove this user?",
     "organization_remove": "Remove Organization",
     "organization_remove_confirmation": "Are you sure you want to remove this organization?",
-    "organization_edit_page_title": "Edit Organization"
+    "organization_edit_page_title": "Edit Organization",
+    "calendar_category": "Category: {category}",
+    "calendar_answered": "Answered: {boolean}"
 }
