@@ -136,7 +136,7 @@ async def get_surveys_in_organization(current_user: Annotated[User, Depends(get_
             
     
 
-@org_router.put("/organizations/{id}", status_code=201, response_model=OrganizationResponse)
+@org_router.put("/organizations/{id}", status_code=200, response_model=OrganizationResponse)
 @required_roles(["admin"])
 async def update_organization(id: uuid.UUID, org: OrganizationCreate, db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 

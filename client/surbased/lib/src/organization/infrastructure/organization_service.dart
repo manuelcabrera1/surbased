@@ -142,4 +142,54 @@ class OrganizationService {
     }
   }
 
+  Future<Map<String, dynamic>> updateOrganization(
+      String orgId, String name, String token) async {
+    try {
+      final response = await http
+          .put(Uri.parse('$_baseUrl/$orgId'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'name': name}));
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': json.decode(utf8.decode(response.bodyBytes)),
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteOrganization(
+      String orgId, String token) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('$_baseUrl/$orgId'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 204) {
+        return {
+          'success': true,
+        };
+      } else {
+        return {
+          'success': false,
+          'data': json.decode(utf8.decode(response.bodyBytes))['detail']
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
+  }
+
 }

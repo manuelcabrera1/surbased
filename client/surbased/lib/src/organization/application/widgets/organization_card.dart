@@ -47,7 +47,7 @@ class OrganizationCard extends StatelessWidget {
                         organization.name.split(' ')[0],
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontSize: organization.name.length > 10 ? 18 : 25,
+                          fontSize: organization.name.length > 10 ? 18 : 22,
                         ),
                       ),
                     ],
@@ -57,7 +57,7 @@ class OrganizationCard extends StatelessWidget {
                       organization.name.split(' ').sublist(1).join(' '),
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: organization.name.length > 10 ? 18 : 25,
+                        fontSize: organization.name.length > 10 ? 18 : 22,
                       ),
                     ),
                 ],

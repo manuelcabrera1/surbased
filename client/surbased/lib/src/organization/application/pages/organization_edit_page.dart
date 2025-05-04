@@ -11,21 +11,20 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../category/application/provider/category_provider.dart';
 
 
-class OrganizationCreatePage extends StatefulWidget {
-  const OrganizationCreatePage({super.key});
+class OrganizationEditPage extends StatefulWidget {
+  const OrganizationEditPage({super.key});
 
   @override
-  State<OrganizationCreatePage> createState() => OrganizationCreatePageState();
+  State<OrganizationEditPage> createState() => OrganizationEditPageState();
 }
 
-class OrganizationCreatePageState extends State<OrganizationCreatePage> {
+class OrganizationEditPageState extends State<OrganizationEditPage> {
 
   
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final organizationProvider = Provider.of<OrganizationProvider>(context);
 
     final t = AppLocalizations.of(context)!;
     return Scaffold(
@@ -39,22 +38,24 @@ class OrganizationCreatePageState extends State<OrganizationCreatePage> {
                   Row(
                       children: [
                         IconButton(
-                          onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                          onPressed: () => {
+                            Navigator.pop(context),
+                          },
                           icon: const Icon(Icons.arrow_back),
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          t.organization_create_page_title,
+                          t.organization_edit_page_title,
                           maxLines: 2,
                           style: theme.textTheme.displayMedium?.copyWith(
-                            fontSize: t.organization_create_page_title.length > 20 ? 25 : 30,
+                            fontSize: t.organization_edit_page_title.length > 20 ? 25 : 30,
                           ),
                         ),
                       ],
                     ),
                   const Padding(
                     padding: EdgeInsets.all(24.0),
-                    child: OrganizationForm()
+                    child: OrganizationForm(isEditing: true)
                   )
                 ],
               ),

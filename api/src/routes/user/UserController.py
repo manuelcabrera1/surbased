@@ -234,7 +234,7 @@ async def update_user_notifications(id: uuid.UUID, current_user: Annotated[User,
 
 
 
-@user_router.delete("/users/{id}", status_code=200)
+@user_router.delete("/users/{id}", status_code=204)
 async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
         if not current_user:

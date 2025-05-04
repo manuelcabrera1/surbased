@@ -308,8 +308,8 @@ class AuthService {
         body: json.encode({if (password != null) 'password': password})
       );
 
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+      if (response.statusCode == 204) {
+        return {'success': true};
       } 
       else if (response.statusCode == 401) {
         return {'success': false, 'data': json.decode(utf8.decode(response.bodyBytes))['detail']};

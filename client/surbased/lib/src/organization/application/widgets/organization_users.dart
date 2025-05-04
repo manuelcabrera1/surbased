@@ -5,11 +5,13 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/organization/application/widgets/user_filter_dialog.dart';
+import 'package:surbased/src/organization/domain/organization_model.dart';
 import 'package:surbased/src/user/application/pages/user_details_page.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 
 class OrganizationUsers extends StatefulWidget {
-  const OrganizationUsers({super.key});
+  final bool isCurrentOrganization;
+  const OrganizationUsers({super.key, this.isCurrentOrganization = true});
 
   @override
   State<OrganizationUsers> createState() => _OrganizationUsersState();
@@ -21,6 +23,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
   String _sortField = 'name';
   bool _isAscending = true;
   String? _selectedRole;
+  Organization? organization;
 
   @override
   void didChangeDependencies() {
@@ -37,20 +40,38 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final organizationProvider =
+            Provider.of<OrganizationProvider>(context, listen: false);
+      if (widget.isCurrentOrganization) {
+        setState(() {
+          organization = organizationProvider.organization;
+          _usersToShow = organization!.users!;
+        });
+      } else {
+        setState(() {
+          organization = organizationProvider.selectedOrganization;
+          _usersToShow = organization!.users!;
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
   void filterUsers() {
-    final organizationProvider =
-        Provider.of<OrganizationProvider>(context, listen: false);
 
     if (mounted &&
-        organizationProvider.organization != null &&
-        organizationProvider.organization!.users != null) {
+        organization != null &&
+        organization!.users != null) {
       setState(() {
-        _usersToShow = organizationProvider.organization!.users!
+        _usersToShow = organization!.users!
             .where((user) =>
                 // Filtro por texto
                 (user.name?.toLowerCase().contains(_searchController.text.toLowerCase()) ??
@@ -173,8 +194,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                               onPressed: () {
                                 setState(() {
                                   _searchController.clear();
-                                  _usersToShow =
-                                      organizationProvider.organization!.users!;
+                                  _usersToShow = organization!.users!;
                                 });
                               },
                               icon: const Icon(Icons.close),
@@ -186,8 +206,7 @@ class _OrganizationUsersState extends State<OrganizationUsers> {
                             filterUsers();
                           } else {
                             setState(() {
-                              _usersToShow =
-                                  organizationProvider.organization!.users!;
+                              _usersToShow = organization!.users!;
                             });
                           }
                         },

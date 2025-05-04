@@ -155,7 +155,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
           ),
           TextButton(
             onPressed: () => _removeSurvey(),
-            child: Text(t.save),
+            child: Text(t.remove),
           ),
         ],
       ),
@@ -165,7 +165,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
   void _showDownloadDialog() {
     showDialog(
       context: context,
-      builder: (context) => SurveyAnswersDownloadDialog(),
+      builder: (context) => const SurveyAnswersDownloadDialog(),
     );
   }
 

@@ -123,12 +123,14 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
 
   void _removeUser() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     try {
       if (authProvider.token != null && mounted) {
         final isDeleted = await authProvider.deleteUser(widget.userId, null, authProvider.token!, isCurrentUser: false);
         if (isDeleted && mounted) {
-          Navigator.pushNamed(context, AppRoutes.home);
+          userProvider.getUsers(authProvider.token!, null, null);
+          Navigator.popUntil(context, (route) => route.isFirst);
 
         } else{ 
           if (mounted) {
@@ -161,7 +163,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
           ),
           TextButton(
             onPressed: () => _removeUser(),
-            child: Text(t.save),
+            child: Text(t.remove),
           ),
         ],
       ),

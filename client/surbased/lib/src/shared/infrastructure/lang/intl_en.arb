@@ -152,6 +152,7 @@
     "admin": "Admin",
     "explore_page_title": "Explore",
     "users_error_no_users": "No users found",
+    "organizations_error_no_organizations": "No organizations found",
     "survey_removed": "Survey removed successfully",
     "scope": "Scope",
     "scope_private": "Private",
@@ -206,6 +207,7 @@
     "organization_create_page_title": "Create a New Organization",
     "organization_name": "Organization Name",
     "organization_create": "Create Organization",
+    "organization_edit": "Edit Organization",
     "user_assign_hint_text": "Enter user email",
     "user_already_assigned": "User is already assigned to this survey",
     "survey_invitation_title": "Survey Invitation",
@@ -351,5 +353,8 @@
     "user_no_categories": "No categories of interest defined",
     "user_invitation_sent": "Invitation sent successfully",
     "user_remove": "Remove User",
-    "user_remove_confirmation": "Are you sure you want to remove this user?"
+    "user_remove_confirmation": "Are you sure you want to remove this user?",
+    "organization_remove": "Remove Organization",
+    "organization_remove_confirmation": "Are you sure you want to remove this organization?",
+    "organization_edit_page_title": "Edit Organization"
 }

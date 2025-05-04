@@ -150,6 +150,7 @@
     "admin": "Admin",
     "explore_page_title": "Explorar",
     "users_error_no_users": "No se encontraron usuarios",
+    "organizations_error_no_organizations": "No se encontraron organizaciones",
     "survey_removed": "Cuestionario eliminado correctamente",
     "scope": "Visibilidad",
     "scope_private": "Privado",
@@ -226,6 +227,7 @@
     "organization_create_page_title": "Crear una Nueva Organización",
     "organization_name": "Nombre de la Organización",
     "organization_create": "Crear Organización",
+    "organization_edit": "Editar Organización",
     "user_assign_hint_text": "Ingrese el correo del usuario",
     "user_already_assigned": "El usuario ya está asignado a este cuestionario",
     "survey_download_answers": "Exportar respuestas",
@@ -351,5 +353,8 @@
     "user_no_categories": "Sin categorías de interés definidas",
     "user_invitation_sent": "Invitación enviada correctamente",
     "user_remove": "Eliminar Usuario",
-    "user_remove_confirmation": "¿Está seguro que desea eliminar este usuario?"
+    "user_remove_confirmation": "¿Está seguro que desea eliminar este usuario?",
+    "organization_remove": "Eliminar Organización",
+    "organization_remove_confirmation": "¿Estás seguro de que quieres eliminar esta organización?",
+    "organization_edit_page_title": "Editar Organización"
 }

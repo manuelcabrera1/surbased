@@ -10,12 +10,19 @@ class OrganizationProvider with ChangeNotifier {
   String? _error;
   bool _isLoading = false;
   Organization? _organization;
+  Organization? _selectedOrganization;
   List<Organization> _organizations = [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
   Organization? get organization => _organization;
   List<Organization> get organizations => _organizations;
+  Organization? get selectedOrganization => _selectedOrganization;
+
+  set selectedOrganization(Organization? organization) {
+    _selectedOrganization = organization;
+    notifyListeners();
+  }
 
   set organization(Organization? organization) {
     _organization = organization;
@@ -24,6 +31,7 @@ class OrganizationProvider with ChangeNotifier {
 
   void clearState() {
     _organization = null;
+    _selectedOrganization = null;
     _error = null;
     _isLoading = false;
     notifyListeners();
@@ -154,7 +162,7 @@ class OrganizationProvider with ChangeNotifier {
   }
 
   Future<void> getUsersInOrganization(String token,
-      {String? sortBy, String? order}) async {
+      {String? sortBy, String? order, String? organizationId, bool? isCurrentOrganization = true}) async {
     _error = null;
     _isLoading = true;
     notifyListeners();
@@ -162,14 +170,20 @@ class OrganizationProvider with ChangeNotifier {
       late Map<String, dynamic> getUsersResponse;
 
       getUsersResponse = await _organizationService
-          .getUsersInCurrentOrganization(token, _organization!.id,
+          .getUsersInCurrentOrganization(token, organizationId ?? _organization!.id,
               sortBy: sortBy, order: order);
 
       if (getUsersResponse['success']) {
-        _organization!.users =
+        final users =
             (getUsersResponse['data']['users'] as List<dynamic>)
                 .map((user) => User.fromJson(user))
                 .toList();
+        if (isCurrentOrganization!) {
+            _organization!.users = users;
+        } else {
+          _selectedOrganization!.users = users;
+        }
+
         _isLoading = false;
         _error = null;
         notifyListeners();
@@ -185,13 +199,13 @@ class OrganizationProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getSurveysInOrganization(String token, {String? category}) async {
+  Future<void> getSurveysInOrganization(String token, {String? category, String? organizationId, bool? isCurrentOrganization = true}) async {
     _error = null;
     _isLoading = true;
     notifyListeners();
     try {
       final getSurveysResponse = await _organizationService
-          .getSurveysInOrganization(_organization!.id, token, category: category);
+          .getSurveysInOrganization(organizationId ?? _organization!.id, token, category: category);
 
       if (getSurveysResponse['success']) {
         final surveys =
@@ -199,7 +213,9 @@ class OrganizationProvider with ChangeNotifier {
                 .map((survey) => Survey.fromJson(survey))
                 .toList();
 
-        _organization!.surveys = surveys;
+        isCurrentOrganization!
+        ?_organization!.surveys = surveys
+        : _selectedOrganization!.surveys = surveys;
 
         _isLoading = false;
         _error = null;
@@ -214,5 +230,63 @@ class OrganizationProvider with ChangeNotifier {
       _error = e.toString();
       notifyListeners();
     }
+  }
+
+  Future<bool> updateOrganization(String id, String name, String token) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+
+      final updateOrganizationResponse = await _organizationService.updateOrganization(id, name, token);
+
+      if (updateOrganizationResponse['success']) {
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = updateOrganizationResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
+  }
+
+  Future<bool> deleteOrganization(String id, String token) async {
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+    try {
+
+      final deleteOrganizationResponse = await _organizationService.deleteOrganization(id, token);
+      print(deleteOrganizationResponse);
+
+      if (deleteOrganizationResponse['success']) {
+        _error = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = deleteOrganizationResponse['data'];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
   }
 }

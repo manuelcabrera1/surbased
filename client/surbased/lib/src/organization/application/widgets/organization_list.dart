@@ -115,25 +115,12 @@ class _OrganizationListState extends State<OrganizationList> {
     }
   }
 
-  String _getSizeName(String size) {
-    final t = AppLocalizations.of(context)!;
-    switch (size) {
-      case 'small':
-        return t.list_size_small;
-      case 'medium':
-        return t.list_size_medium;
-      case 'large':
-        return t.list_size_large;
-      default:
-        return t.list_size_small;
-    }
-  }
 
   Future<void> _handleOnTap(Organization organization) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
     if (mounted && authProvider.userRole != null) {
-      organizationProvider.organization = organization;
+      organizationProvider.selectedOrganization = organization;
       Navigator.pushNamed(context, AppRoutes.organizationDetails);
     }
   }
@@ -165,14 +152,30 @@ class _OrganizationListState extends State<OrganizationList> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (mounted) {
+      final organizationProvider =
+          Provider.of<OrganizationProvider>(context, listen: false);
+
+        setState(() {
+          _organizationsToShow = organizationProvider.organizations;
+        });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final organizationProvider = Provider.of<OrganizationProvider>(context);
     final t = AppLocalizations.of(context)!;
+    
 
     // Asegurarnos de tener la lista actualizada
     if (_organizationsToShow.isEmpty && organizationProvider.organizations.isNotEmpty) {
-      _organizationsToShow = [...organizationProvider.organizations];
+      setState(() {
+        _organizationsToShow = [...organizationProvider.organizations];
+      });
     }
     
     // Aplicar ordenamiento
@@ -299,7 +302,7 @@ class _OrganizationListState extends State<OrganizationList> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No se encontraron organizaciones',
+                        t.organizations_error_no_organizations,
                         style: theme.textTheme.titleMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -315,7 +318,7 @@ class _OrganizationListState extends State<OrganizationList> {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                    childAspectRatio: 1,
+                    childAspectRatio: 0.95,
                     mainAxisSpacing: 2,
                   ),
                   itemCount: displayOrganizations.length,

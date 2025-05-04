@@ -6,6 +6,7 @@ import 'package:surbased/src/auth/application/pages/login_page.dart';
 import 'package:surbased/src/auth/application/pages/register_page.dart';
 import 'package:surbased/src/organization/application/pages/organization_create_page.dart';
 import 'package:surbased/src/organization/application/pages/organization_details.dart';
+import 'package:surbased/src/organization/application/pages/organization_edit_page.dart';
 import 'package:surbased/src/shared/application/pages/home_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_add_questions_page.dart';
 import 'package:surbased/src/survey/application/pages/survey_complete_page.dart';
@@ -46,6 +47,7 @@ class AppRoutes {
   static const String userCreate = '/user/create';
   static const String userEdit = '/user/edit';
   static const String organizationCreate = '/organization/create';
+  static const String organizationEdit = '/organization/edit';
   static Map<String, WidgetBuilder> routes = {
     register: (_) => const RegisterPage(),
     login: (_) => const LoginPage(),
@@ -69,6 +71,7 @@ class AppRoutes {
     userCreate: (_) => const UserCreatePage(),
     userEdit: (context) => UserEditPage(user: ModalRoute.of(context)!.settings.arguments as User),
     organizationCreate: (_) => const OrganizationCreatePage(),
+    organizationEdit: (_) => const OrganizationEditPage(),
     //researcherHome: (_) => const ResearcherHomePage(),
     //adminHome: (_) => const AdminHomePage(),
   };

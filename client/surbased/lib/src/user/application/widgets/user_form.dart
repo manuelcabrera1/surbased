@@ -9,6 +9,7 @@ import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dar
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
+import 'package:surbased/src/user/application/provider/user_provider.dart';
 
 class UserForm extends StatefulWidget {
   final bool isCreate;
@@ -49,6 +50,7 @@ class _UserFormState extends State<UserForm> {
     if (_formKey.currentState!.validate()) {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
 
         bool isSuccess = false;
 
@@ -79,7 +81,14 @@ class _UserFormState extends State<UserForm> {
 
         if (isSuccess) {
           if (mounted) {
-            (!widget.isCreate && widget.user == null) ? _navigateToLogin() : Navigator.popUntil(context, (route) => route.isFirst);
+            if (!widget.isCreate && widget.user == null) {
+              _navigateToLogin();
+            } else {
+              await userProvider.getUsers(authProvider.token!, null, null);
+              if (mounted) {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
+            }
           }
         } else {
           if (mounted) {
@@ -109,7 +118,6 @@ class _UserFormState extends State<UserForm> {
   void initState() {
     super.initState();
     if (widget.user != null) {
-      print(widget.user!.gender);
       if (widget.user!.name != null) _nameController.text = widget.user!.name!;
       if (widget.user!.lastname != null) _lastNameController.text = widget.user!.lastname!;
       _emailController.text = widget.user!.email;

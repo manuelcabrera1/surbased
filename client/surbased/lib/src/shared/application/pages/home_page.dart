@@ -67,9 +67,10 @@ class _HomePageState extends State<HomePage> {
   
 
   Future<void> _onDestinationSelected(int index) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
-      if (index == 0 || index == 1 || index == 2) {
+      if (index == 0 || index == 1 || index == 2 || (index == 3 && authProvider.userRole == 'admin')) {
         _refreshData();
       }
 

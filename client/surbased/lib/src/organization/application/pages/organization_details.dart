@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
+import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/organization/application/provider/organization_provider.dart';
 import 'package:surbased/src/organization/application/widgets/organization_section.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -47,10 +48,14 @@ class _OrganizationDetailsState extends State<OrganizationDetails> with TickerPr
     try {
       await organizationProvider.getSurveysInOrganization(
             authProvider.token!,
+            organizationId: organizationProvider.selectedOrganization!.id,
+            isCurrentOrganization: false,
           );
 
           await organizationProvider.getUsersInOrganization(
             authProvider.token!,
+            organizationId: organizationProvider.selectedOrganization!.id,
+            isCurrentOrganization: false,
           );
       
     } catch(e) {
@@ -62,6 +67,56 @@ class _OrganizationDetailsState extends State<OrganizationDetails> with TickerPr
     }
   }
 
+
+  void _removeOrganization() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+
+    try {
+      if (authProvider.token != null && mounted) {
+        final isDeleted = await organizationProvider.deleteOrganization(organizationProvider.selectedOrganization!.id.toString(), authProvider.token!);
+        if (isDeleted && mounted) {
+          organizationProvider.getOrganizations(authProvider.token!);
+          Navigator.popUntil(context, (route) => route.isFirst);
+
+        } else{ 
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(organizationProvider.error!)),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _showRemoveOrganizationDialog() {
+    final t = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.organization_remove),
+        content: Text(t.organization_remove_confirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t.cancel),
+          ),
+          TextButton(
+            onPressed: () => _removeOrganization(),
+            child: Text(t.remove),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final organizationProvider = Provider.of<OrganizationProvider>(context);
@@ -70,43 +125,71 @@ class _OrganizationDetailsState extends State<OrganizationDetails> with TickerPr
 
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => {
+            Navigator.pop(context),
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: Text(organizationProvider.selectedOrganization!.name),
+        actions: [
+            PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () => {
+                          Navigator.pushNamed(context, AppRoutes.organizationEdit)
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.edit, color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text(t.edit),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => _showRemoveOrganizationDialog(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.delete,
+                                color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text(t.remove),
+                          ],
+                        ),
+                      ),
+                    ])
+          ],
+          bottom: TabBar(
+            dividerHeight: 0,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: theme.colorScheme.surface,
+            unselectedLabelColor: theme.colorScheme.surface.withOpacity(0.7),
+            indicatorColor: theme.colorScheme.surface,
+            controller: tabController,
+            tabAlignment: TabAlignment.fill,
+            tabs: [
+              Tab(text: t.surveys_page_title),
+              Tab(text: t.users_page_title),
+            ],
+          ),
+          ),
       body: SafeArea(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Row(
-                  children: [
-                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back),
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      organizationProvider.organization!.name,
-                      style: theme.textTheme.displayMedium,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              TabBar(
-                  dividerHeight: 0,
-                  controller: tabController,
-                  tabs: [
-                    Tab(text: t.surveys_page_title),
-                    Tab(text: t.users_page_title),
-                  ],
-                ),
                 const SizedBox(height: 20),
                 Expanded(
                   child: TabBarView(
                     controller: tabController,
                     children: [
-                      SurveyList(surveys: organizationProvider.organization!.surveys ?? []),
-                       const OrganizationUsers(),
+                      SurveyList(surveys: organizationProvider.selectedOrganization!.surveys ?? []),
+                      const OrganizationUsers(isCurrentOrganization: false),
                     ],
                   ),
                 ),
