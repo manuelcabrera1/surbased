@@ -1,16 +1,16 @@
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, select, update
-from models.SurveyModel import Survey
-from schemas.SurveySchema import SurveyResponseWithLength, SurveyScopeEnum
-from models.UserModel import User
-from schemas.OrganizationSchema import *
-from schemas.UserSchema import *
-from models.OrganizationModel import Organization
-from database import get_db
+from src.models.SurveyModel import Survey
+from src.schemas.SurveySchema import SurveyResponseWithLength, SurveyScopeEnum
+from src.models.UserModel import User
+from src.schemas.OrganizationSchema import *
+from src.schemas.UserSchema import *
+from src.models.OrganizationModel import Organization
+from src.database import get_db
 from typing import Annotated, List
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.Auth import create_access_token, check_current_user, get_current_user, required_roles
+from src.auth.Auth import create_access_token, check_current_user, get_current_user, required_roles
 
 
 

@@ -2,14 +2,14 @@ from typing import List, Optional, TYPE_CHECKING
 import uuid
 from sqlalchemy import ForeignKey, String, UUID
 
-from database import Base
+from src.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 
 if TYPE_CHECKING:
-    from .OrganizationModel import Organization
-    from .SurveyModel import Survey
+    from src.models.OrganizationModel import Organization
+    from src.models.SurveyModel import Survey
 
 class Category(Base):
     __tablename__ = "categories"

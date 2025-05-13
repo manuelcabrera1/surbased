@@ -1,22 +1,20 @@
 from typing import List, Optional, TYPE_CHECKING
 import uuid
-from models.TagModel import Tag
-from database import Base
+from src.models.TagModel import Tag
+from src.database import Base
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Date, UniqueConstraint, func, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import date
 from sqlalchemy.orm import  Mapped, mapped_column, relationship
-from .SurveyMetricModel import survey_metric
-from .SurveyUserModel import survey_user
-from .SurveyTagModel import survey_tag
+from src.models.SurveyUserModel import survey_user
+from src.models.SurveyTagModel import survey_tag
 
 
 if TYPE_CHECKING:
-    from .OrganizationModel import Organization
-    from .UserModel import User
-    from .CategoryModel import Category
-    from .MetricModel import Metric
-    from .QuestionModel import Question
+    from src.models.OrganizationModel import Organization
+    from src.models.UserModel import User
+    from src.models.CategoryModel import Category
+    from src.models.QuestionModel import Question
 
 class Survey(Base):
     __tablename__ = "surveys"
@@ -37,7 +35,6 @@ class Survey(Base):
     assigned_users: Mapped[Optional[List["User"]]] = relationship(secondary=survey_user, back_populates="surveys_assigned",lazy="selectin")
     owner: Mapped["User"] = relationship(back_populates="surveys_owned", lazy="selectin")
     category: Mapped["Category"] = relationship(back_populates="surveys", lazy="selectin")
-    metrics: Mapped[Optional[List["Metric"]]] = relationship(secondary=survey_metric, back_populates="surveys", lazy="selectin")
     questions: Mapped[Optional[List["Question"]]] = relationship(back_populates="survey", cascade="all, delete", lazy="selectin")
     organization: Mapped[Optional["Organization"]] = relationship(back_populates="surveys", lazy="selectin")
     tags: Mapped[Optional[List["Tag"]]] = relationship(secondary=survey_tag, back_populates="surveys", lazy="selectin")

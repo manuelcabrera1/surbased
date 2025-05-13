@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 from uuid import UUID
 
-from schemas.QuestionSchema import *
+from src.schemas.QuestionSchema import *
 
 class AnswerBase(BaseModel):...
 

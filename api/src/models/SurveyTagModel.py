@@ -1,5 +1,5 @@
 from datetime import datetime
-from database import Base
+from src.database import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Table
 
 survey_tag = Table(

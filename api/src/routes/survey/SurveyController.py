@@ -1,23 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, insert, or_, select, update, and_
-from models.TagModel import Tag
-from models.AnswerModel import Answer
-from models.QuestionModel import Question
-from models.OptionModel import Option
-from schemas.OptionSchema import OptionResponse
-from schemas.QuestionSchema import QuestionResponse
-from models.CategoryModel import Category
-from models.UserModel import User
-from models.SurveyModel import Survey
-from schemas.SurveySchema import *
+from src.models.TagModel import Tag
+from src.models.AnswerModel import Answer
+from src.models.QuestionModel import Question
+from src.models.OptionModel import Option
+from src.schemas.OptionSchema import OptionResponse
+from src.schemas.QuestionSchema import QuestionResponse
+from src.models.CategoryModel import Category
+from src.models.UserModel import User
+from src.models.SurveyModel import Survey
+from src.schemas.SurveySchema import *
 import bcrypt
-from database import get_db
+from src.database import get_db
 from typing import Annotated, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
-from auth.Auth import create_access_token, check_current_user, oauth_scheme, get_current_user, required_roles
+from src.auth.Auth import create_access_token, check_current_user, oauth_scheme, get_current_user, required_roles
 from sqlalchemy.orm import selectinload
-from models.SurveyTagModel import survey_tag
+from src.models.SurveyTagModel import survey_tag
 
 
 survey_router = APIRouter(tags=["Survey"])

@@ -1,12 +1,12 @@
 import uuid
 from typing import List, Optional, TYPE_CHECKING
-from database import Base
+from src.database import Base
 from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from .SurveyTagModel import survey_tag
+from src.models.SurveyTagModel import survey_tag
 
 if TYPE_CHECKING:    
-    from .SurveyModel import Survey
+    from src.models.SurveyModel import Survey
 
 
 

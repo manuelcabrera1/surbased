@@ -1,15 +1,15 @@
 from typing import List, TYPE_CHECKING
 import uuid
-from .AnswerModel import Answer
-from database import Base
+from src.models.AnswerModel import Answer
+from src.database import Base
 from sqlalchemy import Boolean, CheckConstraint, Column, ForeignKey, Integer, String, Date, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 if TYPE_CHECKING:
-    from .SurveyModel import Survey
-    from .OptionModel import Option
+    from src.models.SurveyModel import Survey
+    from src.models.OptionModel import Option
 
 
 class Question(Base):

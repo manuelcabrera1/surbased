@@ -6,7 +6,7 @@ import google.auth.transport.requests
 import requests
 from typing import TYPE_CHECKING
 from google.auth.transport.requests import Request
-from schemas.NotificationSchema import NotificationRequest
+from src.schemas.NotificationSchema import NotificationRequest
 
 def send_notification(payload: NotificationRequest):
 

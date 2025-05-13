@@ -1,18 +1,18 @@
 from datetime import date
 import uuid
 from typing import List, Optional, TYPE_CHECKING
-from database import Base
+from src.database import Base
 from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String, Date, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from .SurveyUserModel import survey_user
+from src.models.SurveyUserModel import survey_user
 
 
 if TYPE_CHECKING:
-    from .UserFcmTokenModel import UserFcmToken
-    from .SurveyModel import Survey
-    from .OrganizationModel import Organization
-    from .AnswerModel import Answer
+    from src.models.UserFcmTokenModel import UserFcmToken
+    from src.models.SurveyModel import Survey
+    from src.models.OrganizationModel import Organization
+    from src.models.AnswerModel import Answer
 
 
 

@@ -1,13 +1,11 @@
-from .UserModel import Base
-from .OrganizationModel import Base
-from .CategoryModel import Base
-from .SurveyModel import Base
-from .QuestionModel import Base
-from .OptionModel import Base
-from .AnswerModel import Base
-from .SurveyMetricModel import Base
-from .SurveyUserModel import Base
-from .MetricModel import Base
+from src.models.UserModel import Base
+from src.models.OrganizationModel import Base
+from src.models.CategoryModel import Base
+from src.models.SurveyModel import Base
+from src.models.QuestionModel import Base
+from src.models.OptionModel import Base
+from src.models.AnswerModel import Base
+from src.models.SurveyUserModel import Base
 
 
 

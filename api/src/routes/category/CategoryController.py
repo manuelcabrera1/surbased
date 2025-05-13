@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, select, update
-from models.UserModel import User
-from models.CategoryModel import Category
-from schemas.CategorySchema import *
-from schemas.TokenSchema import Token
+from src.models.UserModel import User
+from src.models.CategoryModel import Category
+from src.schemas.CategorySchema import *
+from src.schemas.TokenSchema import Token
 import bcrypt
-from database import get_db
+from src.database import get_db
 from typing import Annotated, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
-from auth.Auth import create_access_token, check_current_user, get_current_user, oauth_scheme, required_roles
+from src.auth.Auth import create_access_token, check_current_user, get_current_user, oauth_scheme, required_roles
 
 category_router = APIRouter(tags=["Category"])
 

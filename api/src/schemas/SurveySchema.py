@@ -3,9 +3,9 @@ import uuid
 from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import date, timedelta
 
-from schemas.TagSchema import *
+from src.schemas.TagSchema import *
 
-from .QuestionSchema import *
+from src.schemas.QuestionSchema import *
 
 class SurveyScopeEnum(str, Enum):
     private = "private"

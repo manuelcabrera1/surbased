@@ -2,11 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.Auth import get_current_user
-from schemas.UserFcmTokenSchema import UserFcmTokenCreate
-from models.UserFcmTokenModel import UserFcmToken
-from models.UserModel import User
-from database import get_db
+from src.auth.Auth import get_current_user
+from src.schemas.UserFcmTokenSchema import UserFcmTokenCreate
+from src.models.UserFcmTokenModel import UserFcmToken
+from src.models.UserModel import User
+from src.database import get_db
 
 
 user_fcm_token_router = APIRouter(prefix="/fcm-token", tags=["User FCM Token"])

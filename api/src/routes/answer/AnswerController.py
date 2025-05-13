@@ -4,19 +4,19 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy import delete, or_, select, update, and_
-from schemas.UserSchema import UserRoleEnum
-from schemas.SurveySchema import SurveyScopeEnum
-from models.AnswerModel import Answer
-from models.OptionModel import Option
-from schemas.AnswerSchema import *
-from models.CategoryModel import Category
-from models.SurveyModel import Survey
-from models.QuestionModel import Question
-from database import get_db
+from src.schemas.UserSchema import UserRoleEnum
+from src.schemas.SurveySchema import SurveyScopeEnum
+from src.models.AnswerModel import Answer
+from src.models.OptionModel import Option
+from src.schemas.AnswerSchema import *
+from src.models.CategoryModel import Category
+from src.models.SurveyModel import Survey
+from src.models.QuestionModel import Question
+from src.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.Auth import get_current_user, required_roles
-from models.UserModel import User
-from models.SurveyUserModel import survey_user
+from src.auth.Auth import get_current_user, required_roles
+from src.models.UserModel import User
+from src.models.SurveyUserModel import survey_user
 from datetime import datetime
 import pandas as pd
 

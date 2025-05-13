@@ -3,7 +3,7 @@ import uuid
 from enum import Enum
 from pydantic import BaseModel, Field, model_validator
 
-from .OptionSchema import *
+from src.schemas.OptionSchema import *
 
 class QuestionTypeEnum(str, Enum):
     single_choice = "single_choice"

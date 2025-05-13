@@ -2,8 +2,6 @@ from typing import List
 import uuid
 from pydantic import BaseModel, Field
 
-from schemas.SurveySchema import SurveyResponse
-from schemas.UserSchema import UserResponse
 
 class OrganizationBase(BaseModel):
     name: str

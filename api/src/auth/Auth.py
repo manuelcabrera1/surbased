@@ -9,9 +9,9 @@ from dotenv import load_dotenv
 import os
 
 from sqlalchemy import select
-from models.UserModel import User
-from schemas.TokenSchema import TokenData
-from database import get_db
+from src.models.UserModel import User
+from src.schemas.TokenSchema import TokenData
+from src.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 load_dotenv()

@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
 import os
-from schemas.MailSchema import *
+from src.schemas.MailSchema import *
 load_dotenv()
 
 

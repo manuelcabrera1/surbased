@@ -1,14 +1,14 @@
 import datetime
 from typing import TYPE_CHECKING
 import uuid
-from database import Base
+from src.database import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, UUID, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from .QuestionModel import Question
-    from .OptionModel import Option
-    from .UserModel import User
+    from src.models.QuestionModel import Question
+    from src.models.OptionModel import Option
+    from src.models.UserModel import User
 
 
 

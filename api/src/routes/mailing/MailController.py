@@ -4,13 +4,13 @@ from pydantic import BaseModel, EmailStr
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
-from config.mailing.config import get_conf, get_templates
-from schemas.MailSchema import *
+from src.config.mailing.config import get_conf, get_templates
+from src.schemas.MailSchema import *
 import random
-from database import get_db
+from src.database import get_db
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.UserModel import User
+from src.models.UserModel import User
 mail_router = APIRouter(prefix="/mail", tags=["mail"])
 
 

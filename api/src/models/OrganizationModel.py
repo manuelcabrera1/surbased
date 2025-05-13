@@ -1,14 +1,14 @@
 from typing import List, TYPE_CHECKING, Optional
 import uuid
-from database import Base
+from src.database import Base
 from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 
 if TYPE_CHECKING:
-    from .UserModel import User
-    from .SurveyModel import Survey
+    from src.models.UserModel import User
+    from src.models.SurveyModel import Survey
 
 
 

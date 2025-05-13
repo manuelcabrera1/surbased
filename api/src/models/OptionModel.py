@@ -1,14 +1,14 @@
 from typing import List, TYPE_CHECKING
 import uuid
-from database import Base
+from src.database import Base
 from sqlalchemy import Boolean, ForeignKey, Integer,  String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 
 if TYPE_CHECKING:
-    from .QuestionModel import Question
-    from .AnswerModel import Answer
+    from src.models.QuestionModel import Question
+    from src.models.AnswerModel import Answer
 
 
 class Option(Base):
