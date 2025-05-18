@@ -23,7 +23,7 @@ conf = ConnectionConfig(
 )
 
 templates = Environment(
-    loader=FileSystemLoader('config/mailing/templates')
+    loader=FileSystemLoader('src/config/mailing/templates')
 )
 
 def get_conf():
