@@ -14,10 +14,10 @@ if TYPE_CHECKING:
 
 class Answer(Base):
     __tablename__ = "answers"
-
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), primary_key=True)
-    option_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("options.id"))
-    question_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("questions.id"), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("users.id"), nullable=False)
+    option_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("options.id"), nullable=True)
+    question_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey("questions.id"), nullable=False)
     text: Mapped[str] = mapped_column(String(250), nullable=True)
 
 

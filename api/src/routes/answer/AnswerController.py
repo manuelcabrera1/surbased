@@ -96,8 +96,7 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
     #create answers in one transaction
     try:
         for question in answer.questions:
-            print(question.text)
-            print(question.options)
+
 
             if question.type == QuestionTypeEnum.open:
                 new_answer = Answer(
@@ -113,7 +112,7 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
                         option_id=option.id,
                         question_id=question.id,
                     )
-                db.add(new_answer)
+                    db.add(new_answer)
             
         await db.commit()
 
@@ -221,7 +220,7 @@ async def get_survey_answers(
         )
         assignment = result.unique().scalars().first()
 
-        if not assignment and survey.owner_id != current_user.id:
+        if not assignment and survey.owner_id != current_user.id and current_user.role != UserRoleEnum.admin:
             raise HTTPException(status_code=403, detail="Access denied: User not assigned to this survey")
 
     elif survey.scope == SurveyScopeEnum.organization:
@@ -329,7 +328,7 @@ async def export_survey_answers(
         )
         assignment = result.unique().scalars().first()
 
-        if not assignment and survey.owner_id != current_user.id:
+        if not assignment and survey.owner_id != current_user.id and current_user.role != UserRoleEnum.admin:
             raise HTTPException(status_code=403, detail="Access denied: User not assigned to this survey")
 
     elif survey.scope == SurveyScopeEnum.organization:
