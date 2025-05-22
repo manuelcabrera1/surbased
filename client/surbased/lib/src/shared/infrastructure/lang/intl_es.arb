@@ -180,7 +180,7 @@
     "public_survey_no_responses": "Sin respuestas",
     "tags": "Etiquetas",
     "tags_write": "Escribe para buscar o añadir una etiqueta",
-    "survey_questions": "{questionCount} preguntas",
+    "survey_questions": "Preguntas ({questionCount})",
     "survey_question": "1 pregunta",
     "likert_scale_configuration": "Configuración de la escala Likert",
     "likert_scale_levels": "Niveles de la escala",
@@ -359,6 +359,5 @@
     "organization_remove": "Eliminar Organización",
     "organization_remove_confirmation": "¿Estás seguro de que quieres eliminar esta organización?",
     "organization_edit_page_title": "Editar Organización",
-    "calendar_category": "Categoría: {category}",
     "calendar_answered": "Respondido: {boolean}"
 }

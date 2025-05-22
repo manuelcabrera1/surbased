@@ -182,7 +182,7 @@
     "public_survey_no_responses": "No answers",
     "tags": "Tags",
     "tags_write": "Escribe para buscar o añadir una tag",
-    "survey_questions": "{questionCount} questions",
+    "survey_questions": "Questions ({questionCount})", 
     "survey_question": "1 question",
     "likert_scale_configuration": "Likert scale configuration",
     "likert_scale_levels": "Scale Levels",
@@ -359,6 +359,5 @@
     "organization_remove": "Remove Organization",
     "organization_remove_confirmation": "Are you sure you want to remove this organization?",
     "organization_edit_page_title": "Edit Organization",
-    "calendar_category": "Category: {category}",
     "calendar_answered": "Answered: {boolean}"
 }

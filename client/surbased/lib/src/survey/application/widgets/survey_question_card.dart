@@ -32,11 +32,11 @@ class _SurveyQuestionCardState extends State<SurveyQuestionCard> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
-      print(answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).text);
       switch (widget.question.type) {
         case "multiple_choice":
           setState(() {
-            selectedMultipleOptions = answerProvider.currentSurveyBeingAnswered!.questions.firstWhere((q) => q.id == widget.question.id).options?.map((e) => e.id!).toList() ?? [];
+            
+            selectedMultipleOptions = answerProvider.currentSurveyBeingAnswered?.questions.firstWhere((q) => q.id == widget.question.id).options?.map((e) => e.id!).toList() ?? [];
           });
           break;
         case "single_choice" || "likert_scale":

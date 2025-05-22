@@ -156,7 +156,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                 child: ListView.builder(
                   padding: const EdgeInsets.all(0),
                   physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: surveyProvider.currentSurvey!.questions.length,
+                  itemCount: surveyProvider.currentSurvey?.questions.length,
                   itemBuilder: (context, index) {
                     return SurveyQuestionCard(
                       question: surveyProvider.currentSurvey!.questions[index],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Definición de colores base
@@ -165,53 +166,55 @@ class AppTheme {
       ),
 
       // Textos
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        displayMedium: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        displaySmall: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        headlineLarge: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        headlineSmall: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: blackText,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: blackText,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: blackText,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: pureWhite,
+      textTheme: GoogleFonts.latoTextTheme(
+        const TextTheme(
+          displayLarge: TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          displayMedium: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          displaySmall: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          headlineLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 16,
+            color: blackText,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            color: blackText,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 12,
+            color: blackText,
+          ),
+          labelLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: pureWhite,
+          ),
         ),
       ),
 
@@ -379,43 +382,45 @@ class AppTheme {
       ),
 
       // Textos para tema oscuro
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        displayMedium: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        headlineLarge: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: darkText,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: darkText,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: darkText,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: darkGreyText,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: pureWhite,
+      textTheme: GoogleFonts.latoTextTheme(
+        const TextTheme(
+          displayLarge: TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          displayMedium: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          headlineLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: darkText,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 16,
+            color: darkText,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            color: darkText,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 12,
+            color: darkGreyText,
+          ),
+          labelLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: pureWhite,
+          ),
         ),
       ),
 

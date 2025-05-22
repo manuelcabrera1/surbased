@@ -13,6 +13,7 @@ import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
+import 'package:surbased/src/utils/category_helpers.dart';
 import 'survey_list_filter_dialog.dart';
 
 class SurveyList extends StatefulWidget {
@@ -93,6 +94,7 @@ class _SurveyListState extends State<SurveyList> {
 
     if (mounted && authProvider.userRole != null) {
       final userRole = authProvider.userRole;
+      surveyProvider.currentSurvey = survey;
       if (userRole == 'participant') {
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
@@ -102,7 +104,6 @@ class _SurveyListState extends State<SurveyList> {
         } else {
           answerProvider.initializeCurrentSurveyBeingAnswered(survey);
         }
-        surveyProvider.currentSurvey = survey;
         if (survey.assignmentStatus == 'invited_pending') {
           _showSurveyInvitationDialog(survey);
         } else {
@@ -242,7 +243,7 @@ class _SurveyListState extends State<SurveyList> {
 
   void sortCategories() {
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-    categoryProvider.categories.sort((a, b) => Category.getCategoryName(context, a.name).compareTo(Category.getCategoryName(context, b.name)));
+    categoryProvider.categories.sort((a, b) => getCategoryName(context, a.name).compareTo(getCategoryName(context, b.name)));
   }
 
 
@@ -354,7 +355,7 @@ class _SurveyListState extends State<SurveyList> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(Category.getCategoryName(context, category.name)),
+                        label: Text(getCategoryName(context, category.name)),
                         selected: _selectedCategory == category.id,
                         onSelected: (selected) {
                           setState(() => _selectedCategory = category.id);

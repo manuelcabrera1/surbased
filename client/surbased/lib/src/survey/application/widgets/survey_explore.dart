@@ -13,6 +13,7 @@ import 'package:surbased/src/category/application/provider/category_provider.dar
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/survey/application/widgets/public_survey_card.dart';
 import 'package:surbased/src/survey/application/widgets/category_card.dart';
+import 'package:surbased/src/utils/category_helpers.dart';
 
 class SurveyExplore extends StatefulWidget {
   const SurveyExplore({super.key});
@@ -64,6 +65,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
     if (mounted && authProvider.userRole != null) {
       final userRole = authProvider.userRole;
       if (userRole == 'participant') {
+        surveyProvider.currentSurvey = survey;
         final answerProvider =
             Provider.of<AnswerProvider>(context, listen: false);
 
@@ -199,7 +201,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                          childAspectRatio: 0.85,
+                          childAspectRatio: 1,
                           mainAxisSpacing: 2,
                           crossAxisSpacing: 2,
                         ),
@@ -318,7 +320,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                              childAspectRatio: 0.95,
+                              childAspectRatio: 1,
                               mainAxisSpacing: 2,
                             ),
                             itemCount: surveyProvider.publicSurveys.length,
@@ -362,7 +364,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            Category.getCategoryName(context, categoryProvider.getCategoryById(selectedCategoryId!).name),
+                            getCategoryName(context, categoryProvider.getCategoryById(selectedCategoryId!).name),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -404,7 +406,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                        childAspectRatio: 0.95,
+                        childAspectRatio: 1,
                         mainAxisSpacing: 2,
                       ),
                       itemCount: surveys.length,

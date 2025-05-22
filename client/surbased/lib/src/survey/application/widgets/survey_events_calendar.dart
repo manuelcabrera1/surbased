@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/category/application/provider/category_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
+import 'package:surbased/src/utils/category_helpers.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:surbased/src/shared/application/provider/lang_provider.dart';
@@ -261,10 +262,10 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                       margin: const EdgeInsets.only(bottom: 20),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
+                                        side: BorderSide(color: theme.dividerColor.withOpacity(0.12), width: 1),
                                       ),
                                       elevation: 1,
-                                      color: theme.colorScheme.primaryContainer
-                                          .withOpacity(0.4),
+                                      color: theme.colorScheme.primaryContainer.withOpacity(0.2),
                                       child: Padding(
                                         padding: const EdgeInsets.all(12),
                                         child: Column(
@@ -283,20 +284,14 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                             const SizedBox(height: 4),
                                             Row(
                                               children: [
-                                                Text(
-                                                  t.calendar_category(event['surveyCategory']),
-                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                Icon(
+                                                  getCategoryIcon(event['surveyCategory']),
                                                   color: theme.colorScheme.onSurfaceVariant,
-                                                  fontStyle: FontStyle.italic,
+                                                  size: 18,
                                                 ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text('|', style: theme.textTheme.bodyMedium?.copyWith(
-                                                color: theme.colorScheme.onSurfaceVariant,
-                                              ),),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                t.calendar_answered(event['surveyAnswered']),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  event['surveyCategory'],
                                                 style: theme.textTheme.bodyMedium?.copyWith(
                                                   color: theme.colorScheme.onSurfaceVariant,
                                                   fontStyle: FontStyle.italic,
@@ -305,6 +300,14 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                             ],
                                           ),
                                             const SizedBox(height: 10),
+                                             Text(
+                                                t.calendar_answered(event['surveyAnswered']),
+                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
                                             Text(
                                               '${event['surveyDescription']}',
                                               style: theme.textTheme.bodyMedium,

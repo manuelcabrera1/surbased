@@ -9,6 +9,7 @@ import 'package:surbased/src/user/application/provider/user_provider.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:surbased/src/utils/category_helpers.dart';
 
 class UserDetailsPage extends StatefulWidget {
   final String userId;
@@ -391,7 +392,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                             size: 18,
                                             color: theme.colorScheme.primary,
                                           ),
-                                          label: Text(Category.getCategoryName(context, category.name)),
+                                          label: Text(getCategoryName(context, category.name)),
                                           backgroundColor: theme.colorScheme.secondaryContainer.withOpacity(0.5),
                                           labelStyle: TextStyle(
                                             color: theme.colorScheme.onSecondaryContainer,

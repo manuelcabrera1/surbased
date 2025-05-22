@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:surbased/src/survey/domain/survey_model.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/utils/category_helpers.dart';
 
 class PublicSurveyCard extends StatelessWidget {
   final Survey survey;
@@ -54,115 +55,128 @@ class PublicSurveyCard extends StatelessWidget {
     final theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return Container(
+      margin: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.12), width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Título
-              Text(
-                survey.name,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: survey.name.length > 20 ? 16 : 17,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título
+                Text(
+                  survey.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              // Categoría
-              if (category != null)
+                const SizedBox(height: 6),
+                // Categoría
+                if (category != null)
+                  Row(
+                    children: [
+                      Icon(
+                        getCategoryIcon(category!.name),
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          getCategoryName(context, category!.name),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                if (survey.tags != null && survey.tags!.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      ...survey.tags!.take(_maxVisibleTags).map((tag) {
+                        final index = survey.tags!.indexOf(tag);
+                        final color = _tagColors[index % _tagColors.length];
+                        return _buildTagChip(context, tag.name, color);
+                      }),
+                      if (survey.tags!.length > _maxVisibleTags)
+                        _buildTagChip(
+                          context,
+                          '+${survey.tags!.length - _maxVisibleTags}',
+                          theme.colorScheme.tertiaryContainer,
+                        ),
+                    ],
+                  ),
+                ] else ...[
+                  const Spacer(),
+                ],
+                const Spacer(),
                 Row(
                   children: [
                     Icon(
-                      Icons.label_outline,
-                      size: 18,
-                      color: theme.colorScheme.primary,
+                      Icons.people_outline,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      Category.getCategoryName(context, category!.name),
+                      responseCount == 1 
+                          ? t.public_survey_response
+                          : t.public_survey_responses(responseCount),
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontSize: 14,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 13,
                       ),
                     ),
                   ],
                 ),
-              if (survey.tags != null && survey.tags!.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
+                const SizedBox(height: 4),
+                Row(
                   children: [
-                    ...survey.tags!.take(_maxVisibleTags).map((tag) {
-                      final index = survey.tags!.indexOf(tag);
-                      final color = _tagColors[index % _tagColors.length];
-                      return _buildTagChip(context, tag.name, color);
-                    }),
-                    if (survey.tags!.length > _maxVisibleTags)
-                      _buildTagChip(
-                        context,
-                        '+${survey.tags!.length - _maxVisibleTags}',
-                        theme.colorScheme.tertiaryContainer,
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatDate(survey.startDate),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 13,
                       ),
+                    ),
                   ],
                 ),
               ],
-              const Spacer(),
-              // Información adicional
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Respuestas
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.people_outline,
-                        size: 14,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        responseCount == 1 
-                            ? t.public_survey_response
-                            : t.public_survey_responses(responseCount),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  // Fecha
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 14,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatDate(survey.startDate),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -21,6 +21,7 @@ class SurveyAccessRequestDialog extends StatelessWidget {
     try {
       if (authProvider.token != null) {
         if (authProvider.token != null) {
+
           final result = await surveyProvider.requestSurveyAccess(survey.id!, authProvider.user!.id, authProvider.user!.email, authProvider.token!);
           if (result && context.mounted) {
             Navigator.pop(context);
