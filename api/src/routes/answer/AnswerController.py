@@ -187,7 +187,6 @@ async def get_all_user_answers(user_id: uuid.UUID, current_user: Annotated[User,
     
     return {
         "answers": answers_list,
-        "length": len(answers_list)
     }
         
 
@@ -294,7 +293,6 @@ async def get_survey_answers(
     
     return {
         "answers": answers_list,
-        "length": len(answers_list)
     }
 
 @answer_router.get("/surveys/{survey_id}/answers/export/{format}", status_code=200)

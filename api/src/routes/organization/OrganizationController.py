@@ -2,7 +2,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, select, update
 from src.models.SurveyModel import Survey
-from src.schemas.SurveySchema import SurveyResponseWithLength, SurveyScopeEnum
+from src.schemas.SurveySchema import SurveyResponseList, SurveyScopeEnum
 from src.models.UserModel import User
 from src.schemas.OrganizationSchema import *
 from src.schemas.UserSchema import *
@@ -38,7 +38,7 @@ async def create_organization(org: OrganizationCreate, db: Annotated[AsyncSessio
 
 
  
-@org_router.get("/organizations", status_code=200, response_model=OrganizationResponseWithLength)
+@org_router.get("/organizations", status_code=200, response_model=OrganizationResponseList)
 @required_roles(["admin"])
 async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
@@ -52,7 +52,7 @@ async def get_all_organizations(db: Annotated[AsyncSession, Depends(get_db)], cu
         organizations = [OrganizationResponse(id=o.id, name=o.name, users_count=len(o.users), surveys_count=len(o.surveys)) for o in orgs]
 
 
-        return { "organizations": organizations, "length": len(organizations) }
+        return { "organizations": organizations}
     
 
 
@@ -70,24 +70,8 @@ async def get_organization_by_id(id:uuid.UUID, db: Annotated[AsyncSession, Depen
         
         return OrganizationResponse(id=existing_org.id, name=existing_org.name, users_count=len(existing_org.users), surveys_count=len(existing_org.surveys))
 
-@org_router.get("/organizations/", status_code=200, response_model=OrganizationResponseWithLength)
-async def get_organizations_by_ids(ids:List[uuid.UUID], db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None):
 
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-        
-        orgs = []
-        for id in ids:
-            result = await db.execute(select(Organization).where(Organization.id == id))
-            existing_org = result.unique().scalars().first()
-            orgs.append(existing_org)
-
-        if not existing_org:
-            raise HTTPException(status_code=404, detail="Organization not found") 
-        
-        return orgs
-
-@org_router.get("/organizations/{id}/users", status_code=200, response_model=UserResponseWithLength)
+@org_router.get("/organizations/{id}/users", status_code=200, response_model=UserResponseList)
 @required_roles(["researcher", "admin"])
 async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession, Depends(get_db)], 
                                         current_user: Annotated[User, Depends(get_current_user)] = None, 
@@ -109,9 +93,9 @@ async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession
         elif sortBy == "role":
             users.sort(key=lambda a: (a.role), reverse=order == 'DESC')
 
-        return { "users": users, "length": len(users) }
+        return { "users": users}
 
-@org_router.get("/organizations/{org_id}/surveys", status_code=200, response_model=SurveyResponseWithLength)
+@org_router.get("/organizations/{org_id}/surveys", status_code=200, response_model=SurveyResponseList)
 @required_roles(["admin", "researcher", "participant"])
 async def get_surveys_in_organization(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
                         org_id: uuid.UUID, category_id: Optional[uuid.UUID] = None):
@@ -132,7 +116,7 @@ async def get_surveys_in_organization(current_user: Annotated[User, Depends(get_
         surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
 
 
-        return { "surveys": surveys, "length": len(surveys) }
+        return { "surveys": surveys}
             
     
 

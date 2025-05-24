@@ -88,7 +88,7 @@ async def get_user(current_user: Annotated[User, Depends(get_current_user)] = No
     
 
 
-@user_router.get("/users", status_code=200, response_model=UserResponseWithLength, dependencies=[Depends(check_current_user)])
+@user_router.get("/users", status_code=200, response_model=UserResponseList, dependencies=[Depends(check_current_user)])
 @required_roles(["admin"])
 async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)] = None, role: Optional[UserRoleEnum] = None, org: Optional[uuid.UUID] = None):
         
@@ -108,7 +108,7 @@ async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)], current_us
        
 
         users = result.unique().scalars().all()
-        return { "users": users, "length": len(users) }
+        return { "users": users}
     
 
 
