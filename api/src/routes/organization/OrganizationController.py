@@ -80,6 +80,12 @@ async def get_all_users_in_organization(id:uuid.UUID, db: Annotated[AsyncSession
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
         
+        result = await db.execute(select(Organization).where(Organization.id == id))
+        existing_org = result.unique().scalars().first()
+
+        if not existing_org:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        
         if current_user.organization_id != id and current_user.role != "admin":
             raise HTTPException(status_code=403, detail="You are not allowed to access this organization")
         
@@ -103,6 +109,12 @@ async def get_surveys_in_organization(current_user: Annotated[User, Depends(get_
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
+        result = await db.execute(select(Organization).where(Organization.id == org_id))
+        existing_org = result.unique().scalars().first()
+
+        if not existing_org:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        
         if current_user.role != "admin" and current_user.organization_id != org_id:
             raise HTTPException(status_code=403, detail="Forbidden")
         
@@ -163,7 +175,22 @@ async def delete_organization(id: uuid.UUID, db: Annotated[AsyncSession, Depends
         existing_org = result.unique().scalars().first()
 
         if not existing_org:
-            raise HTTPException(status_code=400, detail="Organization not found")
+            raise HTTPException(status_code=404, detail="Organization not found")
+        
+        
+        result = await db.execute(select(User).where(User.organization_id == id))
+
+        users = result.unique().scalars().all()
+
+        if len(users) > 0:
+            raise HTTPException(status_code=400, detail="Organization has users")
+        
+        result = await db.execute(select(Survey).where(Survey.organization_id == id))
+
+        surveys = result.unique().scalars().all()
+
+        if len(surveys) > 0:
+            raise HTTPException(status_code=400, detail="Organization has surveys")
 
         await db.delete(existing_org)
         await db.commit()
