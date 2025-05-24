@@ -34,7 +34,7 @@ async def create_category(category: CategoryCreate, current_user: Annotated[User
         return new_category
 
 
-@category_router.get("/categories", status_code=200, response_model=CategoryResponseWithLength)
+@category_router.get("/categories", status_code=200, response_model=CategoryResponseList)
 async def get_all_categories(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
         if not current_user:
@@ -45,7 +45,7 @@ async def get_all_categories(current_user: Annotated[User, Depends(get_current_u
 
 
         categories = result.unique().scalars().all()
-        return { "categories": categories, "length": len(categories) }
+        return categories
     
 
 

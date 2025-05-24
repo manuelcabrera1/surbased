@@ -74,7 +74,7 @@ class OrganizationProvider with ChangeNotifier {
       final getOrganizationsResponse = await _organizationService.getOrganizations(token);
 
       if (getOrganizationsResponse['success']) {
-        _organizations = (getOrganizationsResponse['data']['organizations'] as List<dynamic>)
+        _organizations = (getOrganizationsResponse['data'] as List<dynamic>)
         .map((organization) => Organization.fromJson(organization))
         .toList();
 
@@ -175,7 +175,7 @@ class OrganizationProvider with ChangeNotifier {
 
       if (getUsersResponse['success']) {
         final users =
-            (getUsersResponse['data']['users'] as List<dynamic>)
+            (getUsersResponse['data'] as List<dynamic>)
                 .map((user) => User.fromJson(user))
                 .toList();
         if (isCurrentOrganization!) {
@@ -209,7 +209,7 @@ class OrganizationProvider with ChangeNotifier {
 
       if (getSurveysResponse['success']) {
         final surveys =
-            (getSurveysResponse['data']['surveys'] as List<dynamic>)
+            (getSurveysResponse['data'] as List<dynamic>)
                 .map((survey) => Survey.fromJson(survey))
                 .toList();
 

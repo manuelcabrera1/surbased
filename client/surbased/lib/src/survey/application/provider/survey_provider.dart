@@ -194,15 +194,15 @@ class SurveyProvider extends ChangeNotifier {
       if (response['success']) {
         switch (scope) {
           case 'private':
-            _privateSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+            _privateSurveys = (response['data'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
 
             break;
           case 'organization':
-            _organizationSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+            _organizationSurveys = (response['data'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
 
             break;
           case 'public':
-            _publicSurveys = (response['data']['surveys'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
+            _publicSurveys = (response['data'] as List<dynamic>).map((x) => Survey.fromJson(x)).toList();
 
             break;
         }
@@ -232,7 +232,7 @@ class SurveyProvider extends ChangeNotifier {
       );
       
       if (getSurveysResponse['success']) {
-        _highlightedPublicSurveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+        _highlightedPublicSurveys = (getSurveysResponse['data'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
         _error = null;
@@ -262,7 +262,7 @@ class SurveyProvider extends ChangeNotifier {
       );
         
       if (getSurveysResponse['success']) {
-        final surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
+        final surveys = (getSurveysResponse['data'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
         _surveysOwned = surveys;
@@ -298,7 +298,7 @@ class SurveyProvider extends ChangeNotifier {
 
       if (getSurveyUsersResponse['success']) {
 
-        final newAssignedUsers = (getSurveyUsersResponse['data']['users'] as List<dynamic>)
+        final newAssignedUsers = (getSurveyUsersResponse['data']as List<dynamic>)
             .map((s) => User.fromJson(s))
             .toList();
         newAssignedUsers.sort((a, b) => a.name!.compareTo(b.name!));

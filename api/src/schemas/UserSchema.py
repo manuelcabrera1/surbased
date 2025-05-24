@@ -84,12 +84,11 @@ class UserResponse(UserBase):
 class UserByRoleRequest(BaseModel):
     role: UserRoleRequestEnum
 
-class UserResponseWithLength(BaseModel):
+class UserResponseList(BaseModel):
     users: List[UserResponse]
-    length: int
 
-class UserResponseWithPendingAssignments(BaseModel):
-    users: List[UserResponse]
+
+class UserResponseWithPendingAssignments(UserResponseList):
     pending_assignments: dict[str, AssignmentStatusEnum]
     
 class UserUpdateNotificationsRequest(BaseModel):

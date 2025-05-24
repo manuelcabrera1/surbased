@@ -70,7 +70,7 @@ async def get_all_survey_assigned_users(id: uuid.UUID, current_user: Annotated[U
     return { "users": users, "pending_assignments": pending_assignments }
     
 
-@survey_users_router.get("/users/{id}/surveys", status_code=200, response_model=SurveyResponseWithLength)
+@survey_users_router.get("/users/{id}/surveys", status_code=200, response_model=SurveyResponseList)
 async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
     
         if not current_user:
@@ -113,7 +113,7 @@ async def get_user_surveys_assigned(id: uuid.UUID, current_user: Annotated[User,
         surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
 
 
-        return { "surveys": surveys, "length": len(surveys)}
+        return surveys
     
 
 @survey_users_router.post("/surveys/{id}/users/add", status_code=200, response_model=UserResponse)
@@ -318,7 +318,7 @@ async def reject_survey_assignment(user_id: uuid.UUID, survey_id: uuid.UUID, cur
     
     
 
-@survey_users_router.delete("/users/{id}/users/delete", status_code=200, response_model=UserResponseWithLength)
+@survey_users_router.delete("/users/{id}/users/delete", status_code=200, response_model=UserResponseList)
 @required_roles(["admin", "researcher"])
 async def remove_user_from_survey(id: uuid.UUID, user: RemoveParticipantFromSurvey, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
     
@@ -369,7 +369,7 @@ async def remove_user_from_survey(id: uuid.UUID, user: RemoveParticipantFromSurv
                                                                                                 User.id == survey_user.c.user_id)))
         participants = result.unique().scalars().all()
 
-        return { "users": participants, "length": len(participants) }
+        return participants
 
 
 @survey_users_router.post("/surveys/{id}/users/{user_id}/request", status_code=200, response_model=UserResponse)

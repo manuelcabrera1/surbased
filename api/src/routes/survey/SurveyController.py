@@ -22,7 +22,7 @@ from src.models.SurveyTagModel import survey_tag
 
 survey_router = APIRouter(tags=["Survey"])
 
-@survey_router.get("/surveys/", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/", status_code=200, response_model=SurveyResponseList)
 @required_roles(["admin", "researcher", "participant"])
 async def get_surveys_by_scope(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], 
                         scope: SurveyScopeEnum):
@@ -40,7 +40,7 @@ async def get_surveys_by_scope(current_user: Annotated[User, Depends(get_current
 
         surveys = result.unique().scalars().all()
 
-        return { "surveys": surveys, "length": len(surveys) }
+        return surveys
 
 @survey_router.get("/surveys/{id}", status_code=200, response_model=SurveyResponse)
 async def get_survey_by_id(id:uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
@@ -253,7 +253,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
 
 
 
-@survey_router.get("/surveys/owner/{owner_id}", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/owner/{owner_id}", status_code=200, response_model=SurveyResponseList)
 @required_roles(["admin", "researcher"])
 async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], owner_id: uuid.UUID):
     
@@ -277,9 +277,9 @@ async def get_surveys_by_owner(current_user: Annotated[User, Depends(get_current
         surveys = sorted(surveys, key=lambda x: x.end_date, reverse=True)
        
 
-        return { "surveys": surveys, "length": len(surveys) }
+        return surveys
 
-@survey_router.get("/surveys/public/highlighted", status_code=200, response_model=SurveyResponseWithLength)
+@survey_router.get("/surveys/public/highlighted", status_code=200, response_model=SurveyResponseList)
 async def get_highlighted_public_surveys(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
     
     if not current_user:
@@ -306,7 +306,7 @@ async def get_highlighted_public_surveys(current_user: Annotated[User, Depends(g
         survey.response_count = count
         surveys.append(survey)
 
-    return {"surveys": surveys, "length": len(surveys)}
+    return surveys
 
 
 @survey_router.put("/surveys/{id}", status_code=200, response_model=SurveyResponse)

@@ -89,7 +89,7 @@ class UserProvider with ChangeNotifier {
       Map<String, dynamic> getUsersResponse = await _userService.getUsers(token, org, role);
     
       if (getUsersResponse['success']) {
-        _users = (getUsersResponse['data']['users'] as List<dynamic>)
+        _users = (getUsersResponse['data'] as List<dynamic>)
             .map((user) => User.fromJson(user))
             .toList();
         _isLoading = false;

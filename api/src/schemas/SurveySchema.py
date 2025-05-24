@@ -63,6 +63,5 @@ class SurveyResponse(SurveyBase):
     response_count: Optional[int] = Field(default=None)
     tags: Optional[List[TagResponse]] = Field(default=None)
 
-class SurveyResponseWithLength(BaseModel):
+class SurveyResponseList(BaseModel):
     surveys: List[SurveyResponse]
-    length: int
