@@ -16,5 +16,6 @@ class CategoryUpdate(CategoryBase):...
 class CategoryResponse(CategoryBase):
     id: uuid.UUID
 
-class CategoryResponseList(BaseModel):
+class CategoryResponseWithLength(BaseModel):
     categories: List[CategoryResponse]
+    length: int

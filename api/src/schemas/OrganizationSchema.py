@@ -14,7 +14,6 @@ class OrganizationResponse(OrganizationBase):
     users_count: int | None = None
     surveys_count: int | None = None
 
-class OrganizationResponseList(BaseModel):
+class OrganizationResponseWithLength(BaseModel):
     organizations: List[OrganizationResponse]
-
-
+    length: int

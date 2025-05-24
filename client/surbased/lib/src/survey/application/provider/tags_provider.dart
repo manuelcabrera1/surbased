@@ -20,7 +20,7 @@ class TagsProvider extends ChangeNotifier {
     try{
       final response = await _tagService.getTags(token);
       if (response['success']) {
-        _tags = (response['data'] as List<dynamic>).map((x) => Tag.fromJson(x)).toList();
+        _tags = (response['data']['tags'] as List<dynamic>).map((x) => Tag.fromJson(x)).toList();
         _isLoading = false;
         _error = null;
         notifyListeners();

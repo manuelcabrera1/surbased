@@ -22,7 +22,7 @@ class SurveyAnswersProvider extends ChangeNotifier {
     try {
       final result = await _surveyService.getSurveyAnswers(surveyId, token);
       if (result['success']) {
-        _answers = (result['data'] as List)
+        _answers = (result['data']['answers'] as List)
             .map((answer) => Answer.fromJson(answer))
             .toList();
         _calculateStatistics();

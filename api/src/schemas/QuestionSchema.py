@@ -34,8 +34,9 @@ class QuestionResponse(QuestionBase):
     survey_id: uuid.UUID
     options: List[OptionResponse] = Field(default_factory=list)
 
-class QuestionResponseList(BaseModel):
+class QuestionResponseWithLength(BaseModel):
     questions: List[QuestionResponse]
+    length: int
 
 
 class QuestionWithId(BaseModel):

@@ -17,9 +17,9 @@ class OptionResponse(OptionBase):
     id: UUID
     question_id: UUID
 
-class OptionResponseList(BaseModel):
+class OptionResponseWithLength(BaseModel):
     options: List[OptionResponse]
-
+    length: int
 
 class OptionWithId(BaseModel):
     id: UUID

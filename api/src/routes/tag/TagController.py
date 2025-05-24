@@ -18,7 +18,7 @@ tag_router = APIRouter(tags=["Tag"])
 
 
 
-@tag_router.get("/tags", status_code=200, response_model=TagResponseList)
+@tag_router.get("/tags", status_code=200, response_model=TagResponseWithLength)
 async def get_all_tags(current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
 
         if not current_user:
@@ -28,6 +28,9 @@ async def get_all_tags(current_user: Annotated[User, Depends(get_current_user)],
         result = await db.execute(select(Tag))
 
         tags = result.unique().scalars().all()
-        return tags
+        return {
+              "tags": tags,
+              "length": len(tags)
+        }
     
     

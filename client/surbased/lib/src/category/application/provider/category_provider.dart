@@ -31,7 +31,7 @@ class CategoryProvider extends ChangeNotifier {
 
       if (categoriesResponse['success']) {
         _categories =
-            (categoriesResponse['data'] as List<dynamic>)
+            (categoriesResponse['data']['categories'] as List<dynamic>)
                 .map((c) => Category.fromJson(c))
                 .toList();
         _isLoading = false;

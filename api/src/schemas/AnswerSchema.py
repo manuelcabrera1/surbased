@@ -20,8 +20,9 @@ class AnswerResponse(AnswerBase):
     survey_id: UUID
     questions: List[QuestionAnswer]
 
-class AnswerResponseList(AnswerBase):
+class AnswerResponseWithLength(AnswerBase):
     answers: List[AnswerResponse]
+    length: int
 
 
 

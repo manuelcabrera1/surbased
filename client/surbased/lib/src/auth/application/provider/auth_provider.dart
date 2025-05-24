@@ -334,7 +334,7 @@ class AuthProvider with ChangeNotifier {
       );
         
       if (getSurveysResponse['success']) {
-        List<Survey> surveys = (getSurveysResponse['data'] as List<dynamic>)
+        List<Survey> surveys = (getSurveysResponse['data']['surveys'] as List<dynamic>)
             .map((s) => Survey.fromJson(s))
             .toList();
 
@@ -371,7 +371,7 @@ class AuthProvider with ChangeNotifier {
       );
         
       if (getSurveysResponse['success']) {
-        List<Answer> answers = (getSurveysResponse['data'] as List<dynamic>)
+        List<Answer> answers = (getSurveysResponse['data']['answers'] as List<dynamic>)
             .map((s) => Answer.fromJson(s))
             .toList();
 
