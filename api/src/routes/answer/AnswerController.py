@@ -32,6 +32,7 @@ async def register_survey_answers_from_user(survey_id: uuid.UUID, answer: Answer
     if not current_user:
         raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
+    
 
     result = await db.execute(select(Survey).where(Survey.id == survey_id))
     existing_survey = result.unique().scalars().first()
@@ -141,7 +142,7 @@ async def get_all_user_answers(user_id: uuid.UUID, current_user: Annotated[User,
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.unique().scalars().first()
     if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
     if current_user.id != user_id and current_user.role != UserRoleEnum.admin:
         raise HTTPException(status_code=403, detail="You are not allowed to access this user's answers")
