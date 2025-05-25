@@ -2,7 +2,7 @@ from datetime import date
 from enum import Enum
 from typing import List, Optional
 import uuid
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 
 class GenderEnum(str, Enum):
@@ -46,7 +46,7 @@ class UserCreateRequest(UserBase):
     name: str
     lastname: str
     organization: str
-    password: str
+    password: str = Field(min_length=8, max_length=128)
     birthdate: Optional[date] = None
     gender: Optional[GenderEnum] = None
 
@@ -63,6 +63,7 @@ class UserUpdateRequest(UserBase):
     organization: Optional[str] = None
     birthdate: Optional[date] = None
     gender: Optional[GenderEnum] = None
+    allow_notifications: Optional[bool] = None
 
     @model_validator(mode="after")
     def validate_age(self):
@@ -95,13 +96,13 @@ class UserUpdateNotificationsRequest(BaseModel):
     allow_notifications: bool
 
 class UserUpdatePasswordRequest(BaseModel):
-    password: str
+    password: str = Field(min_length=8, max_length=128)
 
 class UserResetPasswordRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=8, max_length=128)
 
 class DeleteUserPasswordRequest(BaseModel):
-    password: Optional[str] = None
+    password: Optional[str] = Field(min_length=8, max_length=128)
 
 

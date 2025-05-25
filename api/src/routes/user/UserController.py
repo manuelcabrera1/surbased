@@ -17,41 +17,36 @@ user_router = APIRouter(tags=["User"])
 async def create_user(user: UserCreateRequest, db: Annotated[AsyncSession, Depends(get_db)]):
     
    
-    try: 
+ 
         #check if user already exists
-        result = await db.execute(select(User).where(User.email == user.email))
-        existing_user = result.unique().scalars().first()
+    result = await db.execute(select(User).where(User.email == user.email))
+    existing_user = result.unique().scalars().first()
 
-        if existing_user and existing_user.email == user.email:
-            raise HTTPException(status_code=400, detail="This email is already in use")  
-        
-        #check if org already exists
-        existing_org = None
-        if user.role != "admin":
-            result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
-            existing_org = result.unique().scalars().first()
-            if not existing_org:
-                raise HTTPException(status_code=404, detail= "Organization not found")
-
+    if existing_user and existing_user.email == user.email:
+        raise HTTPException(status_code=400, detail="This email is already in use")  
     
-        #hash password
-        hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    #check if org already exists
+    existing_org = None
+    if user.role != "admin":
+        result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
+        existing_org = result.unique().scalars().first()
+        if not existing_org:
+            raise HTTPException(status_code=404, detail= "Organization not found")
 
-        #insert user to db
-        new_user = User(name=user.name, lastname=user.lastname, email=user.email, password=hashed_password, role=user.role, birthdate= user.birthdate, gender= user.gender, organization_id= existing_org.id if existing_org else None)
+
+    #hash password
+    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    #insert user to db
+    new_user = User(name=user.name, lastname=user.lastname, email=user.email, password=hashed_password, role=user.role, birthdate= user.birthdate, gender= user.gender, organization_id= existing_org.id if existing_org else None)
+
+    db.add(new_user) 
+    await db.commit()
+    await db.refresh(new_user)
+
+
+    return new_user
     
-        db.add(new_user) 
-        await db.commit()
-        await db.refresh(new_user)
-
-
-        return new_user
-    
-    except Exception as e:
-        await db.rollback() 
-        raise HTTPException(status_code=400, detail=str(e))
-
-
 
 @user_router.post("/users/login", status_code=200)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[AsyncSession, Depends(get_db)]):
@@ -158,6 +153,12 @@ async def update_password(current_user: Annotated[User, Depends(get_current_user
 
 @user_router.put("/users/reset-password", status_code=200)
 async def reset_password(pw: UserResetPasswordRequest, db: Annotated[AsyncSession, Depends(get_db)]):
+        
+        result = await db.execute(select(User).where(User.email == pw.email))
+        existing_user = result.unique().scalars().first()
+
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found")
     
 
         hashed_password = bcrypt.hashpw(pw.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -188,7 +189,10 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
 
             if result3.unique().scalars().first() is not None:
                 raise HTTPException(status_code=400, detail="Email already registered")
-    
+            
+            
+        if user.email:
+            existing_user.email = user.email
         if user.name:
              existing_user.name = user.name
         if user.lastname:
@@ -199,6 +203,8 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
              existing_user.birthdate = user.birthdate
         if user.gender:
              existing_user.gender = user.gender
+        if user.allow_notifications:
+             existing_user.allow_notifications = user.allow_notifications
             
             
         if current_user.id != id and current_user.role != "admin":
@@ -235,7 +241,7 @@ async def update_user_notifications(id: uuid.UUID, current_user: Annotated[User,
 
 
 @user_router.delete("/users/{id}", status_code=204)
-async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+async def delete_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)], password: Optional[DeleteUserPasswordRequest] = None):
 
         if not current_user:
             raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -244,11 +250,13 @@ async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, curren
         result = await db.execute(select(User).where(User.id == id))
         existing_user = result.unique().scalars().first()
 
+
         if current_user.role != "admin" and current_user.id != id:
+
             raise HTTPException(status_code=403, detail="You are not allowed to delete this user")
 
         if not existing_user:
-            raise HTTPException(status_code=400, detail="User not found")
+            raise HTTPException(status_code=404, detail="User not found")
 
 
         if current_user.role != "admin":
@@ -262,10 +270,6 @@ async def delete_user(id: uuid.UUID, password: DeleteUserPasswordRequest, curren
     
         return None
 
-
-@user_router.post("/users/logout", status_code=200)
-def logout():    
-        return {"msg": "Succesfully logout"}
 
 
 
