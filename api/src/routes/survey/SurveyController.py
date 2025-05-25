@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, insert, or_, select, update, and_
+from sqlalchemy import delete, func, insert, or_, select, update, and_
 from src.models.TagModel import Tag
 from src.models.AnswerModel import Answer
 from src.models.QuestionModel import Question
@@ -18,6 +18,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from src.auth.Auth import create_access_token, check_current_user, oauth_scheme, get_current_user, required_roles
 from sqlalchemy.orm import selectinload
 from src.models.SurveyTagModel import survey_tag
+from src.models.SurveyUserModel import survey_user
+
 
 
 survey_router = APIRouter(tags=["Survey"])
@@ -193,6 +195,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
         )
         loaded_questions = result.unique().scalars().all()
 
+
         #check if tags exist, if not, create them
         if survey.tags:  # Solo procesar tags si hay alguno
             survey_tags_names = [tag.name for tag in survey.tags]
@@ -207,6 +210,7 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                 
                 new_tags = [Tag(name=tag) for tag in tags_to_add]
 
+
                 db.add_all(new_tags)
                 await db.flush()
             
@@ -214,6 +218,12 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                 [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in new_tags] + 
                 [{"survey_id": new_survey.id, "tag_id": tag.id} for tag in existing_tags]))
             await db.commit()
+            
+            all_tags = existing_tags + new_tags
+
+        else:
+            all_tags = []
+
         
         # Construir la respuesta
         response = SurveyResponse(
@@ -242,7 +252,8 @@ async def create_survey(survey: SurveyCreate, current_user: Annotated[User, Depe
                         ) for o in q.options
                     ]
                 ) for q in loaded_questions
-            ]
+            ],
+            tags=[TagResponse(id=t.id, name=t.name) for t in all_tags]
         )
         
         return response
@@ -326,6 +337,16 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
 
     if not existing_survey:
         raise HTTPException(status_code=404, detail="Survey not found")
+    
+    if current_user.role != "admin":
+        if existing_survey.scope == SurveyScopeEnum.organization and existing_survey.organization_id != current_user.organization_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        else:
+            result = await db.execute(select(survey_user).where(survey_user.c.survey_id == existing_survey.id, survey_user.c.user_id == current_user.id))
+            assignment = result.unique().scalars().first()
+
+            if not assignment and existing_survey.owner_id != current_user.id:
+                raise HTTPException(status_code=403, detail="Forbidden")
 
     if survey.category_id and survey.category_id != existing_survey.category_id:
         result = await db.execute(select(Category).where(Category.id == survey.category_id))
@@ -334,17 +355,9 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
             raise HTTPException(status_code=404, detail="Category not found")
     
 
-    if survey.scope == SurveyScopeEnum.organization:
-        #check if org id is provided
-        if not survey.organization_id:
-            raise HTTPException(status_code=400, detail="Organization must be specified")
 
         #check if researcher org and survey org match
-        if survey.owner_id and survey.owner_id != existing_survey.owner_id:
-            result = await db.execute(select(User).where(User.id == survey.owner_id, User.organization_id == survey.organization_id))
-            researcher = result.unique().scalars().first()
-            if not researcher:
-                raise HTTPException(status_code=404, detail="Researcher does not belong to the specified organization")
+        
     
 
     if survey.start_date and survey.end_date and survey.start_date > survey.end_date:
@@ -367,7 +380,7 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
     if survey.category_id:
         existing_survey.category_id = survey.category_id
 
-#check if tags exist, if not, create them
+    #check if tags exist, if not, create them
     if survey.tags:  # Solo procesar tags si hay alguno
         survey_tags_names = [tag.name for tag in survey.tags]
         result = await db.execute(select(Tag).where(Tag.name.in_(survey_tags_names)))
@@ -376,7 +389,6 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
         new_tags = []
 
         if len(existing_tags) != len(survey_tags_names):
-
             existing_tags_names = [t.name for t in existing_tags]
             tags_to_add = list(set(survey_tags_names) - set(existing_tags_names))
             
@@ -385,99 +397,140 @@ async def update_survey(id: uuid.UUID, survey: SurveyUpdate, current_user: Annot
             db.add_all(new_tags)
             await db.flush()
 
-            for tag in existing_survey.tags:
-                if tag.name not in survey_tags_names:
-                    await db.delete(survey_tag.where(survey_tag.tag_id == tag.id, survey_tag.survey_id == existing_survey.id))
-
-                if tag.name in existing_tags_names:
-                    new_tags.append(tag)
-        
-        await db.execute(insert(survey_tag).values(
+            await db.execute(insert(survey_tag).values(
             [{"survey_id": existing_survey.id, "tag_id": tag.id} for tag in new_tags]))
-        
-        await db.commit()
 
-    existing_questions = {q.id: q for q in existing_survey.questions}
-    new_questions = {q.id: q for q in survey.questions}
+        # Eliminar etiquetas que ya no existen
+        for tag in existing_survey.tags:
+            if tag.name not in survey_tags_names:
+                await db.execute(delete(survey_tag).where(survey_tag.c.tag_id == tag.id, survey_tag.c.survey_id == existing_survey.id))
+    
+    if survey.questions:
+        existing_questions = {q.description: q for q in existing_survey.questions}
+        new_questions = {q.description: q for q in survey.questions}
 
-    question_number = 1
+        question_number = 1
 
-    # Procesar preguntas
-    for question_id, new_question in new_questions.items():
-        if question_id in existing_questions:
-            # Actualizar pregunta existente
-            existing_question = existing_questions[question_id]
-            existing_question.description = new_question.description
-            existing_question.required = new_question.required
-            existing_question.type = new_question.type
-            existing_question.number = question_number
-            existing_question.survey_id = existing_survey.id
+        # Procesar preguntas
+        for question_description, new_question in new_questions.items():
+            if question_description in existing_questions:
+                # Actualizar pregunta existente
+                existing_question = existing_questions[question_description]
+                existing_question.description = new_question.description
+                existing_question.required = new_question.required
+                existing_question.type = new_question.type
+                existing_question.number = question_number
+                existing_question.survey_id = existing_survey.id
 
-            # Procesar opciones
-            existing_options = {o.id: o for o in existing_question.options}
-            new_options = {o.id: o for o in new_question.options}
+                if new_question.type != "open":
+                    # Procesar opciones
+                    existing_options = {o.description: o for o in existing_question.options}
+                    new_options = {o.description: o for o in new_question.options}
 
-            # Actualizar/Añadir opciones
-            for opt_id, new_opt in new_options.items():
-                if opt_id in existing_options:
-                    # Actualizar opción existente
-                    existing_options[opt_id].points = new_opt.points
-                    existing_options[opt_id].description = new_opt.description
-                else:
-                    # Añadir nueva opción
-                    new_option = Option(
-                        description=new_opt.description,
-                        points=new_opt.points,
-                        question_id=existing_question.id
-                    )
-                    db.add(new_option)
-                    await db.flush()
+                    # Actualizar/Añadir opciones
+                    for opt_description, new_opt in new_options.items():
+                        if opt_description in existing_options:
+                            # Actualizar opción existente
+                            existing_options[opt_description].points = new_opt.points
+                            existing_options[opt_description].description = new_opt.description
+                        else:
+                            # Añadir nueva opción
+                            new_option = Option(
+                                description=new_opt.description,
+                                points=new_opt.points,
+                                question_id=existing_question.id
+                            )
+                            db.add(new_option)
+                            await db.flush()
 
-            # Eliminar opciones que ya no existen
-            for opt_id, old_opt in existing_options.items():
-                if opt_id not in new_options:
-                    await db.delete(old_opt)
+                    # Eliminar opciones que ya no existen
+                    for opt_description, old_opt in existing_options.items():
+                        if opt_description not in new_options:
+                            await db.delete(old_opt)
 
-        else:
-            # Añadir nueva pregunta
-            new_q = Question(
-                number=question_number,
-                description=new_question.description,
-                survey_id=existing_survey.id,
-                required=new_question.required,
-                type=new_question.type
-            )
-            db.add(new_q)
-            await db.flush()  # Para obtener el ID
-
-            # Añadir sus opciones
-            for option in new_question.options:
-                new_option = Option(
-                    description=option.description,
-                    points=option.points,
-                    question_id=new_q.id
+            else:
+                # Añadir nueva pregunta
+                new_q = Question(
+                    number=question_number,
+                    description=new_question.description,
+                    survey_id=existing_survey.id,
+                    required=new_question.required,
+                    type=new_question.type
                 )
-                db.add(new_option)
+                db.add(new_q)
+                await db.flush()  # Para obtener el ID
+                if new_question.type != "open":
+                    # Añadir sus opciones
+                    for option in new_question.options:
+                        new_option = Option(
+                            description=option.description,
+                            points=option.points,
+                            question_id=new_q.id
+                        )
+                        db.add(new_option)
+                        await db.flush()
 
-        question_number += 1
+            question_number += 1
 
-    # Eliminar preguntas que ya no existen
-    for question_id, old_question in existing_questions.items():
-        if question_id not in new_questions:
-            await db.delete(old_question)
+        # Eliminar preguntas que ya no existen
+        for question_description, old_question in existing_questions.items():
+            if question_description not in new_questions:
+                await db.delete(old_question)
 
     try:
+        # Hacer commit de todos los cambios
         await db.commit()
         
-        # Recargar el cuestionario actualizado
+        # Recargar el cuestionario actualizado con todas sus relaciones
         result = await db.execute(
             select(Survey)
             .options(selectinload(Survey.questions).selectinload(Question.options))
+            .options(selectinload(Survey.tags))
             .where(Survey.id == id)
         )
         updated_survey = result.unique().scalars().first()
+
+        if not updated_survey:
+            raise HTTPException(status_code=404, detail="Survey not found after update")
+
+        # Asegurarse de que las relaciones se cargan
+        await db.refresh(updated_survey, ["questions", "tags"])
+        for question in updated_survey.questions:
+            await db.refresh(question, ["options"])
+
+        response = SurveyResponse(
+            id=updated_survey.id,
+            name=updated_survey.name,
+            description=updated_survey.description,
+            scope=updated_survey.scope,
+            start_date=updated_survey.start_date,
+            end_date=updated_survey.end_date,
+            owner_id=updated_survey.owner_id,
+            category_id=updated_survey.category_id,
+            questions=[
+                QuestionResponse(
+                    id=q.id,
+                    number=q.number,
+                    description=q.description,
+                    type=q.type,
+                    survey_id=q.survey_id,
+                    required=q.required,
+                    options=[
+                        OptionResponse(
+                            id=o.id,
+                            description=o.description,
+                            points=o.points,
+                            question_id=o.question_id
+                        ) for o in q.options
+                    ]
+                ) for q in updated_survey.questions
+            ],
+            tags=[TagResponse(id=t.id, name=t.name) for t in updated_survey.tags]
+        )
         
-        return updated_survey
+        return response
+    
+
 
     except Exception as e:
         await db.rollback()
