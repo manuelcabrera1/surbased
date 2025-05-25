@@ -69,7 +69,7 @@ async def get_category_by_id(id:uuid.UUID, current_user: Annotated[User, Depends
 
 @category_router.put("/categories/{id}", status_code=201, response_model=CategoryResponse)
 @required_roles(["researcher", "admin"])
-async def update_category_info(id: uuid.UUID, category: CategoryUpdate, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
+async def update_category(id: uuid.UUID, category: CategoryUpdate, current_user: Annotated[User, Depends(get_current_user)], db: Annotated[AsyncSession, Depends(get_db)]):
         
         #check if category exists
 
