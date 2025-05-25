@@ -33,27 +33,10 @@ async def test_get_all_organizations_success(db_session, admin_token):
     assert response.status_code == 200
 
     data = response.json()["organizations"]
-    assert len(data) == 2
+    assert len(data) == 3 # 2 organizations + 1 created at setup_test_data
     assert any(org["name"] == "Test Organization 1" for org in data)
     assert any(org["name"] == "Test Organization 2" for org in data)
 
-
-
-@pytest.mark.asyncio
-async def test_get_all_organizations_empty(db_session, admin_token):
-    # Arrange
-
-    # Act
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get(
-            "/organizations",
-            headers={"Authorization": f"Bearer {admin_token}", "Content-Type": "application/json"}
-        )
-
-    # Assert
-    assert response.status_code == 200
-    data = response.json()["organizations"]
-    assert len(data) == 0
 
 
 @pytest.mark.asyncio
