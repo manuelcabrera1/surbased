@@ -251,10 +251,8 @@ async def accept_survey_assignment(user_id: uuid.UUID, survey_id: uuid.UUID, cur
             ))
         )
         existing_assignment = assignment_query.first()
-        print("Assignment details:", existing_assignment)
 
         if existing_assignment:
-            print(existing_assignment.status)
             if existing_assignment.status != AssignmentStatusEnum.invited_pending and existing_assignment.status != AssignmentStatusEnum.requested_pending:
                 raise HTTPException(status_code=400, detail=f"This survey can not be accepted")
          
