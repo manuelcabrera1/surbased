@@ -1,3 +1,4 @@
+from datetime import date
 from httpx import ASGITransport, AsyncClient
 import pytest
 import pytest_asyncio
@@ -30,6 +31,7 @@ TEST_DATABASE_URL = f"postgresql+asyncpg://postgres:1234@localhost:5432/{TEST_DB
 # ID del usuario admin para usar en el token y en el mock
 ADMIN_ID = uuid.uuid4()
 RESEARCHER_ID = uuid.uuid4()
+PARTICIPANT_ID = uuid.uuid4()
 @pytest_asyncio.fixture
 async def create_test_database():
     """Crear una base de datos de test temporal"""
@@ -112,6 +114,19 @@ async def setup_test_data(db_session):
         organization_id=org.id
     )
     
+    participant_user = User(
+        id=PARTICIPANT_ID,
+        email="participant@test.com",
+        password=hashed_password,
+        name="Participant",
+        lastname="Test",
+        role="participant",
+        organization_id=org.id,
+        birthdate=date(1990, 1, 1),
+        gender="male"
+        
+    )
+    
     
     # Verificar si el usuario ya existe
     result = await db_session.execute(select(User).where(User.email == "admin@test.com"))
@@ -128,9 +143,15 @@ async def setup_test_data(db_session):
         db_session.add(researcher_user)
         await db_session.commit()
 
+    result = await db_session.execute(select(User).where(User.email == "participant@test.com"))
+    existing_user = result.unique().scalars().first()
+
+    if not existing_user:
+        db_session.add(participant_user)
+        await db_session.commit()
+
     result = await db_session.execute(select(Organization).where(Organization.name == "Organization 1"))
     existing_org = result.unique().scalars().first()
-
     if not existing_org:
         db_session.add(org)
         await db_session.commit()
@@ -174,6 +195,20 @@ async def researcher_token():
         )
         return response.json()["access_token"]
 
+@pytest_asyncio.fixture()
+async def participant_token():
+    login_data = {
+        "username": "participant@test.com",
+        "password": "test123"
+    }
+    
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.post(
+            "/users/login",
+            data=login_data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"}
+        )
+        return response.json()["access_token"]
 
 
 
