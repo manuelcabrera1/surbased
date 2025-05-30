@@ -63,9 +63,9 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           SurveyList(surveys: surveyProvider.publicSurveys),
         ];
         tabTitles = [
-          Tab(text: '${t.scope_private} (${surveyProvider.privateSurveys.length})'),
-          Tab(text: '${t.scope_organization} (${surveyProvider.organizationSurveys.length})'),
-          Tab(text: '${t.scope_public} (${surveyProvider.publicSurveys.length})'),
+          Tab(text: t.scope_private),
+          Tab(text: t.scope_organization),
+          Tab(text: t.scope_public),
         ];
         
         break;
@@ -75,8 +75,8 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           SurveyList(surveys: authProvider.surveysAssigned),
         ];
         tabTitles = [
-          Tab(text: '${t.surveys_owned} (${surveyProvider.surveysOwned.length})'),
-          Tab(text: '${t.surveys_assigned} (${authProvider.surveysAssigned.length})'),
+          Tab(text: t.surveys_owned),
+          Tab(text: t.surveys_assigned),
         ];
         break;
       case 'participant':
@@ -85,10 +85,8 @@ class _SurveySectionState extends State<SurveySection> with TickerProviderStateM
           SurveyList(surveys: organizationProvider.organization?.surveys ?? []),
         ];
         tabTitles = [
-          Tab(text: '${t.surveys_assigned} (${authProvider.surveysAssigned.length})'),
-          Tab(text: '${t.organization} (${organizationProvider.organization != null && organizationProvider.organization!.surveys != null 
-                                          ? organizationProvider.organization!.surveys!.length 
-                                          : 0})'),
+          Tab(text: t.surveys_assigned),
+          Tab(text: t.organization),
         ];
         
         break;

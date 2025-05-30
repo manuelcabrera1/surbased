@@ -67,8 +67,8 @@ class SurveyCard extends StatelessWidget {
 
   Widget _buildStatusLabel(BuildContext context, String status, {Color? backgroundColor, Color? textColor}) {
     final theme = Theme.of(context);
-    final statusColor = backgroundColor ?? Colors.blue.shade100;
-    final labelTextColor = textColor ?? Colors.blue.shade700;
+    final statusColor = backgroundColor ?? Colors.red.shade700;
+    final labelTextColor = textColor ?? Colors.red.shade700;
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -173,7 +173,7 @@ class SurveyCard extends StatelessWidget {
                           _buildStatusLabel(
                             context,
                             t.survey_status_ended,
-                            backgroundColor: theme.colorScheme.surfaceVariant,
+                            backgroundColor: theme.colorScheme.surfaceTint.withOpacity(0.3),
                             textColor: theme.colorScheme.onSurfaceVariant,
                           ),
                       ],
@@ -213,8 +213,8 @@ class SurveyCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           survey.questions.length > 1
-                              ? '${survey.questions.length} preguntas'
-                              : '1 pregunta',
+                              ? '${survey.questions.length} ${t.questions}'
+                              : '1 ${t.question}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,

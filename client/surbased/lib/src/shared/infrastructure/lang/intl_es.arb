@@ -359,5 +359,7 @@
     "organization_remove": "Eliminar Organización",
     "organization_remove_confirmation": "¿Estás seguro de que quieres eliminar esta organización?",
     "organization_edit_page_title": "Editar Organización",
-    "calendar_answered": "Respondido: {boolean}"
+    "calendar_answered": "Respondido: {boolean}",
+    "question": "pregunta",
+    "questions": "preguntas"
 }

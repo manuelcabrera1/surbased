@@ -88,12 +88,20 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const SizedBox(height: 130),
 
-                // Logo o Título
-                Text(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/surbased_logo.png', width: 100, height: 100),
+                    const SizedBox(width: 5),
+                    Text(
                   t.app_title,
                   style: theme.textTheme.displayLarge,
                   textAlign: TextAlign.center,
                 ),
+                ]),
+
+
+               
 
                 const SizedBox(height: 50),
 
