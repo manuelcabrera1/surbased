@@ -17,8 +17,8 @@ class Survey {
   final String? id;
   String? description;
   String scope;
-  DateTime startDate;
-  DateTime endDate;
+  DateTime? startDate;
+  DateTime? endDate;
   final List<Question> questions;
   List<User>? assignedUsers;
   String? organizationId;
@@ -75,8 +75,8 @@ class Survey {
     if (description != null) json["description"] = description;
     json["scope"] = scope;
     if (organizationId != null) json["organization_id"] = organizationId;
-    json["start_date"] = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}';
-    json["end_date"] = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+    if (startDate != null) json["start_date"] = '${startDate?.year}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}';
+    if (endDate != null) json["end_date"] = '${endDate?.year}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}';
     json["questions"] = List<dynamic>.from(questions.map((x) => x.toJson()));
     if (assignedUsers != null) json["assigned_users"] = List<dynamic>.from(assignedUsers!.map((x) => x.toJson()));
     if (tags != null) json["tags"] = List<dynamic>.from(tags!.map((x) => x.toJson()));

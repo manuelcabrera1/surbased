@@ -97,7 +97,7 @@ class SurveyAccessRequestDialog extends StatelessWidget {
                   const Icon(Icons.calendar_month),
                   const SizedBox(width: 8),
                   Text(
-                    'Fecha de inicio: ${survey.startDate.day}/${survey.startDate.month}/${survey.startDate.year}',
+                    'Fecha de inicio: ${survey.startDate!.day}/${survey.startDate!.month}/${survey.startDate!.year}',
                     style: theme.textTheme.bodyMedium,
                   ),
                 ],
@@ -111,7 +111,7 @@ class SurveyAccessRequestDialog extends StatelessWidget {
                   const Icon(Icons.calendar_month_outlined),
                   const SizedBox(width: 8),
                   Text(
-                    'Fecha de fin: ${survey.endDate.day}/${survey.endDate.month}/${survey.endDate.year}',
+                    'Fecha de fin: ${survey.endDate!.day}/${survey.endDate!.month}/${survey.endDate!.year}',
                     style: theme.textTheme.bodyMedium,
                   ),
                 ],

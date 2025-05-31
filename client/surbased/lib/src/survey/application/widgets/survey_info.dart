@@ -175,7 +175,7 @@ class SurveyInfo extends StatelessWidget {
                       Icon(Icons.calendar_today, color: theme.colorScheme.primary, size: 18),
                       const SizedBox(width: 6),
                       Text(
-                        t.survey_start_date(dateFormat.format(survey.startDate)),
+                        t.survey_start_date(dateFormat.format(survey.startDate!)),
                         style: theme.textTheme.bodyMedium,
                       ),
                     ],
@@ -186,7 +186,7 @@ class SurveyInfo extends StatelessWidget {
                       Icon(Icons.calendar_month, color: theme.colorScheme.primary, size: 18),
                       const SizedBox(width: 6),
                       Text(
-                        t.survey_end_date(dateFormat.format(survey.endDate)),
+                        t.survey_end_date(dateFormat.format(survey.endDate!)),
                         style: theme.textTheme.bodyMedium,
                       ),
                     ],

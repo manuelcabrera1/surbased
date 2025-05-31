@@ -172,8 +172,8 @@ class SurveyFormState extends State<SurveyForm> {
       bool success = surveyProvider.addOrUpdateSurveyInfo(
         _nameController.text,
         _descriptionController.text,
-        _startDate ?? DateTime.now(),
-        _endDate ?? DateTime.now().add(const Duration(days: 7)),
+        _startDate,
+        _endDate,
         _categoryId!,
         authProvider.user!.id,
         _selectedTags

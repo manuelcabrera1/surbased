@@ -56,15 +56,9 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
       final t = AppLocalizations.of(context)!;
       _events.clear();
 
-      DateTime now = DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-      );
-
       List<Survey> allSurveys = [];
 
-      if (organizationProvider.organization != null && organizationProvider.organization!.surveys != null && organizationProvider.organization!.surveys!.isNotEmpty) {
+      if (organizationProvider.organization?.surveys?.isNotEmpty ?? false) {
         allSurveys.addAll(organizationProvider.organization!.surveys!);
       }
 
@@ -76,27 +70,38 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
         allSurveys.addAll(authProvider.surveysAssigned.where((survey) => survey.assignmentStatus == 'accepted').toList());
       }
 
-
       if (allSurveys.isNotEmpty) {
         for (var survey in allSurveys) {
+          if (survey.startDate == null || survey.endDate == null) continue;
 
-              for (DateTime date = survey.startDate;
-                  date.isBefore(survey.endDate) ||
-                      date.isAtSameMomentAs(survey.endDate);
-                  date = date.add(const Duration(days: 1))) {
-                final eventDate = DateTime(date.year, date.month, date.day);
-                if (!_events.containsKey(eventDate)) {
-                  _events[eventDate] = [];
-                }
-                _events[eventDate]!.add({
-                  'surveyName': survey.name,
-                  'surveyDescription': survey.description,
-                  'surveyCategory':
-                      categoryProvider.getCategoryById(survey.categoryId).name,
-                  'surveyAnswered': authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id) ? t.yes : t.no,
-                });
-              }
+          // Normalizar las fechas a UTC
+          final startDate = DateTime.utc(
+            survey.startDate!.year,
+            survey.startDate!.month,
+            survey.startDate!.day,
+          );
+          
+          final endDate = DateTime.utc(
+            survey.endDate!.year,
+            survey.endDate!.month,
+            survey.endDate!.day,
+          );
 
+          // Iterar sobre las fechas
+          for (DateTime date = startDate;
+              !date.isAfter(endDate);
+              date = date.add(const Duration(days: 1))) {
+            final eventDate = DateTime(date.year, date.month, date.day);
+            if (!_events.containsKey(eventDate)) {
+              _events[eventDate] = [];
+            }
+            _events[eventDate]!.add({
+              'surveyName': survey.name,
+              'surveyDescription': survey.description,
+              'surveyCategory': categoryProvider.getCategoryById(survey.categoryId).name,
+              'surveyAnswered': authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id) ? t.yes : t.no,
+            });
+          }
         }
       }
 

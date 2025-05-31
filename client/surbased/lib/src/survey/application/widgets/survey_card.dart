@@ -107,12 +107,12 @@ class SurveyCard extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     final isSurveyAnswered = authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id);
-    final isSurveyAvailable = survey.startDate.isBefore(
+    final isSurveyAvailable = survey.startDate!.isBefore(
                                 DateTime.now().add(const Duration(days: 1))) &&
-                            survey.endDate.isAfter(DateTime.now());
-    final isSurveyNotStarted = survey.startDate.isAfter(DateTime.now());
-    final isSurveyFinished = survey.endDate.isBefore(DateTime.now());
-    final isSurveyPending = survey.assignmentStatus == 'invited_pending' && survey.endDate.isAfter(DateTime.now());
+                            survey.endDate!.isAfter(DateTime.now());
+    final isSurveyNotStarted = survey.startDate!.isAfter(DateTime.now());
+    final isSurveyFinished = survey.endDate!.isBefore(DateTime.now());
+    final isSurveyPending = survey.assignmentStatus == 'invited_pending' && survey.endDate!.isAfter(DateTime.now());
 
     // NUEVO DISEÑO DE TARJETA
     return Container(
@@ -134,7 +134,7 @@ class SurveyCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: userRole == 'participant'
-              ? survey.startDate.isBefore(DateTime.now())
+              ? survey.startDate!.isBefore(DateTime.now())
                   ? onTap
                   : null
               : onTap,
@@ -234,10 +234,10 @@ class SurveyCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           isSurveyAvailable
-                              ? t.survey_end_date(_formatDate(survey.endDate))
+                              ? t.survey_end_date(_formatDate(survey.endDate!))
                               : isSurveyNotStarted
-                                  ? t.survey_start_date(_formatDate(survey.startDate))
-                                  : t.survey_end_date(_formatDate(survey.endDate)),
+                                  ? t.survey_start_date(_formatDate(survey.startDate!))
+                                  : t.survey_end_date(_formatDate(survey.endDate!)),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,

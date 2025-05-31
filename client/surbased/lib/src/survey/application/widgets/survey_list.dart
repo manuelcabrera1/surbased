@@ -49,7 +49,7 @@ class _SurveyListState extends State<SurveyList> {
         if (mounted) {
           if (widget.surveys.isNotEmpty) {
             setState(() {
-              _surveysToShow = widget.surveys.where((survey) => survey.endDate.isAfter(DateTime.now())).toList();
+              _surveysToShow = widget.surveys.where((survey) => survey.endDate!.isAfter(DateTime.now())).toList();
             });
           }
         }
@@ -142,15 +142,15 @@ class _SurveyListState extends State<SurveyList> {
                 
                 // Filtrado por fecha de inicio
                 bool startDateMatch = _startDateFilter == null || 
-                    !survey.startDate.isBefore(_startDateFilter!);
+                    !survey.startDate!.isBefore(_startDateFilter!);
                 
                 // Filtrado por fecha de fin
                 bool endDateMatch = _endDateFilter == null || 
-                    !survey.endDate.isAfter(_endDateFilter!);
+                    !survey.endDate!.isAfter(_endDateFilter!);
                 
                 // Filtrado por cuestionarios finalizados
                 bool finishedMatch = _includeFinished || 
-                    survey.endDate.isAfter(DateTime.now());
+                    survey.endDate!.isAfter(DateTime.now());
                 
                 return search && category && startDateMatch && endDateMatch && finishedMatch;
             })
@@ -171,10 +171,10 @@ class _SurveyListState extends State<SurveyList> {
           result = a.name.compareTo(b.name);
           break;
         case 'startDate':
-          result = a.startDate.compareTo(b.startDate);
+          result = a.startDate!.compareTo(b.startDate!);
           break;
         case 'endDate':
-          result = a.endDate.compareTo(b.endDate);
+          result = a.endDate!.compareTo(b.endDate!);
           break;
         case 'organization':
           result = organizationProvider.getOrganizationName(a.organizationId!).compareTo(organizationProvider.getOrganizationName(b.organizationId!));
@@ -183,7 +183,7 @@ class _SurveyListState extends State<SurveyList> {
           result = a.questions.length.compareTo(b.questions.length);
           break;
         default:
-          result = a.endDate.compareTo(b.endDate);
+          result = a.endDate!.compareTo(b.endDate!);
       }
       
       return _isAscending ? result : -result;

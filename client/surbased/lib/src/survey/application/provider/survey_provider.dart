@@ -58,8 +58,8 @@ class SurveyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool addOrUpdateSurveyInfo(String name, String? description, DateTime startDate,
-      DateTime endDate, String categoryId, String ownerId, List<String> selectedTags) {
+  bool addOrUpdateSurveyInfo(String name, String? description, DateTime? startDate,
+      DateTime? endDate, String categoryId, String ownerId, List<String> selectedTags) {
     if (_currentSurvey != null) {
       _currentSurvey!.name = name;
       _currentSurvey!.description = description ?? '';

@@ -167,7 +167,7 @@ class PublicSurveyCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      _formatDate(survey.startDate),
+                      _formatDate(survey.startDate!),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 13,
