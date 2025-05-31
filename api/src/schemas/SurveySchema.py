@@ -34,6 +34,9 @@ class SurveyCreate(SurveyBase):
 
     @model_validator(mode="after")
     def validate_start_date(self):
+        print(self.start_date)
+        print(date.today())
+
         if self.start_date and self.start_date < date.today():
             raise ValueError("The start date cannot be in the past")
         if self.start_date and self.end_date and self.start_date > self.end_date:

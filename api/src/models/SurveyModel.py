@@ -41,7 +41,6 @@ class Survey(Base):
 
 
     __table_args__ = (
-        UniqueConstraint("name", "category_id", name="name_category_unique"),
         CheckConstraint("scope IN ('private', 'organization', 'public')", name="scope_check"),
         CheckConstraint("(scope = 'organization' AND 'organization_id' IS NOT NULL) OR (scope <> 'organization')", name="check_org_scope"),
         CheckConstraint("end_date >= start_date", name="end_date_check"),
