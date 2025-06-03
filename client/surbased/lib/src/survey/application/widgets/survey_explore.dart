@@ -201,7 +201,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                          childAspectRatio: 1,
+                          childAspectRatio: 0.85,
                           mainAxisSpacing: 2,
                           crossAxisSpacing: 2,
                         ),
@@ -320,7 +320,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                              childAspectRatio: 1,
+                              childAspectRatio: 0.85,
                               mainAxisSpacing: 2,
                             ),
                             itemCount: surveyProvider.publicSurveys.length,
@@ -406,7 +406,7 @@ class _SurveyExploreState extends State<SurveyExplore> {
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                        childAspectRatio: 1,
+                        childAspectRatio: 0.85,
                         mainAxisSpacing: 2,
                       ),
                       itemCount: surveys.length,
