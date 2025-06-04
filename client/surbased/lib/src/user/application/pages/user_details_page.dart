@@ -348,8 +348,9 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                   ],
                                 ),
                               ),
-                              
-                              const Divider(height: 32, thickness: 0.5, indent: 16, endIndent: 16),
+
+                              if (_user!.role == 'participant') ...[
+                                const Divider(height: 32, thickness: 0.5, indent: 16, endIndent: 16),
                               
                               // --- Actividad ---
                               _buildCardSubSectionTitle(context, t.user_details_activity),
@@ -403,6 +404,9 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                       }).toList(),
                                     ),
                               ),
+                              ]
+                              
+                              
                             ],
                           ),
                         ),
