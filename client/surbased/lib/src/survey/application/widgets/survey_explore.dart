@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/category/domain/category_model.dart';
 import 'package:surbased/src/config/app_routes.dart';
-import 'package:surbased/src/survey/application/pages/survey_access_request_dialog.dart';
+import 'package:surbased/src/survey/application/widgets/survey_access_request_dialog.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/tags_provider.dart';

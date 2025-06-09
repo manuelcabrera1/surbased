@@ -98,7 +98,7 @@ class _SurveyAnswersDownloadDialogState extends State<SurveyAnswersDownloadDialo
           await appDir.create(recursive: true);
         }
 
-        final url = 'http://192.168.1.69:8000/surveys/$surveyId/answers/export/$format?filename=$fileName';
+        final url = 'http://10.0.2.2:8000/surveys/$surveyId/answers/export/$format?filename=$fileName';
 
 
         final taskId = await FlutterDownloader.enqueue(

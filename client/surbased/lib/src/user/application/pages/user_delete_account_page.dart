@@ -82,7 +82,7 @@ class _UserDeleteAccountPageState extends State<UserDeleteAccountPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Are you sure you want to delete your account?', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(t.delete_account_question, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               // Descripción
               Text(

@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class MailService {
-  final _baseUrl = 'http://192.168.1.69:8000/mail';
+  final _baseUrl = 'http://10.0.2.2:8000/mail';
 
   Future<Map<String, dynamic>> sendForgotPasswordMail(String email) async {
     try {

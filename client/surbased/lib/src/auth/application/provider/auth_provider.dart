@@ -142,7 +142,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool> updateUser(String id, String token, {String? name, String? lastname, String? role, String? organization, String? email,
-      String? birthdate, String? gender}) async {
+      String? birthdate, String? gender, bool? isCurrentUser = true}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -150,7 +150,9 @@ class AuthProvider with ChangeNotifier {
       final isUpdated = await _authService.updateUser(
           id, token, name: name, lastname: lastname, role: role, organization: organization, email: email, birthdate: birthdate, gender: gender);
       if (isUpdated['success']) {
-        _user = User.fromJson(isUpdated['data']);
+        if (isCurrentUser == true) {
+          _user = User.fromJson(isUpdated['data']);
+        }
         _isLoading = false;
         _error = null;
         notifyListeners();

@@ -24,7 +24,8 @@ class UserEditPageState extends State<UserEditPage> {
     final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar usuario'),
+        title: Text(t.edit_user),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {

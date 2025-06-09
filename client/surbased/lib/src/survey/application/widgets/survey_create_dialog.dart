@@ -21,7 +21,7 @@ class SurveyCreateDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              t.create_survey,
+              t.survey_create_dialog_title,
               style: theme.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

@@ -32,7 +32,7 @@ class UserCreatePageState extends State<UserCreatePage> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          'Create a New User',
+                          t.user_create_page_title,
                           style: theme.textTheme.displayMedium?.copyWith(
                             fontSize: 30,
                           ),

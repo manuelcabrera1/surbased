@@ -104,7 +104,8 @@ class _SurveyListState extends State<SurveyList> {
         } else {
           answerProvider.initializeCurrentSurveyBeingAnswered(survey);
         }
-        if (survey.assignmentStatus == 'invited_pending') {
+        if (survey.assignmentStatus == 'invited_pending' ||
+            survey.assignmentStatus == 'requested_pending') {
           _showSurveyInvitationDialog(survey);
         } else {
           Navigator.pushNamed(context, AppRoutes.surveyComplete);

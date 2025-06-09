@@ -197,14 +197,20 @@ async def update_user(id: uuid.UUID, current_user: Annotated[User, Depends(get_c
              existing_user.name = user.name
         if user.lastname:
              existing_user.lastname = user.lastname
-        if user.organization:
-             existing_user.organization_id = user.organization
         if user.birthdate:
              existing_user.birthdate = user.birthdate
         if user.gender:
              existing_user.gender = user.gender
         if user.allow_notifications:
              existing_user.allow_notifications = user.allow_notifications
+
+
+        if user.organization:
+                result = await db.execute(select(Organization).where(Organization.name.ilike(user.organization)))
+                existing_org = result.unique().scalars().first()
+                if not existing_org:
+                    raise HTTPException(status_code=404, detail="Organization not found")
+                existing_user.organization_id = existing_org.id
             
             
         if current_user.id != id and current_user.role != "admin":

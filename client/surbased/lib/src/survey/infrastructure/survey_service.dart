@@ -5,7 +5,7 @@ import 'package:surbased/src/survey/domain/answer_model.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 class SurveyService {
-  final String _baseUrl = 'http://192.168.1.69:8000';
+  final String _baseUrl = 'http://10.0.2.2:8000';
 
   Future<Map<String, dynamic>> createSurvey(
       Map<String, dynamic> survey, String token) async {

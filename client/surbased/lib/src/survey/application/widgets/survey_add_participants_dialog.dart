@@ -114,7 +114,7 @@ class _SurveyAddParticipantsDialogState
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                            t.survey_add_participant,
+                            t.add_user,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class _SurveyAddParticipantsDialogState
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: Text(t.survey_add_participant),
+                      child: Text('Agregar usuario'),
                     ),
 
               ],

@@ -103,6 +103,6 @@ class UserResetPasswordRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 class DeleteUserPasswordRequest(BaseModel):
-    password: Optional[str] = Field(min_length=8, max_length=128)
+    password: Optional[str] = None
 
 

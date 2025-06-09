@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LmService {
-  final String _baseUrl = 'http://192.168.1.69:1234/v1/chat/completions';
+  final String _baseUrl = 'http://10.0.2.2:1234/v1/chat/completions';
 
   Future<Map<String, dynamic>> sendMessageToGenerateAnswersSummary(String questionDescription, List<String> options, String locale) async {
     try {

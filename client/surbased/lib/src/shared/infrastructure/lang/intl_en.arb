@@ -67,7 +67,7 @@
     "survey_submitted": "Survey submitted successfully",
     "survey_new": "New Survey",
     "survey_info": "Info",
-    "survey_participants": "Participants",
+    "survey_participants": "Users",
     "survey_stats": "Stats",
     "survey_edit": "Survey Edit",
     "question_edit": "Edit Question",
@@ -129,6 +129,7 @@
     "password_reset": "Reset Password",
     "password_change": "Change Password",
     "password_dont_match": "Passwords do not match",
+    "password_length_error": "Password must have at least 8 caracters",
     "notifications_page_title": "Notifications",
     "delete_account_page_title": "Delete Account",
     "delete_account_warning": "Are you sure you want to delete your account?",
@@ -205,6 +206,7 @@
     "survey_create_page_title": "Create a New Survey",
     "survey_create_page_title_ai": "Create a New Survey with AI",
     "user_create": "Create User",
+    "user_create_page_title": "Create a New User",
     "role": "Role",
     "organization_create_page_title": "Create a New Organization",
     "organization_name": "Organization Name",
@@ -361,5 +363,9 @@
     "organization_edit_page_title": "Edit Organization",
     "calendar_answered": "Answered: {boolean}",
     "question": "question",
-    "questions": "questions"
+    "questions": "questions",
+    "edit_user": "Edit user",
+    "delete_account_question": "Are you sure you want to delete your account?",
+    "survey_create_dialog_title": "Create Survey",
+    "add_user": "Add User"
 }

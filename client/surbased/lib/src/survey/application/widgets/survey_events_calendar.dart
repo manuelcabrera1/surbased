@@ -98,7 +98,8 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
             _events[eventDate]!.add({
               'surveyName': survey.name,
               'surveyDescription': survey.description,
-              'surveyCategory': categoryProvider.getCategoryById(survey.categoryId).name,
+              'surveyCategory': getCategoryName(context, categoryProvider.getCategoryById(survey.categoryId).name),
+              'surveyCategoryName': categoryProvider.getCategoryById(survey.categoryId).name,
               'surveyAnswered': authProvider.surveysAnswers.any((answer) => answer.surveyId == survey.id) ? t.yes : t.no,
             });
           }
@@ -218,7 +219,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                color: theme.cardColor,
                 elevation: 2,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -290,7 +291,7 @@ class _SurveyEventsCalendarState extends State<SurveyEventsCalendar> {
                                             Row(
                                               children: [
                                                 Icon(
-                                                  getCategoryIcon(event['surveyCategory']),
+                                                  getCategoryIcon(event['surveyCategoryName']),
                                                   color: theme.colorScheme.onSurfaceVariant,
                                                   size: 18,
                                                 ),

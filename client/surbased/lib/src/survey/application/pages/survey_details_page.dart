@@ -262,7 +262,7 @@ class _SurveyDetailsPageState extends State<SurveyDetailsPage>
       ),
       floatingActionButton: tabController.index == 1
           ? FloatingActionButton(
-              heroTag: 'participants',
+              heroTag: '${widget.hashCode}',
               onPressed: () => _showAddParticipantsModal(),
               tooltip: t.survey_add_participant,
               child: const Icon(Icons.person_add),

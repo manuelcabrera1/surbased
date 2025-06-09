@@ -9,7 +9,7 @@ import 'package:surbased/src/survey/application/widgets/survey_invitation_dialog
 
 class FirebaseService {
   final _firebaseMessaging = FirebaseMessaging.instance;
-  final String _baseUrl = 'http://192.168.1.69:8000/fcm-token';
+  final String _baseUrl = 'http://10.0.2.2:8000/fcm-token';
 
 
   Future<String?> initNotifications() async {

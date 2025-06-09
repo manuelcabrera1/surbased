@@ -94,7 +94,6 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
             surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] == 'requested_pending';
         final isInvited = surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] != null &&
             surveyProvider.pendingAssignmentsInCurrentSurvey[user.id.toString()] == 'invited_pending';
-
         return ListTile(
           onTap: () {
             Navigator.pushNamed(context, AppRoutes.userDetails, 
@@ -106,7 +105,7 @@ class _SurveyParticipantsState extends State<SurveyParticipants> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (user.organizationId != null && user.organizationId != authProvider.user!.organizationId)
+              if (user.organizationId != null && user.organizationId != surveyProvider.currentSurvey!.organizationId)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,

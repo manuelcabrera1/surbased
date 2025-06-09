@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class OrganizationService {
-  final String _baseUrl = 'http://192.168.1.69:8000/organizations';
+  final String _baseUrl = 'http://10.0.2.2:8000/organizations';
 
   Future<Map<String, dynamic>> createOrganization(String name, String token) async {
     try {

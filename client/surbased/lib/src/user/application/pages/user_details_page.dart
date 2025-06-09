@@ -195,9 +195,17 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(t.profile_page_title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
+          },
+        ),
         actions: [
             PopupMenuButton(
                 icon: const Icon(Icons.more_vert),
+
                 itemBuilder: (context) => [
                       PopupMenuItem(
                         onTap: () => {

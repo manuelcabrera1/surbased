@@ -79,9 +79,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
     final surveyProvider = Provider.of<SurveyProvider>(context);
     final t = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    //print(surveyProvider.currentSurvey!.toJson());
 
-    //final canContinue = surveyProvider.isLoading || surveyProvider.currentSurvey!.questions.length < 2;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.survey_add_questions_page_title),
@@ -170,7 +168,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
         
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'add',
+        heroTag: '${widget.hashCode}',
         onPressed: () => _showAddEditQuestionDialog(),
         child: const Icon(Icons.add),
       ),
@@ -284,7 +282,7 @@ class _SurveyAddQuestionsPageState extends State<SurveyAddQuestionsPage> {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 8.0),
                                         child: Text(
-                                          "(value: ${option.points})",
+                                          "(valor: ${option.points})",
                                           style: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
                                         ),
                                       ),

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class CategoryService {
-  final String _baseUrl = 'http://192.168.1.69:8000/categories';
+  final String _baseUrl = 'http://10.0.2.2:8000/categories';
 
   Future<Map<String, dynamic>> getCategories(
       String? organizationId, String token) async {

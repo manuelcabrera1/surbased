@@ -321,7 +321,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: role == 'researcher' || role == 'admin'
           ? FloatingActionButton(
-              heroTag: 'create',
+              heroTag: '${widget.hashCode}',
               shape: const CircleBorder(),
               onPressed: () {
                 if (role == 'researcher') {

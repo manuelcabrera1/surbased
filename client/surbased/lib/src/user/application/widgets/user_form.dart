@@ -8,6 +8,8 @@ import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/auth/application/widgets/date_form_field_widget.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:surbased/src/organization/application/provider/organization_provider.dart';
+import 'package:surbased/src/organization/domain/organization_model.dart';
 import 'package:surbased/src/user/domain/user_model.dart';
 import 'package:surbased/src/user/application/provider/user_provider.dart';
 
@@ -30,7 +32,7 @@ class _UserFormState extends State<UserForm> {
   final _passwordController = TextEditingController();
   DateTime? _birthdate;
   String? _gender;
-  String _selectedRole = "participant";
+  String? _selectedRole;
 
   @override
   void dispose() {
@@ -64,14 +66,15 @@ class _UserFormState extends State<UserForm> {
             organization: _organizationController.text,
             email: _emailController.text,
             birthdate: DateFormat('yyyy-MM-dd').format(_birthdate!),
-            gender: _gender!.toLowerCase()
+            gender: _gender!.toLowerCase(),
+            isCurrentUser: false
           );
         }
         else {
           isSuccess = await authProvider.register(
             _nameController.text,
             _lastNameController.text,
-            _selectedRole,
+            _selectedRole ?? "participant",
             _organizationController.text,
             _emailController.text,
             _passwordController.text,
@@ -83,10 +86,20 @@ class _UserFormState extends State<UserForm> {
           if (mounted) {
             if (!widget.isCreate && widget.user == null) {
               _navigateToLogin();
-            } else {
+            }
+            else {
               await userProvider.getUsers(authProvider.token!, null, null);
               if (mounted) {
-                Navigator.popUntil(context, (route) => route.isFirst);
+                if (widget.user != null) {
+                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.userDetails,
+                    arguments: widget.user!.id
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
               }
             }
           }
@@ -114,21 +127,42 @@ class _UserFormState extends State<UserForm> {
     return null;
   }
 
+
+
+
+  String? _passwordValidator(String? value) {
+    if (value == null || value.isEmpty || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.input_error_required;
+    }
+
+    if (value.length < 8) {
+      return AppLocalizations.of(context)!.password_length_error;
+    }
+    return null;
+  }
+
+  
+
   @override
-  void initState() {
-    super.initState();
-    if (widget.user != null) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final organizationProvider = Provider.of<OrganizationProvider>(context, listen: false);
+        if (widget.user != null) {
       if (widget.user!.name != null) _nameController.text = widget.user!.name!;
       if (widget.user!.lastname != null) _lastNameController.text = widget.user!.lastname!;
       _emailController.text = widget.user!.email;
-      if (widget.user!.organizationId != null) _organizationController.text = widget.user!.organizationId!;
-      if (widget.user!.birthdate != null) _birthdate = widget.user!.birthdate;
+      if (widget.user!.organizationId != null) _organizationController.text = organizationProvider.getOrganizationName(widget.user!.organizationId!);
+      
       setState(() {
-        _gender = widget.user!.gender;
+        if (widget.user!.birthdate != null) _birthdate = widget.user!.birthdate;
+        if (widget.user!.gender != null) _gender = widget.user!.gender;
         _selectedRole = widget.user!.role;
       });
       
     }
+    });
+    
   }
 
   @override
@@ -169,7 +203,7 @@ class _UserFormState extends State<UserForm> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                if (widget.isCreate) ...[
+                if (authProvider.userRole == "admin" ) ...[
                   DropdownButtonFormField<String>(
                   value: _selectedRole,
                   decoration: InputDecoration(
@@ -237,7 +271,7 @@ class _UserFormState extends State<UserForm> {
                     labelText: t.password,
                     prefixIcon: const Icon(Icons.lock),
                   ),
-                  validator: _fieldValidator,
+                  validator: _passwordValidator,
                 ),
                 const SizedBox(height: 20),
                 DateFormField(
@@ -246,6 +280,7 @@ class _UserFormState extends State<UserForm> {
                   initialDate: _birthdate,
                   onChanged: (date) =>
                       setState(() => _birthdate = date),
+                  required: _selectedRole == "participant",
                 ),
                 const SizedBox(height: 20),
                 GenderFormField(
@@ -254,6 +289,7 @@ class _UserFormState extends State<UserForm> {
                   initialGender: _gender,
                   onChanged: (gender) =>
                       setState(() => _gender = gender),
+                  required: _selectedRole == "participant",       
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(

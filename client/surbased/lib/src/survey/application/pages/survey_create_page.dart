@@ -57,7 +57,7 @@ class SurveyCreatePageState extends State<SurveyCreatePage> {
                   if (widget.isGeneratingWithAI) ...[
                     const SizedBox(height: 20),
                     Padding(padding: const EdgeInsets.symmetric(horizontal: 10), 
-                    child: Text('Complete the following fields to generate the survey. You can edit it later.', style: theme.textTheme.bodyMedium?.copyWith(
+                    child: Text('Completa los siguientes campos para generar el cuestionario. Podrás editarlo más tarde.', style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),)),
                   ],

@@ -65,7 +65,7 @@
     "survey_submitted": "Cuestionario enviado correctamente",
     "survey_new": "Nuevo cuestionario",
     "survey_info": "Información",
-    "survey_participants": "Participantes",
+    "survey_participants": "Usuarios",
     "survey_stats": "Estadísticas",
     "survey_edit": "Editar cuestionario",
     "question_edit": "Editar pregunta",
@@ -127,6 +127,7 @@
     "password_reset": "Restablecer Contraseña",
     "password_change": "Cambiar contraseña",
     "password_dont_match": "Las contraseñas no coinciden",
+    "password_length_error": "La contraseña debe tener al menos 8 caracteres",
     "notifications_page_title": "Notificaciones",
     "delete_account_page_title": "Eliminar Cuenta",
     "delete_account_warning": "Advertencia: Esta acción no se puede deshacer",
@@ -225,6 +226,7 @@
     "request": "Solicitar",
     "survey_create_page_title_ai": "Crear un Nuevo Cuestionario con IA",
     "user_create": "Crear Usuario",
+    "user_create_page_title": "Crear un Nuevo Usuario",
     "role": "Rol",
     "organization_create_page_title": "Crear una Nueva Organización",
     "organization_name": "Nombre de la Organización",
@@ -361,5 +363,9 @@
     "organization_edit_page_title": "Editar Organización",
     "calendar_answered": "Respondido: {boolean}",
     "question": "pregunta",
-    "questions": "preguntas"
+    "questions": "preguntas",
+    "edit_user": "Editar usuario",
+    "delete_account_question": "¿Estás seguro de que quieres eliminar tu cuenta?",
+    "survey_create_dialog_title": "Crear Cuestionario",
+    "add_user": "Agregar usuario"
 }

@@ -1,8 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:surbased/src/auth/application/provider/auth_provider.dart';
 import 'package:surbased/src/config/app_routes.dart';
 import 'package:surbased/src/survey/application/provider/answer_provider.dart';
+import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import 'package:surbased/src/survey/application/provider/survey_provider.dart';
 import '../widgets/survey_question_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -56,7 +58,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(answerProvider.error!)),
+            SnackBar(content: Text(answerProvider.error ?? '')),
           );
         }
       }
@@ -95,6 +97,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
   }
 
   void _showGoBackConfirmationDialog() {
+    final surveyProvider = Provider.of<SurveyProvider>(context, listen: false);
     final answerProvider = Provider.of<AnswerProvider>(context, listen: false);
     final t = AppLocalizations.of(context)!;
 
@@ -113,8 +116,9 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
             ),
             TextButton(
               onPressed: () {
+                surveyProvider.clearCurrentSurvey();
                 answerProvider.clearAllCurrentInfo();
-                Navigator.pop(context);
+                Navigator.popUntil(context, (route) => route.isFirst);
               },
               child: Text(t.go_back),
             ),
@@ -137,6 +141,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+
     return Scaffold(
       appBar: AppBar(
         title: Text(t.survey_complete),
@@ -152,7 +157,7 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
           key: _formKey,
           child: Column(
             children: [
-              Expanded(
+              if (surveyProvider.currentSurvey != null) ...[Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(0),
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -173,6 +178,8 @@ class _SurveyCompletePageState extends State<SurveyCompletePage> {
                     ? const CircularProgressIndicator(strokeWidth: 2)
                     : Text(t.submit),
               ),
+              ],          
+              
             ],
           ),
         ),

@@ -37,7 +37,7 @@ async def test_update_user_success(db_session, admin_token):
         "email": "updated@test.com",
         "name": "Updated",
         "lastname": "User",
-        "organization": str(org2.id),
+        "organization": str(org2.name),
         "birthdate": "1990-01-01",
         "gender": "male",
         "allow_notifications": True

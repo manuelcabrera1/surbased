@@ -37,15 +37,6 @@ class CreateResourceDialog extends StatelessWidget {
             const SizedBox(height: 12),
             _buildOption(
               context,
-              icon: Icons.assignment_outlined,
-              title: t.create_survey,
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.surveyCreate);
-              },
-            ),
-            const SizedBox(height: 12),
-            _buildOption(
-              context,
               icon: Icons.person_add_outlined,
               title: t.create_user,
               onTap: () {

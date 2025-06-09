@@ -62,6 +62,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
       return AppLocalizations.of(context)!.input_error_required;
     }
+    if (value.length < 8) {
+      return AppLocalizations.of(context)!.password_length_error;
+    }
     return null;
   }
 

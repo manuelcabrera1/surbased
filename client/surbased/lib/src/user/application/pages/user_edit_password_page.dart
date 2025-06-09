@@ -58,14 +58,23 @@ class _UserEditPasswordPageState extends State<UserEditPasswordPage> {
     if (value == null || value.isEmpty || value.trim().isEmpty) {
       return AppLocalizations.of(context)!.input_error_required;
     }
+    if (value.length < 8) {
+      return AppLocalizations.of(context)!.password_length_error;
+    }
     return null;
   }
 
   String? _confirmPasswordValidator(String? value) {
-    _fieldValidator(value);
+    if (value == null || value.isEmpty || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.input_error_required;
+    }
+    if (value.length < 8) {
+      return AppLocalizations.of(context)!.password_length_error;
+    }
     if (value != _passwordController.text) {
       return AppLocalizations.of(context)!.password_dont_match;
     }
+
     return null;
   }
 
